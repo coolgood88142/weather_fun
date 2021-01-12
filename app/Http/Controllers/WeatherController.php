@@ -24,4 +24,19 @@ class WeatherController extends Controller
 
         dd($data);
     }
+
+    public function getArticlesApiData(){
+        $client = new \GuzzleHttp\Client();
+        $cityCount = 23;
+
+        $data = [];
+        for($i = 1; $i < $cityCount; $i++){
+            $url = 'https://smiletaiwan.cw.com.tw/city/' . $i;
+            $response = $client->get($url);
+            $json = json_decode($response->getBody());
+            array_push($data, $json);
+        }
+
+        dd($data);
+    }
 }

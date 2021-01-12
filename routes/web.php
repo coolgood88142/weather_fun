@@ -15,4 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/city', function () {
+    return view('city');
+});
+
 Route::get('/weather','WeatherController@getWeatherApiData');
+
+Route::get('/articles','WeatherController@getArticlesApiData');
