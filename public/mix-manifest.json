@@ -1,6 +1,7 @@
 {
     "/js/app.js": "/js/app.js",
     "/css/app.css": "/css/app.css",
-    "/js/taiwan.js": "/js/taiwan.js",
-    "/js/taiwan.min.js": "/js/taiwan.min.js"
+    "/js/augurio-taiwan.js": "/js/augurio-taiwan.js",
+    "/js/augurio-taiwan.min.js": "/js/augurio-taiwan.min.js",
+    "/js/taiwan.js": "/js/taiwan.js"
 }

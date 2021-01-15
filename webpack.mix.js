@@ -12,6 +12,8 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/js')
+   .js('resources/js/augurio-taiwan.js', 'public/js')
+   .js('resources/js/augurio-taiwan.min.js', 'public/js')
    .js('resources/js/taiwan.js', 'public/js')
-   .js('resources/js/taiwan.min.js', 'public/js')
+    // .sass('resources/sass/augurio-taiwan.scss', 'public/css')
     .sass('resources/sass/app.scss', 'public/css');
