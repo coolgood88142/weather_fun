@@ -15,10 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/weather', function () {
+Route::get('/test', function () {
     return view('weather');
 });
 
-// Route::get('/weather','WeatherController@getWeatherApiData');
+Route::get('/weather','WeatherController@getWeatherApiData');
 
-// Route::get('/articles','WeatherController@getArticlesApiData');
+Route::get('/articles','WeatherController@getArticlesApiData');

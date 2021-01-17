@@ -15,6 +15,10 @@ class CreateUserInfoTable extends Migration
     {
         Schema::create('user_info', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('account', 30);
+            $table->string('password', 30);
+            $table->string('name', 10);
+            $table->Integer('city_id');
             $table->timestamps();
         });
     }

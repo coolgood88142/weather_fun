@@ -42,13 +42,13 @@ hr {
   border-bottom: solid 2px white;
 }
 
-.forcast h2,
+.forcast h3,
 .forcast h4,
 .forcast h5 {
   margin: 0;
 }
 
 .forcast h2 {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
