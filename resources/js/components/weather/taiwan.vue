@@ -178,16 +178,16 @@ export default {
                 let ozone = data[index][7].location.weatherElement[0].time[29].elementValue
                 dataArray.push(ozone)
 
-                let wdir = data[index][4].location[0].weatherElement[1].elementValue
+                let wdir = data[index][2].location[0].weatherElement[1].elementValue
                 dataArray.push(wdir)
 
-                let wdsd = data[index][4].location[0].weatherElement[2].elementValue
+                let wdsd = data[index][2].location[0].weatherElement[2].elementValue
                 dataArray.push(wdsd)
 
-                let humd = data[index][4].location[0].weatherElement[4].elementValue
+                let humd = data[index][2].location[0].weatherElement[4].elementValue
                 dataArray.push(Math.round((humd)*100) + "%")
 
-                let pres = data[index][4].location[0].weatherElement[5].elementValue
+                let pres = data[index][2].location[0].weatherElement[5].elementValue
                 dataArray.push(pres)
 
                 obj.$emit('save-city-data', dataArray)
