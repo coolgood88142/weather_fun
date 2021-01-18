@@ -1,11 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use LINE\LINEBot\HTTPClient\CurlHTTPClient;
+use App\Http\Controllers\Controller;
 use LINE\LINEBot;
-
+use LINE\LINEBot\Constant\HTTPHeader;
+use LINE\LINEBot\SignatureValidator;
+use LINE\LINEBot\HTTPClient\CurlHTTPClient;
+use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
+use Exception;
 class LineBotController extends Controller
 {
     public function getMessageWeather(Request $request){
