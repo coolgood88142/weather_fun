@@ -22,3 +22,5 @@ Route::get('/test', function () {
 Route::get('/weather','WeatherController@getWeatherApiData');
 
 Route::get('/articles','WeatherController@getArticlesApiData');
+
+Route::get('/bot','LineBotController@getMessageWeather');

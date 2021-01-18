@@ -120,34 +120,10 @@ class WeatherController extends Controller
                                 dd($trip);
                             }
                         }
-                        
-                        
-    
-                        // if($lastNum != null){
-                            
-                            
-                        // }
                     }
                 }
             }
         }
-
-        dd($articlesArray);
-        // $content = $this->crawlerService->getOriginalData($url);
-        // dd($content->html());
-
-        // $response = $client->get($url);
-        // $json = json_decode($response->getBody());
-        // array_push($data, $json);
-        // $cityCount = 23;
-        //     for($i = 1; $i < $cityCount; $i++){
-        //         $url = 'https://smiletaiwan.cw.com.tw/city/' . $i;
-        //         $response = $client->get($url);
-        //         $json = json_decode($response->getBody());
-        //         array_push($articlesArray, $json);
-        //     }
-
-        dd($crawler);
 
         //這段是要寫到elesastic
         // foreach($articlesArray as $article){
