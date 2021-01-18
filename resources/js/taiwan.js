@@ -8,18 +8,34 @@ let app = new Vue({
     cityEn: "縣市英文",
     climate: "顯示氣候",
     temperature: "顯示溫度",
-    rain: "降雨機率",
+    rain: "0%",
+    rainPH: '酸雨PH值',
+    uv: '紫外線指數',
+    earthquake: '地震',
+    ozone:'臭氧',
+    wdir: '風向',
+    wdsd: '風速',
+    humd: '相對溼度',
+    pres: '氣壓'
   },
   components: {
     'taiwan': taiwan,
   },
 	methods: {
-		saveCityData(cardArray) {
-      this.cityCh = cardArray[0]
-      this.cityEn = cardArray[1]
-      this.temperature = cardArray[2]
-      this.rain = cardArray[3]
-      this.climate = cardArray[4]
+		saveCityData(weatherArray) {
+      this.cityCh = weatherArray[0]
+      this.cityEn = weatherArray[1]
+      this.temperature = weatherArray[2]
+      this.rain = weatherArray[3]
+      this.climate = weatherArray[4]
+      this.rainPH = weatherArray[5]
+      this.uv = weatherArray[6]
+      this.earthquake = weatherArray[7]
+      this.ozone = weatherArray[8]
+      this.wdir = weatherArray[9]
+      this.wdsd = weatherArray[10]
+      this.humd = weatherArray[11]
+      this.pres = weatherArray[12]
 		},
 	},
 })

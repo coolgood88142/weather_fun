@@ -249,8 +249,24 @@ __webpack_require__.r(__webpack_exports__);
         dataArray.push(mint + '-' + maxt);
         var pop = data[index][0].location[0].weatherElement[1].time[type].parameter.parameterName;
         dataArray.push(pop);
-        var climate = data[index][1].locations[0].location[0].weatherElement[10].time[type - 1].elementValue[0].value;
+        var climate = data[index][1].locations[0].location[0].weatherElement[10].time[type].elementValue[0].value;
         dataArray.push(climate);
+        var rainPH = data[index][5].datasetInfo.datasetDescription;
+        dataArray.push(rainPH);
+        var uv = data[index][6].weatherElement.location[0].value;
+        dataArray.push(uv);
+        var earthquake = data[index][8].earthquake[0].reportContent;
+        dataArray.push(earthquake);
+        var ozone = data[index][7].location.weatherElement[0].time[29].elementValue;
+        dataArray.push(ozone);
+        var wdir = data[index][4].location[0].weatherElement[1].elementValue;
+        dataArray.push(wdir);
+        var wdsd = data[index][4].location[0].weatherElement[2].elementValue;
+        dataArray.push(wdsd);
+        var humd = data[index][4].location[0].weatherElement[4].elementValue;
+        dataArray.push(Math.round(humd * 100) + "%");
+        var pres = data[index][4].location[0].weatherElement[5].elementValue;
+        dataArray.push(pres);
         obj.$emit('save-city-data', dataArray);
         return;
       });
@@ -1775,18 +1791,34 @@ var app = new Vue({
     cityEn: "縣市英文",
     climate: "顯示氣候",
     temperature: "顯示溫度",
-    rain: "降雨機率"
+    rain: "0%",
+    rainPH: '酸雨PH值',
+    uv: '紫外線指數',
+    earthquake: '地震',
+    ozone: '臭氧',
+    wdir: '風向',
+    wdsd: '風速',
+    humd: '相對溼度',
+    pres: '氣壓'
   },
   components: {
     'taiwan': _components_weather_taiwan_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   methods: {
-    saveCityData: function saveCityData(cardArray) {
-      this.cityCh = cardArray[0];
-      this.cityEn = cardArray[1];
-      this.temperature = cardArray[2];
-      this.rain = cardArray[3];
-      this.climate = cardArray[4];
+    saveCityData: function saveCityData(weatherArray) {
+      this.cityCh = weatherArray[0];
+      this.cityEn = weatherArray[1];
+      this.temperature = weatherArray[2];
+      this.rain = weatherArray[3];
+      this.climate = weatherArray[4];
+      this.rainPH = weatherArray[5];
+      this.uv = weatherArray[6];
+      this.earthquake = weatherArray[7];
+      this.ozone = weatherArray[8];
+      this.wdir = weatherArray[9];
+      this.wdsd = weatherArray[10];
+      this.humd = weatherArray[11];
+      this.pres = weatherArray[12];
     }
   }
 });

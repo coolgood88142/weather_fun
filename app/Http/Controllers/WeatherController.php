@@ -29,6 +29,7 @@ class WeatherController extends Controller
         $weatherUrl = 'https://opendata.cwb.gov.tw/api';
         $cityData = Config::get('city');
         $weathers = Config::get('weather');
+        $automatic = Config::get('automatic');
 
         $data = [];
         $startTime = 6;
@@ -49,10 +50,15 @@ class WeatherController extends Controller
                 $count = 0;
                 foreach($weathers as $weather){
                     $locationName = urlencode($key);
+                    if($count == 2 || $count == 3 || $count == 4){
+                        $locationName = urlencode($automatic[$key][$count-2]);
+                    }
                     $url = $weatherUrl . $weather . '?Authorization=' . $token . '&locationName=' . $locationName;
+                    
                     $response = $client->get($url);
                     $json = json_decode($response->getBody());
                     array_push($weatherArray, $json->records);
+                    $count++;
                 }
 
                 $name = (object) array('ch'=> $key, 'en'=> $value, 'type' => $type);
@@ -78,53 +84,49 @@ class WeatherController extends Controller
                     if(is_array($value)){
                         foreach($value as $city){
                             $attractionsUrl = $url . $city;
-                            $content = $this->crawlerService->getOriginalData($attractionsUrl);
-                            $trip = $pageContent->filter('div.layout-blog style-grid > div.col-md-6');
-                            $date = $trip->filter('span.date')->first()->text();
-                            $title = $trip->filter('h4.entry-title > a')->first();
-                            $tripUrl = $title->getUri();
-                            $entrytitle = $title->text();
-                            $categorys = $trip->filter('span.category > a');
-                            $tag = '';
-                            foreach($categorys as $category){
-                                $tag = $tag . $category->text() . '、';
-                            }
-    
-                            $data = (object) array('date'=> $date, 'url'=> $tripUrl, 'title' => $entrytitle, 'tag' => $tag);
+                            
                             array_push($articlesArray, $data);
                         }
                     }else{
                         $attractionsUrl = $url . $value;
-                        $content = $this->crawlerService->getOriginalData($attractionsUrl)->html();
-                        $content = new Crawler($content);
-                        dd($content->filter('a.page-numbers')->html());
-                        // $lastNum = $content->filter('a.page-numbers')->last()->text();
-                        
-    
-                        if($lastNum != null){
+                        $content = $this->crawlerService->getOriginalData($attractionsUrl);
+                        $isPagination = $content->matches('div.apus-pagination');
+
+                        if($isPagination){
+                            $lastNum = $content->filter('a.page-numbers')->last()->text();
                             $lastNum = (int)$lastNum;
                             foreach($lastNum as $num){
                                 $numUrl = $attractionsUrl . '\/page\/' . $num;
-                                $pageContent = $this->crawlerService->getOriginalData($numUrl)->html();
-                                $pageContent = new Crawler($pageContent);
+                                $pageContent = $this->crawlerService->getOriginalData($numUrl);
                                 $trips = $pageContent->filter('div.layout-blog style-grid > div.col-md-6');
                                 foreach($trips as $trip){
-                                    $date = $trip->filter('span.date')->first()->text();
-                                    $title = $trip->filter('h4.entry-title > a')->first();
-                                    $tripUrl = $title->getUri();
-                                    $entrytitle = $title->text();
-                                    $categorys = $trip->filter('span.category > a');
-                                    $tag = '';
-                                    foreach($categorys as $category){
-                                        $tag = $tag . $category->text() . '、';
-                                    }
+                                    $data = $this->getCrawlerAttractionsData($trip);
     
-                                    $data = (object) array('date'=> $date, 'url'=> $tripUrl, 'title' => $entrytitle, 'tag' => $tag);
+                                    // $data = (object) array('date'=> $date, 'url'=> $tripUrl, 'title' => $entrytitle, 'tag' => $tag);
                                     array_push($articlesArray, $data);
                                 }
                             }
+                        }else{
+                            $arrat = [];
+                            $trips = $content->filter('article')->each(function (Crawler $node, $i) {
+                                return $node;
+                            });
+
+                            dd($trips);
+                            // $trips = $content->filter('div.layout-blog style-grid > div')->nextAll();
                             
+                            dd($arrat);
+                            foreach($trips as $trip){
+                                dd($trip);
+                            }
                         }
+                        
+                        
+    
+                        // if($lastNum != null){
+                            
+                            
+                        // }
                     }
                 }
             }
@@ -168,5 +170,23 @@ class WeatherController extends Controller
         //     $conn = $this->elasticService->connElastic();
         //     $this->elasticService->createElastic($conn, $params);
         // }
+    }
+
+    public function getCrawlerAttractionsData(Crawler $crawler, Array $articlesArray){
+        foreach($trips as $trip){
+            $date = $crawler->filter('span.date')->first()->text();
+            $title = $crawler->filter('h4.entry-title > a')->first();
+            $tripUrl = $title->getUri();
+            $entrytitle = $title->text();
+            $categorys = $crawler->filter('span.category > a');
+            $tag = '';
+            foreach($categorys as $category){
+                $tag = $tag . $category->text() . '、';
+            }
+        
+            $data = (object) array('date'=> $date, 'url'=> $tripUrl, 'title' => $entrytitle, 'tag' => $tag);
+            dd($data);
+        }
+        return $articlesArray;
     }
 }

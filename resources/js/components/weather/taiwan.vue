@@ -157,13 +157,39 @@ export default {
                 let type = data[index][13].type
                 let mint = data[index][0].location[0].weatherElement[2].time[type].parameter.parameterName
                 let maxt = data[index][0].location[0].weatherElement[4].time[type].parameter.parameterName
+               
                 dataArray.push(mint + '-' + maxt)
 
                 let pop = data[index][0].location[0].weatherElement[1].time[type].parameter.parameterName
                 dataArray.push(pop)
 
-                let climate = data[index][1].locations[0].location[0].weatherElement[10].time[type-1].elementValue[0].value
+                let climate = data[index][1].locations[0].location[0].weatherElement[10].time[type].elementValue[0].value
                 dataArray.push(climate)
+                
+                let rainPH = data[index][5].datasetInfo.datasetDescription
+                dataArray.push(rainPH)
+
+                let uv = data[index][6].weatherElement.location[0].value
+                dataArray.push(uv)
+
+                let earthquake = data[index][8].earthquake[0].reportContent
+                dataArray.push(earthquake)
+
+                let ozone = data[index][7].location.weatherElement[0].time[29].elementValue
+                dataArray.push(ozone)
+
+                let wdir = data[index][4].location[0].weatherElement[1].elementValue
+                dataArray.push(wdir)
+
+                let wdsd = data[index][4].location[0].weatherElement[2].elementValue
+                dataArray.push(wdsd)
+
+                let humd = data[index][4].location[0].weatherElement[4].elementValue
+                dataArray.push(Math.round((humd)*100) + "%")
+
+                let pres = data[index][4].location[0].weatherElement[5].elementValue
+                dataArray.push(pres)
+
                 obj.$emit('save-city-data', dataArray)
                 return
             });

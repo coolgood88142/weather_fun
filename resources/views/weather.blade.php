@@ -15,11 +15,47 @@
         </div>
       </div>
       <div class="shop-list">
-        <h1>@{{ cityCh }}</h1>
-        <h2>@{{ cityEn }}</h2>
-        <h2>溫度：@{{ temperature }}</h2>
-        <h2>降雨機率：@{{ rain }}%</h2>
-        <h2>未來1週氣候：@{{ climate }}</h2>
+        <h1>@{{ cityCh }}</h1><br/>
+        <h2>@{{ cityEn }}</h2><br/>
+        <div class="row">
+          <div class="col">
+            <h3>溫度：@{{ temperature }}</h3>
+          </div>
+          <div class="col">
+            <h3>降雨機率：@{{ rain }}%</h3>
+          </div>
+          <div class="w-100"></div>
+          <div class="col">
+            <h3>風向：@{{ wdir }}</h3>
+          </div>
+          <div class="col">
+            <h3>風速：@{{ wdsd }}</h3>
+          </div>
+          <div class="w-100"></div>
+          <div class="col">
+            <h3>氣壓：@{{ pres }}</h3>
+          </div>
+          <div class="col">
+            <h3>相對溼度：@{{ humd }}</h3>
+          </div>
+          <div class="w-100"></div>
+          <div class="col">
+            <h3>紫外線指數：@{{ uv }}</h3>
+          </div>
+          <div class="col">
+            <h3>臭氧累年平均值：@{{ ozone }}</h3>
+          </div>
+          <div class="w-100"></div>
+          <div class="col">
+            <h3>地震報告：@{{ earthquake }}</h3>
+          </div>
+          <div class="w-100"></div>
+          <div class="col">
+          <h3>未來1週氣候：@{{ climate }}</h3>
+          </div>
+        </div>
+        {{-- <h3>當月最高酸雨 pH 值：@{{ rainPH }}</h3> --}}
+        
       </div>
     </div>     
   
