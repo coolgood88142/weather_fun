@@ -11,10 +11,11 @@ class LineBotController extends Controller
         $channelSecret = 'b9d3f9583e6f74c1a9a276bb7bd17ae2';
 
         $httpClient = new \LINE\LINEBot\HTTPClient\CurlHTTPClient($accessToken);
-        $bot = new \LINE\LINEBot($httpClient, ['channelSecret' => $channelSecret ]);
+        $bot = new \LINE\LINEBot($httpClient, ['channelSecret' => $channelSecret]);
         $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello');
-        // dd($textMessageBuilder);
-        $response = $bot->replyMessage('<reply token>', $textMessageBuilder);
+
+        dd($textMessageBuilder);
+        $response = $bot->replyMessage('xxxxxxxxxxxxaaaaaaaa', $textMessageBuilder);
         if ($response->isSucceeded()) {
             echo 'Succeeded!';
             return;
