@@ -150,7 +150,6 @@ export default {
             let data = obj.taiwanData
 			$("path").click(function(e){
                 let index = $(this).attr("data-index")
-                console.log(data[index]);
                 dataArray.push(data[index][13].ch)
                 dataArray.push(data[index][13].en)
 

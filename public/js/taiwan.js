@@ -240,7 +240,6 @@ __webpack_require__.r(__webpack_exports__);
       var data = obj.taiwanData;
       $("path").click(function (e) {
         var index = $(this).attr("data-index");
-        console.log(data[index]);
         dataArray.push(data[index][13].ch);
         dataArray.push(data[index][13].en);
         var type = data[index][13].type;
@@ -1791,9 +1790,9 @@ var app = new Vue({
     cityEn: "縣市英文",
     climate: "顯示氣候",
     temperature: "顯示溫度",
-    rain: "0%",
+    rain: "0",
     rainPH: '酸雨PH值',
-    uv: '紫外線指數',
+    uv: '0',
     earthquake: '地震',
     ozone: '臭氧',
     wdir: '風向',
