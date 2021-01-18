@@ -36,7 +36,7 @@ class LineBotController extends Controller
             $type = 1;
         }
 
-        $text = $request->events[0]['text'];
+        $text = $request->events[0]->getText();
         $pop = '目前無降雨機率資料';
         foreach($cityData as $city){
             foreach($city as $key => $value){
@@ -58,7 +58,7 @@ class LineBotController extends Controller
         
         $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($pop);
 
-        $response = $bot->replyText($request->events[0]['replyToken'], $textMessageBuilder);
+        $response = $bot->replyText($request->events[0]->getReplyToken(), $text);
         if ($response->isSucceeded()) {
             return;
         }
