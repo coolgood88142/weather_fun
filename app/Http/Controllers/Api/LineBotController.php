@@ -46,10 +46,10 @@ class LineBotController extends Controller
 
         $httpClient = new CurlHTTPClient($accessToken);
         $bot = new LINEBot($httpClient, ['channelSecret' => $channelSecret]);
-        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello');
+        $text = $request->events[0]['message']['text'];
+        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($text);
 
-        $response = $bot->replyMessage('hi', $textMessageBuilder);
-        dd($response);
+        $response = $bot->replyMessage('<reply token>', $textMessageBuilder);
         if ($response->isSucceeded()) {
             echo 'Succeeded!';
             return;
