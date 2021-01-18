@@ -55,10 +55,10 @@ class LineBotController extends Controller
         }
 
 
-        
+        Log::info($text);
         $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($pop);
 
-        $response = $bot->replyText($request->events[0]->getReplyToken(), $text);
+        $response = $bot->replyText($request->events[0]->getReplyToken(), $textMessageBuilder);
         if ($response->isSucceeded()) {
             return;
         }
