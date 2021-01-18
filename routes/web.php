@@ -24,3 +24,7 @@ Route::get('/weather','WeatherController@getWeatherApiData');
 Route::get('/articles','WeatherController@getArticlesApiData');
 
 Route::get('/bot','LineBotController@getMessageWeather');
+
+Route::group(['namespace' => 'Api'], function() {
+    Route::post('/line/webhook', 'LineBotController@getMessageWeather')->name('line.webhook');
+});

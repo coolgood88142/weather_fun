@@ -12,19 +12,50 @@ class LineBotController extends Controller
         $accessToken = 'b9z+6EeBQ6i4D9iHJKTgy4oMznvpwYJqllWaigLXXzhm7xx8/WYTsa9zLyyj5Rim2r2m+T/axKZaoRMVeaK+L7ME8RFRYr9xMRhXsh2H+nKazDoe0VP6TikA8B9SYXTRFbXuHAGbA/vIWA0+i43kdAdB04t89/1O/w1cDnyilFU=';
         $channelSecret = 'b9d3f9583e6f74c1a9a276bb7bd17ae2';
 
-        $httpClient = new CurlHTTPClient($accessToken);
-        $bot = new LINEBot($httpClient, ['channelSecret' => $channelSecret]);
-        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello');
-
-        $response = $bot->replyMessage('hi', $textMessageBuilder);
-        dd($response);
-        if ($response->isSucceeded()) {
-            echo 'Succeeded!';
+        $signature = $request->headers->get(HTTPHeader::LINE_SIGNATURE);
+        if (!SignatureValidator::validateSignature($request->getContent(), $channelSecret, $signature)) {
+           
             return;
         }
 
-        // Failed
-        echo $response->getHTTPStatus() . ' ' . $response->getRawBody();
+        $httpClient = new CurlHTTPClient ($accessToken);
+        $lineBot = new LINEBot($httpClient, ['channelSecret' => $channelSecret]);
+
+        try {
+          
+            $events = $lineBot->parseEventRequest($request->getContent(), $signature);
+
+            foreach ($events as $event) {
+                
+                $replyToken = $event->getReplyToken();
+                $text = $event->getText();// 得到使用者輸入
+                $lineBot->replyText($replyToken, $text);// 回復使用者輸入
+                //$textMessage = new TextMessageBuilder("你好");
+              //  $lineBot->replyMessage($replyToken, $textMessage);
+            }
+        } catch (Exception $e) {
+           
+            return;
+        }
+
+        return;
+
+        // $httpClient = new CurlHTTPClient ($lineAccessToken);
+        // $lineBot = new LINEBot($httpClient, ['channelSecret' => $lineChannelSecret]);
+
+        // $httpClient = new CurlHTTPClient($accessToken);
+        // $bot = new LINEBot($httpClient, ['channelSecret' => $channelSecret]);
+        // $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello');
+
+        // $response = $bot->replyMessage('hi', $textMessageBuilder);
+        // dd($response);
+        // if ($response->isSucceeded()) {
+        //     echo 'Succeeded!';
+        //     return;
+        // }
+
+        // // Failed
+        // echo $response->getHTTPStatus() . ' ' . $response->getRawBody();
 
     }
 }
