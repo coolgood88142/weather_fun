@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call('App\Http\Controllers\WeatherController@saveWeatherApiData')->everyTenMinutes();
+        $schedule->call('App\Http\Controllers\WeatherController@saveWeatherApiData')->everyMinute();
     }
 
     /**
