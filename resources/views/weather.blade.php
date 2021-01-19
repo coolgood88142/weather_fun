@@ -16,7 +16,7 @@
       </div>
       <div class="shop-list">
         <h1>@{{ cityCh }}</h1><br/>
-        <h2>@{{ cityEn }}</h2><br/>
+        {{-- <h2>@{{ cityEn }}</h2><br/> --}}
         <div class="row">
           <div class="col">
             <h3>溫度：@{{ temperature }}</h3>

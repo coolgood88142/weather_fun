@@ -150,43 +150,43 @@ export default {
             let data = obj.taiwanData
 			$("path").click(function(e){
                 let index = $(this).attr("data-index")
-                dataArray.push(data[index][13].ch)
-                dataArray.push(data[index][13].en)
+                dataArray.push(data[index].city)
+                // dataArray.push(data[index][13].en)
 
-                let type = data[index][13].type
-                let mint = data[index][0].location[0].weatherElement[2].time[type].parameter.parameterName
-                let maxt = data[index][0].location[0].weatherElement[4].time[type].parameter.parameterName
+                // let type = data[index][13].type
+                // let mint = data[index][0].location[0].weatherElement[2].time[type].parameter.parameterName
+                // let maxt = data[index][0].location[0].weatherElement[4].time[type].parameter.parameterName
                
-                dataArray.push(mint + '-' + maxt)
+                dataArray.push(data[index].temperature)
 
-                let pop = data[index][0].location[0].weatherElement[1].time[type].parameter.parameterName
-                dataArray.push(pop)
+                let rain = data[index].probability_of_precipitation
+                dataArray.push(rain)
 
-                let climate = data[index][1].locations[0].location[0].weatherElement[10].time[type].elementValue[0].value
+                let climate = data[index].next_week_weather
                 dataArray.push(climate)
                 
-                let rainPH = data[index][5].datasetInfo.datasetDescription
+                let rainPH = data[index].acid_rain_ph
                 dataArray.push(rainPH)
 
-                let uv = data[index][6].weatherElement.location[0].value
+                let uv = data[index].ultraviolet_index
                 dataArray.push(uv)
 
-                let earthquake = data[index][8].earthquake[0].reportContent
+                let earthquake = data[index].seismicity
                 dataArray.push(earthquake)
 
-                let ozone = data[index][7].location.weatherElement[0].time[29].elementValue
+                let ozone = data[index].ozone_year_avg
                 dataArray.push(ozone)
 
-                let wdir = data[index][2].location[0].weatherElement[1].elementValue
+                let wdir = data[index].wind_direction
                 dataArray.push(wdir)
 
-                let wdsd = data[index][2].location[0].weatherElement[2].elementValue
+                let wdsd = data[index].anemometer
                 dataArray.push(wdsd)
 
-                let humd = data[index][2].location[0].weatherElement[4].elementValue
+                let humd = data[index].relative_humidity
                 dataArray.push(Math.round((humd)*100) + "%")
 
-                let pres = data[index][2].location[0].weatherElement[5].elementValue
+                let pres = data[index].barometric_pressure
                 dataArray.push(pres)
 
                 obj.$emit('save-city-data', dataArray)

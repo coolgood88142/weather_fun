@@ -24,18 +24,18 @@ let app = new Vue({
 	methods: {
 		saveCityData(weatherArray) {
       this.cityCh = weatherArray[0]
-      this.cityEn = weatherArray[1]
-      this.temperature = weatherArray[2]
-      this.rain = weatherArray[3]
-      this.climate = weatherArray[4]
-      this.rainPH = weatherArray[5]
-      this.uv = weatherArray[6]
-      this.earthquake = weatherArray[7]
-      this.ozone = weatherArray[8]
-      this.wdir = weatherArray[9]
-      this.wdsd = weatherArray[10]
-      this.humd = weatherArray[11]
-      this.pres = weatherArray[12]
+      // this.cityEn = weatherArray[1]
+      this.temperature = weatherArray[1]
+      this.rain = weatherArray[2]
+      this.climate = weatherArray[3]
+      this.rainPH = weatherArray[4]
+      this.uv = weatherArray[5]
+      this.earthquake = weatherArray[6]
+      this.ozone = weatherArray[7]
+      this.wdir = weatherArray[8]
+      this.wdsd = weatherArray[9]
+      this.humd = weatherArray[10]
+      this.pres = weatherArray[11]
 		},
 	},
 })

@@ -32,7 +32,7 @@ class WeatherController extends Controller
         $weathers = Config::get('weather');
         $automatic = Config::get('automatic');
 
-        $data = [];
+        $dataArray = [];
         $startTime = 6;
         $endTime = 18;
         $today = Carbon::now()->timezone('Asia/Shanghai');
@@ -59,11 +59,14 @@ class WeatherController extends Controller
                 $ozoneYearAvg = '';
                 $seismicity = '';
                 $smallAreaSeismicity ='';
-                $acidRainPh = '';
+                $acidRainPh = 0;
                 $sunrise = '';
                 $moonrise = '';
                 $nextWeekWeather = '';
+                
                 foreach($weathers as $weather){
+                    
+
                     $locationName = urlencode($key);
                     if($count == 2 || $count == 3 || $count == 4){
                         $locationName = urlencode($automatic[$key][$count-2]);
@@ -73,11 +76,14 @@ class WeatherController extends Controller
                     $response = $client->get($url);
                     $weatherData = json_decode($response->getBody())->records;
                     if(isset($weatherData)){
-                        if($count == 1){
-                            $mint = $weatherData->location;
+                        if($count == 0){
+                            $mint = $weatherData->location[0]->weatherElement[2]->time[$type]->parameter->parameterName;
                             $maxt = $weatherData->location[0]->weatherElement[4]->time[$type]->parameter->parameterName;
                             $temperature = $mint . ' - ' . $maxt;
                             $probabilityOfPrecipitation = $weatherData->location[0]->weatherElement[1]->time[$type]->parameter->parameterName;
+                        }
+
+                        if($count == 1){
                             $nextWeekWeather = $weatherData->locations[0]->location[0]->weatherElement[10]->time[$type]->elementValue[0]->value;
                         }
     
@@ -87,10 +93,18 @@ class WeatherController extends Controller
                             $relativeHumidity = $weatherData->location[0]->weatherElement[4]->elementValue;
                             $barometricPressure = $weatherData->location[0]->weatherElement[5]->elementValue;
                         }
-                        
+
+                        if($count == 5){
+                            $rainPh = $weatherData->weatherElement[0]->location;
+                            $length = count($rainPh);
+
+                            if($length > 0){
+                                $acidRainPh = $rainPh.value;
+                            }
+                        }
     
                         if($count == 6){
-                            $ultravioletIndex = $weatherData->weatherElement->location[0]->value;
+                            $ultravioletIndex = (String)$weatherData->weatherElement->location[0]->value;
                         }
     
                         if($count == 7){
@@ -104,13 +118,17 @@ class WeatherController extends Controller
                         if($count == 9){
                             $smallAreaSeismicity = $weatherData->earthquake[0]->reportContent;
                         }
+
+                        if($count == 11){
+                            $sunrise = $weatherData->note;
+                        }
+
+                        if($count == 12){
+                            $moonrise = $weatherData->note;
+                        }
                         
                         $count++;
                     }
-                   
-
-
-                    
                 }
 
                 $data = [
@@ -118,23 +136,34 @@ class WeatherController extends Controller
                     'probability_of_precipitation' => $probabilityOfPrecipitation, 'wind_direction' =>$windDirection,
                     'anemometer' => $anemometer, 'barometric_pressure' => $barometricPressure,
                     'relative_humidity' => $relativeHumidity, 'ultraviolet_index' => $ultravioletIndex,
-                    'seismicity' => '', 'small_area_seismicity' => '',
-                    'acid_rain_ph' => '', 'sunrise' => '',
-                    'ozone_year_avg' => $ozoneYearAvg, 'nextWeekWeather' => $nextWeekWeather,
+                    'seismicity' => $seismicity, 'small_area_seismicity' => $smallAreaSeismicity,
+                    'acid_rain_ph' => $acidRainPh, 'sunrise' => $sunrise, 'moonrise' => $moonrise,
+                    'ozone_year_avg' => $ozoneYearAvg, 'next_week_weather' => $nextWeekWeather,
                 ];
 
-                // dd($data);
-
-                array_push($data, $weatherArray);
+                array_push($dataArray, $data);
             }
         }
 
-        
+        try {
+            $db = DB::table('weather')->insert($dataArray);
 
-        dd($data);
-
+        } catch (Exception $e) {
+            $status = 'error';
+            $message = '新增失敗!';
+            dd($e);
+        }
         
     }
+
+    public function getWeatherData(){
+        $db = DB::table('weather')->get();
+        return view('weather', [
+            'taiwanData' => $db
+        ]);
+    }
+
+
 
     public function getWeatherApiData(){
         $client = new \GuzzleHttp\Client();

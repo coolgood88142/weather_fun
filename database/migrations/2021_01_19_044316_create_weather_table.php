@@ -15,20 +15,21 @@ class CreateWeatherTable extends Migration
     {
         Schema::create('weather', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('city', 30);
-            $table->string('temperature', 30);
+            $table->string('city', 20);
+            $table->string('temperature', 20);
             $table->Integer('probability_of_precipitation');
-            $table->string('anemometer', 30);
-            $table->string('barometric_pressure', 30);
-            $table->Integer('relative_humidity');
+            $table->Integer('wind_direction');
+            $table->string('anemometer', 20);
+            $table->string('barometric_pressure', 100);
+            $table->string('relative_humidity', 20);
             $table->Integer('ultraviolet_index');
-            $table->string('seismicity', 30);
-            $table->string('small_area_seismicity', 30);
+            $table->string('seismicity', 100);
+            $table->string('small_area_seismicity', 100);
             $table->Integer('acid_rain_ph');
-            $table->string('sunrise', 30);
-            $table->string('moonrise', 30);
+            $table->string('sunrise', 100);
+            $table->string('moonrise', 100);
             $table->Integer('ozone_year_avg');
-            $table->string('next_week_weather', 50);
+            $table->string('next_week_weather', 100);
 
             $table->timestamps();
         });

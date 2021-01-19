@@ -240,31 +240,31 @@ __webpack_require__.r(__webpack_exports__);
       var data = obj.taiwanData;
       $("path").click(function (e) {
         var index = $(this).attr("data-index");
-        dataArray.push(data[index][13].ch);
-        dataArray.push(data[index][13].en);
-        var type = data[index][13].type;
-        var mint = data[index][0].location[0].weatherElement[2].time[type].parameter.parameterName;
-        var maxt = data[index][0].location[0].weatherElement[4].time[type].parameter.parameterName;
-        dataArray.push(mint + '-' + maxt);
-        var pop = data[index][0].location[0].weatherElement[1].time[type].parameter.parameterName;
-        dataArray.push(pop);
-        var climate = data[index][1].locations[0].location[0].weatherElement[10].time[type].elementValue[0].value;
+        dataArray.push(data[index].city); // dataArray.push(data[index][13].en)
+        // let type = data[index][13].type
+        // let mint = data[index][0].location[0].weatherElement[2].time[type].parameter.parameterName
+        // let maxt = data[index][0].location[0].weatherElement[4].time[type].parameter.parameterName
+
+        dataArray.push(data[index].temperature);
+        var rain = data[index].probability_of_precipitation;
+        dataArray.push(rain);
+        var climate = data[index].next_week_weather;
         dataArray.push(climate);
-        var rainPH = data[index][5].datasetInfo.datasetDescription;
+        var rainPH = data[index].acid_rain_ph;
         dataArray.push(rainPH);
-        var uv = data[index][6].weatherElement.location[0].value;
+        var uv = data[index].ultraviolet_index;
         dataArray.push(uv);
-        var earthquake = data[index][8].earthquake[0].reportContent;
+        var earthquake = data[index].seismicity;
         dataArray.push(earthquake);
-        var ozone = data[index][7].location.weatherElement[0].time[29].elementValue;
+        var ozone = data[index].ozone_year_avg;
         dataArray.push(ozone);
-        var wdir = data[index][2].location[0].weatherElement[1].elementValue;
+        var wdir = data[index].wind_direction;
         dataArray.push(wdir);
-        var wdsd = data[index][2].location[0].weatherElement[2].elementValue;
+        var wdsd = data[index].anemometer;
         dataArray.push(wdsd);
-        var humd = data[index][2].location[0].weatherElement[4].elementValue;
+        var humd = data[index].relative_humidity;
         dataArray.push(Math.round(humd * 100) + "%");
-        var pres = data[index][2].location[0].weatherElement[5].elementValue;
+        var pres = data[index].barometric_pressure;
         dataArray.push(pres);
         obj.$emit('save-city-data', dataArray);
         return;
@@ -1805,19 +1805,19 @@ var app = new Vue({
   },
   methods: {
     saveCityData: function saveCityData(weatherArray) {
-      this.cityCh = weatherArray[0];
-      this.cityEn = weatherArray[1];
-      this.temperature = weatherArray[2];
-      this.rain = weatherArray[3];
-      this.climate = weatherArray[4];
-      this.rainPH = weatherArray[5];
-      this.uv = weatherArray[6];
-      this.earthquake = weatherArray[7];
-      this.ozone = weatherArray[8];
-      this.wdir = weatherArray[9];
-      this.wdsd = weatherArray[10];
-      this.humd = weatherArray[11];
-      this.pres = weatherArray[12];
+      this.cityCh = weatherArray[0]; // this.cityEn = weatherArray[1]
+
+      this.temperature = weatherArray[1];
+      this.rain = weatherArray[2];
+      this.climate = weatherArray[3];
+      this.rainPH = weatherArray[4];
+      this.uv = weatherArray[5];
+      this.earthquake = weatherArray[6];
+      this.ozone = weatherArray[7];
+      this.wdir = weatherArray[8];
+      this.wdsd = weatherArray[9];
+      this.humd = weatherArray[10];
+      this.pres = weatherArray[11];
     }
   }
 });
