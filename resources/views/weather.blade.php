@@ -61,7 +61,7 @@
   
     <link rel="stylesheet" href="dist/augurio-taiwan.min.css"/>
     <link rel="stylesheet" href="{{mix('css/app.css')}}"/>
-    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="{{mix('js/d3.v3.min.js')}}"></script>
     <script src="{{mix('js/app.js')}}"></script>
     <script src="{{mix('js/taiwan.js')}}"></script>
   </body>
