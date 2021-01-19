@@ -163,6 +163,10 @@ class WeatherController extends Controller
         ]);
     }
 
+    public function deleteWeatherData(){
+        $db = DB::table('weather')->delete();
+    }
+
 
 
     public function getWeatherApiData(){

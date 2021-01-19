@@ -29,4 +29,4 @@ Route::post('/line/webhook', 'LineBotController@getMessageWeather');
 
 Route::get('/weatherApi','WeatherController@saveWeatherApiData');
 
-// Route::get('/getWeatherData','WeatherController@getWeatherData');
+Route::get('/delete','WeatherController@deleteWeatherData');
