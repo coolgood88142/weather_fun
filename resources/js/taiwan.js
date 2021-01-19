@@ -5,7 +5,6 @@ let app = new Vue({
 	el: "#app",
 	data: {
     cityCh: "縣市中文",
-    cityEn: "縣市英文",
     climate: "顯示氣候",
     temperature: "顯示溫度",
     rain: "0",
@@ -24,7 +23,6 @@ let app = new Vue({
 	methods: {
 		saveCityData(weatherArray) {
       this.cityCh = weatherArray[0]
-      // this.cityEn = weatherArray[1]
       this.temperature = weatherArray[1]
       this.rain = weatherArray[2]
       this.climate = weatherArray[3]
