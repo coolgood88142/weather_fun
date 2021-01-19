@@ -140,7 +140,7 @@ class WeatherController extends Controller
                     'seismicity' => $seismicity, 'small_area_seismicity' => $smallAreaSeismicity,
                     'acid_rain_ph' => $acidRainPh, 'sunrise' => $sunrise, 'moonrise' => $moonrise,
                     'ozone_year_avg' => $ozoneYearAvg, 'next_week_weather' => $nextWeekWeather,
-                    'created_at' => $today
+                    'created_at' => Carbon::now()
                 ];
 
                 array_push($dataArray, $data);
