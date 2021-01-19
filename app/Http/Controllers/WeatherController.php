@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use Symfony\Component\DomCrawler\Crawler;
 // use App\Services\ElasticService;
@@ -21,6 +22,118 @@ class WeatherController extends Controller
         // $this->elasticService = $elasticService;
         $this->crawlerService = $crawlerService;
         // $this->client = app(Client::class);
+    }
+
+    public function saveWeatherApiData(){
+        $client = new \GuzzleHttp\Client();
+        $token = 'CWB-96170F0C-F4B6-4626-B946-D6892DA6D584';
+        $weatherUrl = 'https://opendata.cwb.gov.tw/api';
+        $cityData = Config::get('city');
+        $weathers = Config::get('weather');
+        $automatic = Config::get('automatic');
+
+        $data = [];
+        $startTime = 6;
+        $endTime = 18;
+        $today = Carbon::now()->timezone('Asia/Shanghai');
+        $hour = (int)$today->format('H');
+        $type = 0;
+
+        if($hour > $endTime){
+            $type = 2;
+        }else if($hour <= $startTime){ 
+            $type = 1;
+        }
+
+        foreach($cityData as $city){
+            foreach($city as $key => $value){
+                $weatherArray = [];
+                $count = 0;
+                $temperature = '';
+                $probabilityOfPrecipitation = '';
+                $windDirection = '';
+                $anemometer = '';
+                $relativeHumidity = '';
+                $barometricPressure = '';
+                $ultravioletIndex = '';
+                $ozoneYearAvg = '';
+                $seismicity = '';
+                $smallAreaSeismicity ='';
+                $acidRainPh = '';
+                $sunrise = '';
+                $moonrise = '';
+                $nextWeekWeather = '';
+                foreach($weathers as $weather){
+                    $locationName = urlencode($key);
+                    if($count == 2 || $count == 3 || $count == 4){
+                        $locationName = urlencode($automatic[$key][$count-2]);
+                    }
+                    $url = $weatherUrl . $weather . '?Authorization=' . $token . '&locationName=' . $locationName;
+                    
+                    $response = $client->get($url);
+                    $weatherData = json_decode($response->getBody())->records;
+                    if(isset($weatherData)){
+                        if($count == 1){
+                            $mint = $weatherData->location;
+                            $maxt = $weatherData->location[0]->weatherElement[4]->time[$type]->parameter->parameterName;
+                            $temperature = $mint . ' - ' . $maxt;
+                            $probabilityOfPrecipitation = $weatherData->location[0]->weatherElement[1]->time[$type]->parameter->parameterName;
+                            $nextWeekWeather = $weatherData->locations[0]->location[0]->weatherElement[10]->time[$type]->elementValue[0]->value;
+                        }
+    
+                        if($count == 2){
+                            $windDirection = $weatherData->location[0]->weatherElement[1]->elementValue;
+                            $anemometer = $weatherData->location[0]->weatherElement[2]->elementValue;
+                            $relativeHumidity = $weatherData->location[0]->weatherElement[4]->elementValue;
+                            $barometricPressure = $weatherData->location[0]->weatherElement[5]->elementValue;
+                        }
+                        
+    
+                        if($count == 6){
+                            $ultravioletIndex = $weatherData->weatherElement->location[0]->value;
+                        }
+    
+                        if($count == 7){
+                            $ozoneYearAvg = $weatherData->location->weatherElement[0]->time[29]->elementValue;
+                        }
+    
+                        if($count == 8){
+                            $seismicity = $weatherData->earthquake[0]->reportContent;
+                        }
+    
+                        if($count == 9){
+                            $smallAreaSeismicity = $weatherData->earthquake[0]->reportContent;
+                        }
+                        
+                        $count++;
+                    }
+                   
+
+
+                    
+                }
+
+                $data = [
+                    'city' => $key, 'temperature' => $temperature, 
+                    'probability_of_precipitation' => $probabilityOfPrecipitation, 'wind_direction' =>$windDirection,
+                    'anemometer' => $anemometer, 'barometric_pressure' => $barometricPressure,
+                    'relative_humidity' => $relativeHumidity, 'ultraviolet_index' => $ultravioletIndex,
+                    'seismicity' => '', 'small_area_seismicity' => '',
+                    'acid_rain_ph' => '', 'sunrise' => '',
+                    'ozone_year_avg' => $ozoneYearAvg, 'nextWeekWeather' => $nextWeekWeather,
+                ];
+
+                // dd($data);
+
+                array_push($data, $weatherArray);
+            }
+        }
+
+        
+
+        dd($data);
+
+        
     }
 
     public function getWeatherApiData(){
