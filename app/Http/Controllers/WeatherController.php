@@ -25,6 +25,7 @@ class WeatherController extends Controller
     }
 
     public function saveWeatherApiData(){
+        $this->deleteWeatherData();
         $client = new \GuzzleHttp\Client();
         $token = 'CWB-96170F0C-F4B6-4626-B946-D6892DA6D584';
         $weatherUrl = 'https://opendata.cwb.gov.tw/api';
