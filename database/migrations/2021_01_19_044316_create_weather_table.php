@@ -30,8 +30,7 @@ class CreateWeatherTable extends Migration
             $table->string('moonrise', 100);
             $table->Integer('ozone_year_avg');
             $table->string('next_week_weather', 100);
-
-            $table->timestamps();
+            $table->timestamp('created_at')->nullable();
         });
     }
 
