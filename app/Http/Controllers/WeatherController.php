@@ -27,7 +27,7 @@ class WeatherController extends Controller
     public function saveWeatherApiData(){
         $this->deleteWeatherData();
         $client = new \GuzzleHttp\Client();
-        $token = 'CWB-96170F0C-F4B6-4626-B946-D6892DA6D584';
+        
         $weatherUrl = 'https://opendata.cwb.gov.tw/api';
         $cityData = Config::get('city');
         $weathers = Config::get('weather');
@@ -49,88 +49,47 @@ class WeatherController extends Controller
         foreach($cityData as $city){
             foreach($city as $key => $value){
                 $weatherArray = [];
-                $count = 0;
-                $temperature = '';
-                $probabilityOfPrecipitation = '';
-                $windDirection = '';
-                $anemometer = '';
-                $relativeHumidity = '';
-                $barometricPressure = '';
-                $ultravioletIndex = '';
-                $ozoneYearAvg = '';
-                $seismicity = '';
-                $smallAreaSeismicity ='';
                 $acidRainPh = 0;
-                $sunrise = '';
-                $moonrise = '';
-                $nextWeekWeather = '';
-                
-                foreach($weathers as $weather){
-                    
+                $locationName = urlencode($key);
+                $weatherForecastData = $this->getCrawlerData($client, $weathers[0], $locationName);
 
-                    $locationName = urlencode($key);
-                    if($count == 2 || $count == 3 || $count == 4){
-                        $locationName = urlencode($automatic[$key][$count-2]);
-                    }
-                    $url = $weatherUrl . $weather . '?Authorization=' . $token . '&locationName=' . $locationName;
-                    
-                    $response = $client->get($url);
-                    $weatherData = json_decode($response->getBody())->records;
-                    if(isset($weatherData)){
-                        if($count == 0){
-                            $mint = $weatherData->location[0]->weatherElement[2]->time[$type]->parameter->parameterName;
-                            $maxt = $weatherData->location[0]->weatherElement[4]->time[$type]->parameter->parameterName;
-                            $temperature = $mint . ' - ' . $maxt;
-                            $probabilityOfPrecipitation = $weatherData->location[0]->weatherElement[1]->time[$type]->parameter->parameterName;
-                        }
+                $mint = $weatherForecastData->location[0]->weatherElement[2]->time[$type]->parameter->parameterName;
+                $maxt = $weatherForecastData->location[0]->weatherElement[4]->time[$type]->parameter->parameterName;
+                $temperature = $mint . ' - ' . $maxt;
+                $probabilityOfPrecipitation = $weatherForecastData->location[0]->weatherElement[1]->time[$type]->parameter->parameterName;
 
-                        if($count == 1){
-                            $nextWeekWeather = $weatherData->locations[0]->location[0]->weatherElement[10]->time[$type]->elementValue[0]->value;
-                        }
-    
-                        if($count == 2){
-                            $windDirection = $weatherData->location[0]->weatherElement[1]->elementValue;
-                            $anemometer = $weatherData->location[0]->weatherElement[2]->elementValue;
-                            $relativeHumidity = $weatherData->location[0]->weatherElement[4]->elementValue;
-                            $barometricPressure = $weatherData->location[0]->weatherElement[5]->elementValue;
-                        }
+                $townshipWeatherForecastData = $this->getCrawlerData($client, $weathers[1], $locationName);
+                $nextWeekWeather = $townshipWeatherForecastData->locations[0]->location[0]->weatherElement[10]->time[$type]->elementValue[0]->value;
 
-                        if($count == 5){
-                            $rainPh = $weatherData->weatherElement[0]->location;
-                            $length = count($rainPh);
+                $automaticWeatherData = $this->getCrawlerData($client, $weathers[2], urlencode($automatic[$key][0]));
+                $windDirection = $automaticWeatherData->location[0]->weatherElement[1]->elementValue;
+                $anemometer = $automaticWeatherData->location[0]->weatherElement[2]->elementValue;
+                $relativeHumidity = $automaticWeatherData->location[0]->weatherElement[4]->elementValue;
+                $barometricPressure = $automaticWeatherData->location[0]->weatherElement[5]->elementValue;
 
-                            if($length > 0){
-                                $acidRainPh = $rainPh.value;
-                            }
-                        }
-    
-                        if($count == 6){
-                            $ultravioletIndex = (String)$weatherData->weatherElement->location[0]->value;
-                        }
-    
-                        if($count == 7){
-                            $ozoneYearAvg = $weatherData->location->weatherElement[0]->time[29]->elementValue;
-                        }
-    
-                        if($count == 8){
-                            $seismicity = $weatherData->earthquake[0]->reportContent;
-                        }
-    
-                        if($count == 9){
-                            $smallAreaSeismicity = $weatherData->earthquake[0]->reportContent;
-                        }
-
-                        if($count == 11){
-                            $sunrise = $weatherData->note;
-                        }
-
-                        if($count == 12){
-                            $moonrise = $weatherData->note;
-                        }
-                        
-                        $count++;
-                    }
+                $acidRainData = $this->getCrawlerData($client, $weathers[5], $locationName);
+                $rainPh = $acidRainData->weatherElement[0]->location;
+                if(count($rainPh) > 0){
+                     $acidRainPh = $rainPh.value;
                 }
+
+                $ultravioletRaysData = $this->getCrawlerData($client, $weathers[6], $locationName);
+                $ultravioletIndex = (String)$ultravioletRaysData->weatherElement->location[0]->value;
+
+                $ozoneYearAvgData = $this->getCrawlerData($client, $weathers[7], $locationName);
+                $ozoneYearAvg = $ozoneYearAvgData->location->weatherElement[0]->time[29]->elementValue;
+
+                $seismicityData = $this->getCrawlerData($client, $weathers[8], $locationName);
+                $seismicity = $seismicityData->earthquake[0]->reportContent;
+
+                $smallAreaSeismicityData = $this->getCrawlerData($client, $weathers[9], $locationName);
+                $smallAreaSeismicity = $smallAreaSeismicityData->earthquake[0]->reportContent;
+
+                $sunriseData = $this->getCrawlerData($client, $weathers[11], $locationName);
+                $sunrise = $sunriseData->note;
+
+                $moonriseData = $this->getCrawlerData($client, $weathers[12], $locationName);
+                $moonrise = $moonriseData->note;
 
                 $data = [
                     'city' => $key, 'temperature' => $temperature, 
@@ -156,6 +115,16 @@ class WeatherController extends Controller
             dd($e);
         }
         
+    }
+
+    public function getCrawlerData(Client $client, String $weather, String $locationName){
+        $token = 'CWB-96170F0C-F4B6-4626-B946-D6892DA6D584';
+        $weatherUrl = 'https://opendata.cwb.gov.tw/api';
+        $url = $weatherUrl . $weather . '?Authorization=' . $token . '&locationName=' . $locationName;
+        $response = $client->get($url);
+        $weatherData = json_decode($response->getBody())->records;
+
+        return $weatherData;
     }
 
     public function getWeatherData(){
