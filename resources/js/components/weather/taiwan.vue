@@ -80,12 +80,6 @@ export default {
 			$("path").click(function(e){
                 let index = $(this).attr("data-index")
                 dataArray.push(data[index].city)
-                // dataArray.push(data[index][13].en)
-
-                // let type = data[index][13].type
-                // let mint = data[index][0].location[0].weatherElement[2].time[type].parameter.parameterName
-                // let maxt = data[index][0].location[0].weatherElement[4].time[type].parameter.parameterName
-               
                 dataArray.push(data[index].temperature)
 
                 let rain = data[index].probability_of_precipitation

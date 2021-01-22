@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\LineBotService;
 use LINE\LINEBot;
 use LINE\LINEBot\Constant\HTTPHeader;
 use LINE\LINEBot\SignatureValidator;
@@ -15,9 +16,20 @@ use Config;
 use Exception;
 class LineBotController extends Controller
 {
-    public function getMessageWeather(Request $request){
-        $httpClient = new CurlHTTPClient(env('LINEBOT_TOKEN'));
-        $bot = new LINEBot($httpClient, ['channelSecret' => env('LINEBOT_SECRET')]);
+    private $lineBotService;
+
+    public function __construct()
+    {
+        $this->lineBotService = app(LineBotService::class);
+    }
+
+    public function sendMessage($text){
+        $response = $this->lineBotService->pushMessage($text);
+
+        $this->assertEquals(200, $response->getHTTPStatus());
+    }
+
+    public function sendMessageWeather(){
         $weatherUrl = 'https://opendata.cwb.gov.tw/api';
         $token = 'CWB-96170F0C-F4B6-4626-B946-D6892DA6D584';
         $client = new \GuzzleHttp\Client();
@@ -36,32 +48,49 @@ class LineBotController extends Controller
             $type = 1;
         }
 
-        $text = $request->events[0]->getText();
-        $pop = '目前無降雨機率資料';
+        // $text = $request->events[0]->getText();
+        $cityRain = '';
+        $text = '';
         foreach($cityData as $city){
             foreach($city as $key => $value){
-                if($key == $text){
-                    $locationName = urlencode($key);
-                    $url = $weatherUrl  . $weathers[0] . '?Authorization=' . $token . '&locationName=' . $locationName;
+                $text = '';
+                $locationName = urlencode($key);
+                $url = $weatherUrl  . $weathers[0] . '?Authorization=' . $token . '&locationName=' . $locationName;
 
-                    $response = $client->get($url);
-                    $json = json_decode($response->getBody());
-                    $data = $json->records;
-                    $pop = $text . '降雨機率為：';
-                    $pop = $pop . $data->location[0]->weatherElement[1]->time[$type]->parameter->parameterName;
-                    $pop = $pop . '%';
+                $response = $client->get($url);
+                $json = json_decode($response->getBody());
+                $data = $json->records;
+                $probabilityOfPrecipitation = $data->location[0]->weatherElement[1]->time[$type]->parameter->parameterName;
+
+                if($probabilityOfPrecipitation > 50){
+                    $cityRain = $cityRain . $key . '、';
                 }
             }
         }
 
-
-        Log::info($text);
-        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($pop);
-
-        $response = $bot->replyText($request->events[0]->getReplyToken(), $textMessageBuilder);
-        if ($response->isSucceeded()) {
-            return;
+        if($cityRain == ''){
+            $text = '明天沒有降雨機率50%的城市';
+        }else{
+            $text = '明天降雨機率50%超過的城市，有' . rtrim($cityRain, "、");
         }
 
+        $response = $this->lineBotService->pushMessage($text);
+
+
+        // Log::info($text);
+        // $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($pop);
+
+        // $response = $bot->replyText($request->events[0]->getReplyToken(), $textMessageBuilder);
+        // if ($response->isSucceeded()) {
+        //     return;
+        // }
+
+    }
+
+    public function getMessageWeather(Request $request)
+    {
+        $params = $request->all();
+        logger(json_encode($params, JSON_UNESCAPED_UNICODE));
+        return response('hello world', 200);
     }
 }
