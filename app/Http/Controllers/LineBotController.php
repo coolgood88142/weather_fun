@@ -102,7 +102,7 @@ class LineBotController extends Controller
     public function getMessageWeather(Request $request)
     {
         $lineUserId = $this->lineBotService->$lineUserId;
-        $lineBot = $this->lineBotService->$lineBot;
+        $bot = $this->lineBotService->$lineBot;
         $signature = $request->header(\LINE\LINEBot\Constant\HTTPHeader::LINE_SIGNATURE);
 
         $body = $request->getContent();
