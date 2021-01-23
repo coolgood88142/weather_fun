@@ -36,8 +36,8 @@ class LineBotController extends Controller
         $this->channel_access_token = env('CHANNEL_ACCESS_TOKEN');
         $this->channel_secret = env('CHANNEL_SECRET');
 
-        $httpClient   = new CurlHTTPClient($this->channel_access_token);
-        $this->bot    = new LINEBot($httpClient, ['channelSecret' => $this->channel_secret]);
+        $httpClient = new CurlHTTPClient($this->channel_access_token);
+        $this->bot = new LINEBot($httpClient, ['channelSecret' => $this->channel_secret]);
         $this->client = $httpClient;
     }
 
@@ -115,12 +115,14 @@ class LineBotController extends Controller
 
     public function getMessageWeather(Request $request)
     {
-        $bot       = $this->bot;
+        $bot = $this->bot;
         $signature = $request->header(\LINE\LINEBot\Constant\HTTPHeader::LINE_SIGNATURE);
-        $body      = $request->getContent();
+        $body = $request->getContent();
+        Log::info($body);
 
         try {
             $events = $bot->parseEventRequest($body, $signature);
+            Log::info($events);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
