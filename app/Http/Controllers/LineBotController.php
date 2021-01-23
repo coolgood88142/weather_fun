@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\WeatherController;
 use App\Services\LineBotService;
 use LINE\LINEBot;
+use LINE\LINEBot\Event\MessageEvent;
 use LINE\LINEBot\Constant\HTTPHeader;
 use LINE\LINEBot\SignatureValidator;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
@@ -16,6 +18,7 @@ use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Config;
 use Exception;
+
 class LineBotController extends Controller
 {
     private $lineBotService;
