@@ -29,4 +29,6 @@ Route::get('/line','LineBotController@sendMessageWeather');
 
 Route::post('/webhook','LineBotController@getMessageWeather');
 
+Route::get('/webhook','LineBotController@getMessageWeather');
+
 Route::get('/tomorrowWeatherApi','WeatherController@saveTomorrowWeatherApiData');
