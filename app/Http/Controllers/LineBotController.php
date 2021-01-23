@@ -26,7 +26,7 @@ class LineBotController extends Controller
     public function sendMessage($text){
         $response = $this->lineBotService->pushMessage($text);
 
-        $this->assertEquals(200, $response->getHTTPStatus());
+        return $this->assertEquals(200, $response->getHTTPStatus());
     }
 
     public function sendMessageWeather(){
@@ -74,7 +74,7 @@ class LineBotController extends Controller
             $text = '明天降雨機率50%超過的城市，有' . rtrim($cityRain, "、");
         }
 
-        $response = $this->lineBotService->pushMessage($text);
+        $response = $this->sendMessage($text);
 
 
         // Log::info($text);
