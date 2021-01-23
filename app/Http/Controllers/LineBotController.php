@@ -23,11 +23,22 @@ class LineBotController extends Controller
 {
     private $lineBotService;
     private $weatherController;
+    private $client;
+    private $bot;
+    private $channel_access_token;
+    private $channel_secret;
 
     public function __construct()
     {
         $this->lineBotService = app(LineBotService::class);
         $this->weatherController = app(WeatherController::class);
+
+        $this->channel_access_token = env('CHANNEL_ACCESS_TOKEN');
+        $this->channel_secret = env('CHANNEL_SECRET');
+
+        $httpClient   = new CurlHTTPClient($this->channel_access_token);
+        $this->bot    = new LINEBot($httpClient, ['channelSecret' => $this->channel_secret]);
+        $this->client = $httpClient;
     }
 
     public function sendMessage($text){
@@ -104,20 +115,9 @@ class LineBotController extends Controller
 
     public function getMessageWeather(Request $request)
     {
-        // $lineUserId = $this->lineBotService->lineUserId;
-        // $bot = $this->lineBotService->lineBot;
-
-        $channel_access_token = env('CHANNEL_ACCESS_TOKEN');
-        $channel_secret       = env('CHANNEL_SECRET');
-
-        $httpClient   = new CurlHTTPClient($channel_access_token);
-        $bot    = new LINEBot($httpClient, ['channelSecret' => $channel_secret]);
-        $client = $httpClient;
-
-        // dd($bot);
+        $bot       = $this->bot;
         $signature = $request->header(\LINE\LINEBot\Constant\HTTPHeader::LINE_SIGNATURE);
-
-        $body = $request->getContent();
+        $body      = $request->getContent();
 
         try {
             $events = $bot->parseEventRequest($body, $signature);
@@ -140,6 +140,16 @@ class LineBotController extends Controller
 
         // $params = $request->all();
         // logger(json_encode($params, JSON_UNESCAPED_UNICODE));
+
+        // Log::info($text);
+        // $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello world!');
+
+        // $response = $bot->replyText($request->events[0]->getReplyToken(), $textMessageBuilder);
+        // if ($response->isSucceeded()) {
+        //     return;
+        // }
+
+        
         // return response('hello world', 200);
     }
 }
