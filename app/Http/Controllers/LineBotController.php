@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\WeatherController;
 use App\Services\LineBotService;
 use LINE\LINEBot;
 use LINE\LINEBot\Constant\HTTPHeader;
@@ -17,10 +19,12 @@ use Exception;
 class LineBotController extends Controller
 {
     private $lineBotService;
+    private $weatherController;
 
     public function __construct()
     {
         $this->lineBotService = app(LineBotService::class);
+        $this->weatherController = app(WeatherController::class);
     }
 
     public function sendMessage($text){
@@ -30,23 +34,8 @@ class LineBotController extends Controller
     }
 
     public function sendMessageWeather(){
-        $weatherUrl = 'https://opendata.cwb.gov.tw/api';
-        $token = 'CWB-96170F0C-F4B6-4626-B946-D6892DA6D584';
-        $client = new \GuzzleHttp\Client();
-        $cityData = Config::get('city');
-        $weathers = Config::get('weather');
-
-        $startTime = 6;
-        $endTime = 18;
-        $today = Carbon::now()->timezone('Asia/Shanghai');
-        $hour = (int)$today->format('H');
-        $type = 0;
-
-        if($hour > $endTime){
-            $type = 2;
-        }else if($hour <= $startTime){ 
-            $type = 1;
-        }
+        $db = DB::table('weather_tomorrow')->get();
+        dd($db);
 
         // $text = $request->events[0]->getText();
         $cityRain = '';

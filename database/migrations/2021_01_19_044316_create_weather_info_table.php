@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWeatherTable extends Migration
+class CreateWeatherInfoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateWeatherTable extends Migration
      */
     public function up()
     {
-        Schema::create('weather', function (Blueprint $table) {
+        Schema::create('weather_info', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('city', 20);
             $table->string('temperature', 20);
@@ -41,6 +41,6 @@ class CreateWeatherTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('weather');
+        Schema::dropIfExists('weather_info');
     }
 }

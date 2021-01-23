@@ -36,7 +36,7 @@ class WeatherController extends Controller
         $dataArray = [];
         $startTime = 6;
         $endTime = 18;
-        $today = Carbon::now()->timezone('Asia/Shanghai');
+        $today = Carbon::now()->timezone('Asia/Taipei');
         $hour = (int)$today->format('H');
         $type = 0;
 
@@ -99,7 +99,7 @@ class WeatherController extends Controller
                     'seismicity' => $seismicity, 'small_area_seismicity' => $smallAreaSeismicity,
                     'acid_rain_ph' => $acidRainPh, 'sunrise' => $sunrise, 'moonrise' => $moonrise,
                     'ozone_year_avg' => $ozoneYearAvg, 'next_week_weather' => $nextWeekWeather,
-                    'created_at' => Carbon::now()->timezone('Asia/Shanghai')
+                    'created_at' => Carbon::now()->timezone('Asia/Taipei')
                 ];
 
                 array_push($dataArray, $data);
@@ -107,7 +107,7 @@ class WeatherController extends Controller
         }
 
         try {
-            $db = DB::table('weather')->insert($dataArray);
+            $db = DB::table('weather_info')->insert($dataArray);
 
         } catch (Exception $e) {
             $status = 'error';
@@ -115,6 +115,45 @@ class WeatherController extends Controller
             dd($e);
         }
         
+    }
+
+    public function saveTomorrowWeatherApiData(){
+        $this->deleteWeatherTomorrowData();
+        $client = new \GuzzleHttp\Client();
+        $cityData = Config::get('city');
+        $weathers = Config::get('weather');
+        $timePeriodCount = 3;
+        $dataArray = [];
+        foreach($cityData as $city){
+            foreach($city as $key => $value){
+                $locationName = urlencode($key);
+                $weatherForecastData = $this->getCrawlerData($client, $weathers[0], $locationName);
+                
+                for($i = 0; $i < $timePeriodCount; $i++){
+                    $mint = $weatherForecastData->location[0]->weatherElement[2]->time[$i]->parameter->parameterName;
+                    $maxt = $weatherForecastData->location[0]->weatherElement[4]->time[$i]->parameter->parameterName;
+                    $temperature = $mint . ' - ' . $maxt;
+                    $probabilityOfPrecipitation = $weatherForecastData->location[0]->weatherElement[1]->time[$i]->parameter->parameterName;
+                    
+                    $data = [
+                        'city' => $key, 'temperature' => $temperature, 
+                        'probability_of_precipitation' => $probabilityOfPrecipitation, 'time_period'=> $i,
+                        'created_at' => Carbon::now()->timezone('Asia/Taipei'),
+                    ];
+
+                    array_push($dataArray, $data);
+                }
+            }
+        }
+
+        try {
+            $db = DB::table('weather_tomorrow')->insert($dataArray);
+
+        } catch (Exception $e) {
+            $status = 'error';
+            $message = '新增失敗!';
+            dd($e);
+        }
     }
 
     public function getCrawlerData(Client $client, String $weather, String $locationName){
@@ -128,17 +167,19 @@ class WeatherController extends Controller
     }
 
     public function getWeatherData(){
-        $db = DB::table('weather')->get();
+        $db = DB::table('weather_info')->get();
         return view('weather', [
             'taiwanData' => $db
         ]);
     }
 
     public function deleteWeatherData(){
-        $db = DB::table('weather')->delete();
+        $db = DB::table('weather_info')->delete();
     }
 
-
+    public function deleteWeatherTomorrowData(){
+        $db = DB::table('weather_tomorrow')->delete();
+    }
 
     public function getWeatherApiData(){
         $client = new \GuzzleHttp\Client();
@@ -151,7 +192,7 @@ class WeatherController extends Controller
         $data = [];
         $startTime = 6;
         $endTime = 18;
-        $today = Carbon::now()->timezone('Asia/Shanghai');
+        $today = Carbon::now()->timezone('Asia/Taipei');
         $hour = (int)$today->format('H');
         $type = 0;
 
