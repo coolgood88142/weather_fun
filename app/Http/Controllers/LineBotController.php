@@ -130,9 +130,11 @@ class LineBotController extends Controller
             if ($event instanceof MessageEvent) {
                 $message_type = $event->getMessageType();
                 $text = $event->getText();
+                Log::info($text);
                 switch ($message_type) {
                     case 'text':
-                        $bot->replyText($replyToken, 'Hello world!');
+                        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello world!');
+                        $bot->replyText($replyToken, $textMessageBuilder);
                         break;
                 }
             }
