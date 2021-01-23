@@ -23,10 +23,6 @@ Route::get('/weather','WeatherController@getWeatherData');
 
 Route::get('/articles','WeatherController@getArticlesApiData');
 
-Route::get('/bot','LineBotController@getMessageWeather');
-
-Route::post('/line/webhook', 'LineBotController@getMessageWeather');
-
 Route::get('/weatherApi','WeatherController@saveWeatherApiData');
 
 Route::get('/line','LineBotController@sendMessageWeather');
