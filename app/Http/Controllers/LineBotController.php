@@ -115,43 +115,44 @@ class LineBotController extends Controller
 
     public function getMessageWeather(Request $request)
     {
-        $bot = $this->bot;
-        $signature = $request->header(\LINE\LINEBot\Constant\HTTPHeader::LINE_SIGNATURE);
-        $body = $request->getContent();
-        Log::info($body);
+        // dd($this->client);
+        // $bot = $this->bot;
+        // $signature = $request->header(\LINE\LINEBot\Constant\HTTPHeader::LINE_SIGNATURE);
+        // $body = $request->getContent();
+        // Log::info($body);
 
-        try {
-            $events = $bot->parseEventRequest($body, $signature);
-            Log::info($events);
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-        }
-
-        foreach ($events as $event) {
-            $replyToken = $event->getReplyToken();
-            if ($event instanceof MessageEvent) {
-                $message_type = $event->getMessageType();
-                $text = $event->getText();
-                Log::info($text);
-                switch ($message_type) {
-                    case 'text':
-                        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello world!');
-                        $bot->replyText($replyToken, $textMessageBuilder);
-                        break;
-                }
-            }
-        }
-
-        // $params = $request->all();
-        // logger(json_encode($params, JSON_UNESCAPED_UNICODE));
-
-        // Log::info($text);
-        // $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello world!');
-
-        // $response = $bot->replyText($request->events[0]->getReplyToken(), $textMessageBuilder);
-        // if ($response->isSucceeded()) {
-        //     return;
+        // try {
+        //     $events = $bot->parseEventRequest($body, $signature);
+        //     Log::info($events);
+        // } catch (\Exception $e) {
+        //     Log::error($e->getMessage());
         // }
+
+        // foreach ($events as $event) {
+        //     $replyToken = $event->getReplyToken();
+        //     if ($event instanceof MessageEvent) {
+        //         $message_type = $event->getMessageType();
+        //         $text = $event->getText();
+        //         Log::info($text);
+        //         switch ($message_type) {
+        //             case 'text':
+        //                 $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello world!');
+        //                 $bot->replyText($replyToken, $textMessageBuilder);
+        //                 break;
+        //         }
+        //     }
+        // }
+
+        $params = $request->all();
+        Log::info($params);
+        logger(json_encode($params, JSON_UNESCAPED_UNICODE));
+
+        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello world!');
+
+        $response = $bot->replyText($request->events[0]->getReplyToken(), $textMessageBuilder);
+        if ($response->isSucceeded()) {
+            return;
+        }
 
         
         // return response('hello world', 200);
