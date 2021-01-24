@@ -9,6 +9,7 @@ class LineBotService
     /** @var LINEBot */
     private $lineBot;
     private $lineUserId;
+    private $response;
 
     public function __construct($lineUserId)
     {

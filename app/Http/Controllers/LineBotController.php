@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\WeatherController;
 use App\Services\LineBotService;
+use App\Services\WebhookResponseService;
+use App\Transformers\Requests\WebhookRequestTransformer;
 use LINE\LINEBot;
 use LINE\LINEBot\Event\MessageEvent;
 use LINE\LINEBot\Constant\HTTPHeader;
@@ -39,6 +41,8 @@ class LineBotController extends Controller
         $httpClient = new CurlHTTPClient($this->channel_access_token);
         $this->bot = new LINEBot($httpClient, ['channelSecret' => $this->channel_secret]);
         $this->client = $httpClient;
+
+        $this->responseService = app(WebhookResponseService::class);
     }
 
     public function sendMessage($text){
@@ -71,62 +75,28 @@ class LineBotController extends Controller
         }
 
         $message = rtrim($message, ' \n');
-
         $response = $this->sendMessage($message);
-
-        // $text = $request->events[0]->getText();
-        // $cityRain = '';
-        // $text = '';
-        // foreach($cityData as $city){
-        //     foreach($city as $key => $value){
-        //         $text = '';
-        //         $locationName = urlencode($key);
-        //         $url = $weatherUrl  . $weathers[0] . '?Authorization=' . $token . '&locationName=' . $locationName;
-
-        //         $response = $client->get($url);
-        //         $json = json_decode($response->getBody());
-        //         $data = $json->records;
-        //         $probabilityOfPrecipitation = $data->location[0]->weatherElement[1]->time[$type]->parameter->parameterName;
-
-        //         if($probabilityOfPrecipitation > 50){
-        //             $cityRain = $cityRain . $key . '、';
-        //         }
-        //     }
-        // }
-
-        // if($cityRain == ''){
-        //     $text = '明天沒有降雨機率50%的城市';
-        // }else{
-        //     $text = '明天降雨機率50%超過的城市，有' . rtrim($cityRain, "、");
-        // }
-
-        // $response = $this->sendMessage($text);
-
-
-        // Log::info($text);
-        // $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($pop);
-
-        // $response = $bot->replyText($request->events[0]->getReplyToken(), $textMessageBuilder);
-        // if ($response->isSucceeded()) {
-        //     return;
-        // }
 
     }
 
     public function getMessageWeather(Request $request)
     {
-        // dd($this->client);
-        // $bot = $this->bot;
-        // $signature = $request->header(\LINE\LINEBot\Constant\HTTPHeader::LINE_SIGNATURE);
-        // $body = $request->getContent();
-        // Log::info($body);
+        $text = $request->events[0]['message']['text'];
+        $user_id = $request->events[0]['source']['userId'];
 
-        // try {
-        //     $events = $bot->parseEventRequest($body, $signature);
-        //     Log::info($events);
-        // } catch (\Exception $e) {
-        //     Log::error($e->getMessage());
+        // Log::info('Webhook has request',$request->all());
+        
+        // foreach ($request['events'] as $event) {
+
+        //     $webhookRequest = $reqTransformer->tramsforRequest($event);
+
+        //     $this->sendMessage($webhookRequest['content']);
         // }
+
+        // return $response;
+
+        // return $response;
+
 
         // foreach ($events as $event) {
         //     $replyToken = $event->getReplyToken();
@@ -143,16 +113,16 @@ class LineBotController extends Controller
         //     }
         // }
 
-        $params = $request->all();
-        Log::info($params);
-        logger(json_encode($params, JSON_UNESCAPED_UNICODE));
+        // $params = $request->all();
+        // Log::info($params);
+        // logger(json_encode($params, JSON_UNESCAPED_UNICODE));
 
-        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello world!');
+        // $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello world!');
 
-        $response = $bot->replyText($request->events[0]->getReplyToken(), $textMessageBuilder);
-        if ($response->isSucceeded()) {
-            return;
-        }
+        // $response = $bot->replyMessage($request->events[0]->getReplyToken(), $textMessageBuilder);
+        // if ($response->isSucceeded()) {
+        //     return;
+        // }
 
         
         // return response('hello world', 200);
