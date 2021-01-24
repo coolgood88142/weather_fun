@@ -16,6 +16,8 @@ use LINE\LINEBot\Constant\HTTPHeader;
 use LINE\LINEBot\SignatureValidator;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
+use LINE\LINEBot\MessageBuilder\TemplateBuilder\ConfirmTemplateBuilder;
+use LINE\LINEBot\TemplateActionBuilder\MessageTemplateActionBuilder;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Config;
@@ -51,19 +53,24 @@ class LineBotController extends Controller
         $datas = DB::table('weather_tomorrow')->whereIn('city', ['臺北市', '新北市'])->get();
         $count = 0;
         $message = '';
+        $now = Carbon::now()->timezone('Asia/Taipei');
+        $yesterday = $now->yesterday()->format('m/d');
+        $today = $now->format('m/d');
+        $tomorrow = $now->tomorrow()->format('m/d');
+        
         foreach($datas as $data){
             $city = $data->city;
             $time_period = $data->time_period;
             $temperature = $data->temperature;
             $probability_of_precipitation = $data->probability_of_precipitation;
-            $temperature_text = '昨天18:00-今天06:00';
+            $temperature_text = $yesterday . ' 18:00 - '. $today .' 06:00';
             
             if($time_period == 0){
                 $message = $message . $city . ':' . "\n";
             }else if($time_period == 1){
-                $temperature_text = '今天06:00-18:00';
+                $temperature_text = $today . ' 06:00 - 18:00';
             }else if($time_period == 2){
-                $temperature_text = '今天18:00-明天06:00';
+                $temperature_text = $today . ' 18:00 - ' . $tomorrow . ' 06:00';
             }
 
             $message = $message . '【'. $temperature_text . ' 溫度為' . $temperature;
@@ -80,57 +87,25 @@ class LineBotController extends Controller
     {
         $text = $request->events[0]['message']['text'];
         $replyToken = $request->events[0]['replyToken'];
-        Log::info($request->all());
+        $cityData = Config::get('city');
         
-        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($text);
-        $response = $this->bot->replyMessage($replyToken, $textMessageBuilder);
+        // $imageUrl = UrlBuilder::buildUrl($this->req, ['image', 'weather.jpg']);
+        $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入正確的縣市名稱');
+        
+        if(in_array($text, $cityData)){
+            $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
+                '詢問'. $text .'的氣候',
+                new ConfirmTemplateBuilder('請問要選擇哪一天的氣候?', [
+                    new MessageTemplateActionBuilder('今天', $text . '今天氣候'),
+                    new MessageTemplateActionBuilder('明天', $text . '明天氣候'),
+                ]));
+        }
+        
+        $response = $this->bot->replyMessage($replyToken, $messageBuilder);
+
         if ($response->isSucceeded()) {
             echo 'Succeeded!';
             return;
         }
-
-
-        // Log::info('Webhook has request',$request->all());
-        
-        // foreach ($request['events'] as $event) {
-
-        //     $webhookRequest = $reqTransformer->tramsforRequest($event);
-
-        //     $this->sendMessage($webhookRequest['content']);
-        // }
-
-        // return $response;
-
-        // return $response;
-
-
-        // foreach ($events as $event) {
-        //     $replyToken = $event->getReplyToken();
-        //     if ($event instanceof MessageEvent) {
-        //         $message_type = $event->getMessageType();
-        //         $text = $event->getText();
-        //         Log::info($text);
-        //         switch ($message_type) {
-        //             case 'text':
-        //                 $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello world!');
-        //                 $bot->replyText($replyToken, $textMessageBuilder);
-        //                 break;
-        //         }
-        //     }
-        // }
-
-        // $params = $request->all();
-        // Log::info($params);
-        // logger(json_encode($params, JSON_UNESCAPED_UNICODE));
-
-        // $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello world!');
-
-        // $response = $bot->replyMessage($request->events[0]->getReplyToken(), $textMessageBuilder);
-        // if ($response->isSucceeded()) {
-        //     return;
-        // }
-
-        
-        // return response('hello world', 200);
     }
 }
