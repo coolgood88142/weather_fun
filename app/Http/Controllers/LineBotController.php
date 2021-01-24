@@ -41,14 +41,10 @@ class LineBotController extends Controller
         $httpClient = new CurlHTTPClient($this->channel_access_token);
         $this->bot = new LINEBot($httpClient, ['channelSecret' => $this->channel_secret]);
         $this->client = $httpClient;
-
-        $this->responseService = app(WebhookResponseService::class);
     }
 
     public function sendMessage($text){
         $response = $this->lineBotService->pushMessage($text);
-
-        return $this->assertEquals(200, $response->getHTTPStatus());
     }
 
     public function sendMessageWeather(){
@@ -63,7 +59,7 @@ class LineBotController extends Controller
             $temperature_text = '昨天18:00-今天06:00';
             
             if($time_period == 0){
-                $message = $message . $city . ':' . ' \n';
+                $message = $message . $city . ':' . "\n";
             }else if($time_period == 1){
                 $temperature_text = '今天06:00-18:00';
             }else if($time_period == 2){
@@ -71,18 +67,28 @@ class LineBotController extends Controller
             }
 
             $message = $message . '【'. $temperature_text . ' 溫度為' . $temperature;
-            $message = $message . '， 降雨機率為' . $probability_of_precipitation . '%】' . ' \n';
+            $message = $message . '， 降雨機率為' . $probability_of_precipitation . '%】' . "\n";
         }
 
-        $message = rtrim($message, ' \n');
-        $response = $this->sendMessage($message);
+        $message = rtrim($message, "\n");
 
+        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+        $response = $this->sendMessage($textMessageBuilder);
     }
 
     public function getMessageWeather(Request $request)
     {
         $text = $request->events[0]['message']['text'];
-        $user_id = $request->events[0]['source']['userId'];
+        $replyToken = $request->events[0]['replyToken'];
+        Log::info($request->all());
+        
+        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($text);
+        $response = $this->bot->replyMessage($replyToken, $textMessageBuilder);
+        if ($response->isSucceeded()) {
+            echo 'Succeeded!';
+            return;
+        }
+
 
         // Log::info('Webhook has request',$request->all());
         

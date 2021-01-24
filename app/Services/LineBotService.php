@@ -9,7 +9,6 @@ class LineBotService
     /** @var LINEBot */
     private $lineBot;
     private $lineUserId;
-    private $response;
 
     public function __construct($lineUserId)
     {
@@ -25,11 +24,16 @@ class LineBotService
      * @param TemplateMessageBuilder|string $content
      * @return Response
      */
-    public function pushMessage($content): Response
+    public function pushMessage($content)
     {
         if (is_string($content)) {
             $content = new TextMessageBuilder($content);
         }
-        return $this->lineBot->pushMessage($this->lineUserId, $content);
+
+        $response = $this->lineBot->pushMessage($this->lineUserId, $content);
+
+        if ($response->isSucceeded()) {
+            return;
+        }
     }
 }

@@ -55,7 +55,7 @@ class WeatherController extends Controller
 
                 $mint = $weatherForecastData->location[0]->weatherElement[2]->time[$type]->parameter->parameterName;
                 $maxt = $weatherForecastData->location[0]->weatherElement[4]->time[$type]->parameter->parameterName;
-                $temperature = $mint . ' - ' . $maxt;
+                $temperature = $mint . '-' . $maxt;
                 $probabilityOfPrecipitation = $weatherForecastData->location[0]->weatherElement[1]->time[$type]->parameter->parameterName;
 
                 $townshipWeatherForecastData = $this->getCrawlerData($client, $weathers[1], $locationName);
@@ -132,7 +132,7 @@ class WeatherController extends Controller
                 for($i = 0; $i < $timePeriodCount; $i++){
                     $mint = $weatherForecastData->location[0]->weatherElement[2]->time[$i]->parameter->parameterName;
                     $maxt = $weatherForecastData->location[0]->weatherElement[4]->time[$i]->parameter->parameterName;
-                    $temperature = $mint . ' - ' . $maxt;
+                    $temperature = $mint . '-' . $maxt;
                     $probabilityOfPrecipitation = $weatherForecastData->location[0]->weatherElement[1]->time[$i]->parameter->parameterName;
                     
                     $data = [
