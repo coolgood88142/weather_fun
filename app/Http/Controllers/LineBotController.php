@@ -15,9 +15,13 @@ use LINE\LINEBot\Event\MessageEvent;
 use LINE\LINEBot\Constant\HTTPHeader;
 use LINE\LINEBot\SignatureValidator;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
+use LINE\LINEBot\MessageBuilder\TemplateMessageBuilder;
 use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
+use LINE\LINEBot\MessageBuilder\TemplateBuilder\ButtonTemplateBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateBuilder\ConfirmTemplateBuilder;
+use LINE\LINEBot\TemplateActionBuilder\UriTemplateActionBuilder;
 use LINE\LINEBot\TemplateActionBuilder\MessageTemplateActionBuilder;
+use LINE\LINEBot\TemplateActionBuilder\PostbackTemplateActionBuilder;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Config;
@@ -89,7 +93,6 @@ class LineBotController extends Controller
         $replyToken = $request->events[0]['replyToken'];
         $cityData = Config::get('city');
         
-        // $imageUrl = UrlBuilder::buildUrl($this->req, ['image', 'weather.jpg']);
         $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入正確的縣市名稱');
         
         if(in_array($text, $cityData)){
@@ -100,6 +103,24 @@ class LineBotController extends Controller
                     new MessageTemplateActionBuilder('明天', $text . '明天氣候'),
                 ]));
         }
+
+        // $req = new \Slim\Http\Request;
+        // $imageUrl = UrlBuilder::buildUrl($this->req, ['static', 'buttons', '1040.jpg']);
+
+        // $buttonArray = [];
+        // foreach($cityData as $city){
+        //     $data = new MessageTemplateActionBuilder($city, $city);
+        //     array_push($buttonArray, $data);
+        // }
+
+        // $imageUrl = UrlBuilder::buildUrl('./', ['image', 'weather.jpg']);
+        // $buttonTemplateBuilder = new ButtonTemplateBuilder(
+        //     'My button sample',
+        //     'Hello my button',
+        //     '',
+        //     $buttonArray
+        //     );
+        // $messageBuilder = new TemplateMessageBuilder('Button alt text', $buttonTemplateBuilder);
         
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
 
