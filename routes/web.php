@@ -27,10 +27,10 @@ Route::get('/weatherApi','WeatherController@saveWeatherApiData');
 
 Route::get('/line','LineBotController@sendMessageWeather');
 
-Route::post('/webhook','LineBotController@getMessageWeather');
+Route::post('/callback','LineBotController@getMessageWeather');
 
-Route::get('/webhook','LineBotController@getMessageWeather');
+// Route::get('/webhook','LineBotController@getMessageWeather');
 
 Route::get('/tomorrowWeatherApi','WeatherController@saveTomorrowWeatherApiData');
 
-Route::post('/callback', 'LineController@webhook');
+// Route::post('/callback', 'LineController@webhook');
