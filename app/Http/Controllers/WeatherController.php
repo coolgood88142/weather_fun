@@ -91,7 +91,7 @@ class WeatherController extends Controller
             $moonrise = $moonriseData->note;
 
             $data = [
-                'city' => $value, 'temperature' => $temperature, 
+                'city' => $city, 'temperature' => $temperature, 
                 'probability_of_precipitation' => $probabilityOfPrecipitation, 'wind_direction' =>$windDirection,
                 'anemometer' => $anemometer, 'barometric_pressure' => $barometricPressure,
                 'relative_humidity' => $relativeHumidity, 'ultraviolet_index' => $ultravioletIndex,
