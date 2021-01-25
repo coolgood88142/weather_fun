@@ -41,8 +41,8 @@ class LineBotController extends Controller
         $this->lineBotService = app(LineBotService::class);
         $this->weatherController = app(WeatherController::class);
 
-        $this->channel_access_token = env('CHANNEL_ACCESS_TOKEN');
-        $this->channel_secret = env('CHANNEL_SECRET');
+        $this->channel_access_token = env('LINE_BOT_CHANNEL_ACCESS_TOKEN');
+        $this->channel_secret = env('LINE_BOT_CHANNEL_SECRET');
 
         $httpClient = new CurlHTTPClient($this->channel_access_token);
         $this->bot = new LINEBot($httpClient, ['channelSecret' => $this->channel_secret]);
@@ -93,34 +93,36 @@ class LineBotController extends Controller
         $replyToken = $request->events[0]['replyToken'];
         $cityData = Config::get('city');
         
-        $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入正確的縣市名稱');
+        // $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入正確的縣市名稱');
         
-        if(in_array($text, $cityData)){
-            $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
-                '詢問'. $text .'的氣候',
-                new ConfirmTemplateBuilder('請問要選擇哪一天的氣候?', [
-                    new MessageTemplateActionBuilder('今天', $text . '今天氣候'),
-                    new MessageTemplateActionBuilder('明天', $text . '明天氣候'),
-                ]));
-        }
+        // if(in_array($text, $cityData)){
+        //     $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
+        //         '詢問'. $text .'的氣候',
+        //         new ConfirmTemplateBuilder('請問要選擇哪一天的氣候?', [
+        //             new MessageTemplateActionBuilder('今天', $text . '今天氣候'),
+        //             new MessageTemplateActionBuilder('明天', $text . '明天氣候'),
+        //         ]));
+        // }
 
         // $req = new \Slim\Http\Request;
         // $imageUrl = UrlBuilder::buildUrl($this->req, ['static', 'buttons', '1040.jpg']);
 
-        // $buttonArray = [];
-        // foreach($cityData as $city){
-        //     $data = new MessageTemplateActionBuilder($city, $city);
-        //     array_push($buttonArray, $data);
-        // }
+        $buttonArray = [];
+        foreach($cityData as $city){
+            $data = new MessageTemplateActionBuilder($city, $city);
+            array_push($buttonArray, $data);
+        }
+
+        Log::info($buttonArray);
 
         // $imageUrl = UrlBuilder::buildUrl('./', ['image', 'weather.jpg']);
-        // $buttonTemplateBuilder = new ButtonTemplateBuilder(
-        //     'My button sample',
-        //     'Hello my button',
-        //     '',
-        //     $buttonArray
-        //     );
-        // $messageBuilder = new TemplateMessageBuilder('Button alt text', $buttonTemplateBuilder);
+        $buttonTemplateBuilder = new ButtonTemplateBuilder(
+            'My button sample',
+            'Hello my button',
+            '',
+            $buttonArray
+            );
+        $messageBuilder = new TemplateMessageBuilder('Button alt text', $buttonTemplateBuilder);
         
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
 
