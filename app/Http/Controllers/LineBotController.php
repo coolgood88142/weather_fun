@@ -107,18 +107,17 @@ class LineBotController extends Controller
         // $req = new \Slim\Http\Request;
         // $imageUrl = UrlBuilder::buildUrl($this->req, ['static', 'buttons', '1040.jpg']);
 
-        // $buttonArray = [];
-        // foreach($cityData as $city){
-        //     $data = new MessageTemplateActionBuilder($city, $city);
-        //     array_push($buttonArray, $data);
-        // }
+        // $buttonArray = [
+        //     new MessageTemplateActionBuilder('北部', '北部'),
+        //     new MessageTemplateActionBuilder('南部', '南部'),
+        //     new MessageTemplateActionBuilder('東部', '東部'),
+        //     new MessageTemplateActionBuilder('外島', '外島'),
+        // ];
 
-        // Log::info($buttonArray);
-
-        // // $imageUrl = UrlBuilder::buildUrl('./', ['image', 'weather.jpg']);
+        // $imageUrl = UrlBuilder::buildUrl('./', ['image', 'weather.jpg']);
         // $buttonTemplateBuilder = new ButtonTemplateBuilder(
-        //     'My button sample',
-        //     'Hello my button',
+        //     '台灣氣候資訊',
+        //     '請選擇一個縣市',
         //     '',
         //     $buttonArray
         //     );
