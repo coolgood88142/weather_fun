@@ -53,8 +53,19 @@ class LineBotController extends Controller
         $response = $this->lineBotService->pushMessage($text);
     }
 
-    public function sendMessageWeather(){
-        $datas = DB::table('weather_tomorrow')->whereIn('city', ['臺北市', '新北市'])->get();
+    public function sendMessageWeather(int $type, String $cityText){
+        $cityArray = ['臺北市', '新北市'];
+        $tableName = 'weather_info';
+
+        if($type == 1){
+            $tableName = 'weather_tomorrow';
+        }
+
+        if($cityText != null){
+            $cityArray = [$cityText];
+        }
+
+        $datas = DB::table($tableName)->whereIn('city', $cityArray)->get();
         $count = 0;
         $message = '';
         $now = Carbon::now()->timezone('Asia/Taipei');
@@ -64,27 +75,37 @@ class LineBotController extends Controller
         
         foreach($datas as $data){
             $city = $data->city;
-            $time_period = $data->time_period;
             $temperature = $data->temperature;
             $probability_of_precipitation = $data->probability_of_precipitation;
             $temperature_text = $yesterday . ' 18:00 - '. $today .' 06:00';
             
-            if($time_period == 0){
-                $message = $message . $city . ':' . "\n";
-            }else if($time_period == 1){
-                $temperature_text = $today . ' 06:00 - 18:00';
-            }else if($time_period == 2){
-                $temperature_text = $today . ' 18:00 - ' . $tomorrow . ' 06:00';
-            }
+            if($type == 1){
+                $time_period = $data->time_period;
+                if($time_period == 0){
+                    $message = $message . $city . '明天氣候：' . "\n";
+                }else if($time_period == 1){
+                    $temperature_text = $today . ' 06:00 - 18:00';
+                }else if($time_period == 2){
+                    $temperature_text = $today . ' 18:00 - ' . $tomorrow . ' 06:00';
+                }
 
-            $message = $message . '【'. $temperature_text . ' 溫度為' . $temperature;
-            $message = $message . '， 降雨機率為' . $probability_of_precipitation . '%】' . "\n";
+                $message = $message . '【'. $temperature_text . ' 溫度為' . $temperature;
+                $message = $message . '， 降雨機率為' . $probability_of_precipitation . '%】' . "\n";
+            }else{
+                $message = $city . '今天氣候：' . "\n";
+                $message = $message . '【'. ' 溫度為' . $temperature;
+                $message = $message . '， 降雨機率為' . $probability_of_precipitation . '%】';
+            }
         }
 
         $message = rtrim($message, "\n");
 
-        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
-        $response = $this->sendMessage($textMessageBuilder);
+        if($cityText != null){
+            return $message;
+        }else{
+            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+            $response = $this->sendMessage($textMessageBuilder);
+        }
     }
 
     public function getMessageWeather(Request $request)
@@ -92,37 +113,34 @@ class LineBotController extends Controller
         $text = $request->events[0]['message']['text'];
         $replyToken = $request->events[0]['replyToken'];
         $cityData = Config::get('city');
+        $len = mb_strlen($text, 'utf-8');
+        $text = str_replace('台','臺',$text);
+        $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入【氣候】');
         
-        $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入正確的縣市名稱');
-        
-        if(in_array($text, $cityData)){
-            $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
-                '詢問'. $text .'的氣候',
-                new ConfirmTemplateBuilder('請問要選擇哪一天的氣候?', [
-                    new MessageTemplateActionBuilder('今天', $text . '今天氣候'),
-                    new MessageTemplateActionBuilder('明天', $text . '明天氣候'),
-                ]));
+        if($len > 3){
+            $text = mb_substr($text , 0 , 3, 'utf-8');
+        }else if($text == '氣候'){
+            $cityText = '請輸入下列任一個縣市名稱：' . "\n";
+            foreach($cityData as $city){
+                $cityText = $cityText . $city . '、';
+            }
+
+            $cityText = rtrim($cityText, '、');
+            $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
         }
 
-        // $req = new \Slim\Http\Request;
-        // $imageUrl = UrlBuilder::buildUrl($this->req, ['static', 'buttons', '1040.jpg']);
+        if(in_array($text, $cityData)){
+            Log::info('有近來');
+            $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
+                '詢問'. $text .'的氣候',
+                new ConfirmTemplateBuilder('請問要選擇哪一天?', [
+                    new MessageTemplateActionBuilder('今天', $this->sendMessageWeather(0, $text)),
+                    new MessageTemplateActionBuilder('明天', $this->sendMessageWeather(1, $text)),
+                ])
+            );
+            Log::info($messageBuilder);
+        }
 
-        // $buttonArray = [
-        //     new MessageTemplateActionBuilder('北部', '北部'),
-        //     new MessageTemplateActionBuilder('南部', '南部'),
-        //     new MessageTemplateActionBuilder('東部', '東部'),
-        //     new MessageTemplateActionBuilder('外島', '外島'),
-        // ];
-
-        // $imageUrl = UrlBuilder::buildUrl('./', ['image', 'weather.jpg']);
-        // $buttonTemplateBuilder = new ButtonTemplateBuilder(
-        //     '台灣氣候資訊',
-        //     '請選擇一個縣市',
-        //     '',
-        //     $buttonArray
-        //     );
-        // $messageBuilder = new TemplateMessageBuilder('Button alt text', $buttonTemplateBuilder);
-        
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
 
         if ($response->isSucceeded()) {
