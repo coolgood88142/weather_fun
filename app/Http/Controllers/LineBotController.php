@@ -116,29 +116,29 @@ class LineBotController extends Controller
         $len = mb_strlen($text, 'utf-8');
         $text = str_replace('台','臺',$text);
         $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入【氣候】');
-        
-        if($len > 3){
-            $text = mb_substr($text , 0 , 3, 'utf-8');
-        }else if($text == '氣候'){
-            $cityText = '請輸入下列任一個縣市名稱：' . "\n";
-            foreach($cityData as $city){
-                $cityText = $cityText . $city . '、';
+
+        if($len = 3){
+            // $text = mb_substr($text , 0 , 3, 'utf-8');
+            // $messageBuilder = null;
+            if($text == '氣候'){
+                $cityText = '請輸入下列任一個縣市名稱：' . "\n";
+                foreach($cityData as $city){
+                    $cityText = $cityText . $city . '、';
+                }
+    
+                $cityText = rtrim($cityText, '、');
+                $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
+            }else if(in_array($text, $cityData)){
+                $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
+                    '詢問'. $text .'的氣候',
+                    new ConfirmTemplateBuilder('請問要選擇哪一天?', [
+                        new MessageTemplateActionBuilder('今天', $this->sendMessageWeather(0, $text)),
+                        new MessageTemplateActionBuilder('明天', $this->sendMessageWeather(1, $text)),
+                    ])
+                );
             }
-
-            $cityText = rtrim($cityText, '、');
-            $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
         }
-
-        if(in_array($text, $cityData)){
-            $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
-                '詢問'. $text .'的氣候',
-                new ConfirmTemplateBuilder('請問要選擇哪一天?', [
-                    new MessageTemplateActionBuilder('今天', $this->sendMessageWeather(0, $text)),
-                    new MessageTemplateActionBuilder('明天', $this->sendMessageWeather(1, $text)),
-                ])
-            );
-        }
-
+        
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
 
         if ($response->isSucceeded()) {

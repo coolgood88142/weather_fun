@@ -61,10 +61,13 @@ class WeatherController extends Controller
             $nextWeekWeather = $townshipWeatherForecastData->locations[0]->location[0]->weatherElement[10]->time[$type]->elementValue[0]->value;
 
             $automaticWeatherData = $this->getCrawlerData($client, $weathers[2], urlencode($automatic[$city][0]));
-            $windDirection = $automaticWeatherData->location[0]->weatherElement[1]->elementValue;
-            $anemometer = $automaticWeatherData->location[0]->weatherElement[2]->elementValue;
-            $relativeHumidity = $automaticWeatherData->location[0]->weatherElement[4]->elementValue;
-            $barometricPressure = $automaticWeatherData->location[0]->weatherElement[5]->elementValue;
+            if(isset($automaticWeatherData->location[0])){
+                $windDirection = $automaticWeatherData->location[0]->weatherElement[1]->elementValue;
+                $anemometer = $automaticWeatherData->location[0]->weatherElement[2]->elementValue;
+                $relativeHumidity = $automaticWeatherData->location[0]->weatherElement[4]->elementValue;
+                $barometricPressure = $automaticWeatherData->location[0]->weatherElement[5]->elementValue;
+            }
+            
 
             $acidRainData = $this->getCrawlerData($client, $weathers[5], $locationName);
             $rainPh = $acidRainData->weatherElement[0]->location;
