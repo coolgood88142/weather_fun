@@ -130,7 +130,6 @@ class LineBotController extends Controller
         }
 
         if(in_array($text, $cityData)){
-            Log::info('有近來');
             $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
                 '詢問'. $text .'的氣候',
                 new ConfirmTemplateBuilder('請問要選擇哪一天?', [
@@ -138,7 +137,6 @@ class LineBotController extends Controller
                     new MessageTemplateActionBuilder('明天', $this->sendMessageWeather(1, $text)),
                 ])
             );
-            Log::info($messageBuilder);
         }
 
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
