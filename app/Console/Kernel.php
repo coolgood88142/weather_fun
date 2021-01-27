@@ -25,6 +25,15 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call('App\Http\Controllers\WeatherController@saveWeatherApiData');
+
+        $today = Carbon::now()->timezone('Asia/Taipei');
+        $hour = (int)$today->format('H');
+
+        //晚上9點執行
+        if($hour == 21){
+            $schedule->call('App\Http\Controllers\WeatherController@saveTomorrowWeatherApiData');
+        }
+        
     }
 
     /**

@@ -81,12 +81,13 @@ class LineBotController extends Controller
             
             if($type == 1){
                 $time_period = $data->time_period;
+                $temperature_text = $today . ' 06:00 - 18:00';
                 if($time_period == 0){
                     $message = $message . $city . '明天氣候：' . "\n";
                 }else if($time_period == 1){
-                    $temperature_text = $today . ' 06:00 - 18:00';
-                }else if($time_period == 2){
                     $temperature_text = $today . ' 18:00 - ' . $tomorrow . ' 06:00';
+                }else if($time_period == 2){ 
+                    $temperature_text = $tomorrow . ' 06:00 - 18:00';
                 }
 
                 $message = $message . '【'. $temperature_text . ' 溫度為' . $temperature;
@@ -121,12 +122,12 @@ class LineBotController extends Controller
             // $text = mb_substr($text , 0 , 3, 'utf-8');
             // $messageBuilder = null;
             if($text == '氣候'){
-                $cityText = '請輸入下列任一個縣市名稱：' . "\n";
+                $cityText = '請輸入要查詢的縣市：' . "\n";
                 foreach($cityData as $city){
-                    $cityText = $cityText . $city . '、';
+                    $cityText = $cityText . $city . "\n";
                 }
     
-                $cityText = rtrim($cityText, '、');
+                $cityText = rtrim($cityText, "\n");
                 $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
             }else if(in_array($text, $cityData)){
                 $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
