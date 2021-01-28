@@ -159,7 +159,7 @@ class LineBotController extends Controller
                                 'type'=> 'bubble',
                                 'hero'=> [
                                     'type'=> 'image',
-                                    'url'=> 'https://f2473c9c84b5.ngrok.io/image/weather.jpg',
+                                    'url'=> 'https://fierce-headland-21046.herokuapp.com/image/weather.jpg',
                                     'size'=> 'full',
                                     'aspectRatio'=> '20:13',
                                     'aspectMode'=> 'cover'
