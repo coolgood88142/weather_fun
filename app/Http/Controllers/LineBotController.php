@@ -13,8 +13,19 @@ use App\Transformers\Requests\WebhookRequestTransformer;
 use LINE\LINEBot;
 use LINE\LINEBot\Event\MessageEvent;
 use LINE\LINEBot\Constant\HTTPHeader;
+use LINE\LINEBot\Constant\Flex\ComponentMargin;
+use LINE\LINEBot\Constant\Flex\ComponentLayout;
+use LINE\LINEBot\Constant\Flex\ComponentSpacing;
+use LINE\LINEBot\Constant\Flex\ComponentButtonHeight;
 use LINE\LINEBot\SignatureValidator;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
+use LINE\LINEBot\MessageBuilder\RawMessageBuilder;
+use LINE\LINEBot\MessageBuilder\Flex\ContainerBuilder\BubbleContainerBuilder;
+use LINE\LINEBot\MessageBuilder\Flex\ComponentBuilder\BoxComponentBuilder;
+use LINE\LINEBot\MessageBuilder\Flex\ComponentBuilder\TextComponentBuilder;
+use LINE\LINEBot\MessageBuilder\Flex\ComponentBuilder\ButtonComponentBuilder;
+use LINE\LINEBot\MessageBuilder\Flex\ComponentBuilder\SpacerComponentBuilder;
+use LINE\LINEBot\MessageBuilder\FlexMessageBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateMessageBuilder;
 use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
 use LINE\LINEBot\MessageBuilder\TemplateBuilder\ButtonTemplateBuilder;
@@ -22,6 +33,9 @@ use LINE\LINEBot\MessageBuilder\TemplateBuilder\ConfirmTemplateBuilder;
 use LINE\LINEBot\TemplateActionBuilder\UriTemplateActionBuilder;
 use LINE\LINEBot\TemplateActionBuilder\MessageTemplateActionBuilder;
 use LINE\LINEBot\TemplateActionBuilder\PostbackTemplateActionBuilder;
+use LINE\LINEBot\QuickReplyBuilder\QuickReplyMessageBuilder;
+use LINE\LINEBot\TemplateActionBuilder\Uri\AltUriBuilder;
+use LINE\LINEBot\QuickReplyBuilder\ButtonBuilder\QuickReplyButtonBuilder;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Config;
@@ -111,35 +125,205 @@ class LineBotController extends Controller
 
     public function getMessageWeather(Request $request)
     {
-        $text = $request->events[0]['message']['text'];
+        Log::info($request->all());
         $replyToken = $request->events[0]['replyToken'];
-        $cityData = Config::get('city');
-        $len = mb_strlen($text, 'utf-8');
-        $text = str_replace('台','臺',$text);
-        $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入【氣候】');
-
-        if($len = 3){
-            // $text = mb_substr($text , 0 , 3, 'utf-8');
-            // $messageBuilder = null;
-            if($text == '氣候'){
-                $cityText = '請輸入要查詢的縣市：' . "\n";
-                foreach($cityData as $city){
-                    $cityText = $cityText . $city . "\n";
-                }
+        $messageBuilder =  new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入【氣候】');
+        if(isset($request->events[0]['postback'])){
+            $messageBuilder =  new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($request->events[0]['postback']['data']);
+        }else{
+            $text = $request->events[0]['message']['text'];
+            $cityData = Config::get('city');
+            $len = mb_strlen($text, 'utf-8');
+            $text = str_replace('台','臺',$text);
+            
     
-                $cityText = rtrim($cityText, "\n");
-                $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
-            }else if(in_array($text, $cityData)){
-                $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
-                    '詢問'. $text .'的氣候',
-                    new ConfirmTemplateBuilder('請問要選擇哪一天?', [
-                        new MessageTemplateActionBuilder('今天', $this->sendMessageWeather(0, $text)),
-                        new MessageTemplateActionBuilder('明天', $this->sendMessageWeather(1, $text)),
-                    ])
-                );
+            if($len = 3){
+                // $text = mb_substr($text , 0 , 3, 'utf-8');
+                // $messageBuilder = null;
+                if($text == '氣候'){
+                    $cityText = '請輸入要查詢的縣市：' . "\n";
+                    foreach($cityData as $city){
+                        $cityText = $cityText . $city . "\n";
+                    }
+        
+                    $cityText = rtrim($cityText, "\n");
+                    $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
+                }else if(in_array($text, $cityData)){
+                    // $Flex1 = FlexMessageBuilder::builder()
+                    // ->setAltText('alt test')
+                    // ->setContents(
+                    //     BubbleContainerBuilder::builder()
+                    //         ->setBody(
+                    //             BoxComponentBuilder::builder()
+                    //                 ->setLayout(ComponentLayout::VERTICAL)
+                    //                 ->setContents([
+                    //                     $this->sendMessageWeather(0, $text)
+                    //                 ])
+                    //         )
+                    // );
+    
+                    // $Flex2 = FlexMessageBuilder::builder()
+                    // ->setAltText('alt test')
+                    // ->setContents(
+                    //     BubbleContainerBuilder::builder()
+                    //         ->setBody(
+                    //             BoxComponentBuilder::builder()
+                    //                 ->setLayout(ComponentLayout::VERTICAL)
+                    //                 ->setContents([
+                    //                     $this->sendMessageWeather(1, $text)
+                    //                 ])
+                    //         )
+                    // );
+    
+                    // $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
+                    //     '詢問'. $text .'的氣候',
+                    //     new ConfirmTemplateBuilder('請問要選擇哪一天?', [
+                    //         new MessageTemplateActionBuilder('今天', $this->bot->replyMessage($replyToken, $Flex1)),
+                    //         new MessageTemplateActionBuilder('明天', $this->bot->replyMessage($replyToken, $Flex2)),
+                    //     ])
+                    // );
+                    
+    
+                    // $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
+                    //     FlexMessageBuilder::builder()
+                    // ->setAltText('alt test')
+                    // ->setContents(
+                    //     BubbleContainerBuilder::builder()
+                    //         ->setBody(
+                    //             BoxComponentBuilder::builder()
+                    //                 ->setLayout(ComponentLayout::VERTICAL)
+                    //                 ->setContents([
+                    //                     new MessageTemplateActionBuilder('今天', '今天'),
+                    //                     new MessageTemplateActionBuilder('明天', '明天'),
+                    //                 ])
+                    //         )
+                    // )
+                    // ->setQuickReply(
+                    //     new QuickReplyMessageBuilder([
+                    //         new QuickReplyButtonBuilder(
+                    //             new MessageTemplateActionBuilder('reply1', 'Reply1')
+                    //         ),
+                    //         new QuickReplyButtonBuilder(
+                    //             new MessageTemplateActionBuilder('reply2', 'Reply2')
+                    //         )
+                    //     ])
+                    //         ));
+    
+                    // $messageBuilder = FlexMessageBuilder::builder()
+                    // ->setAltText('alt test')
+                    // ->setContents(
+                    //     BubbleContainerBuilder::builder()
+                    //         ->setBody(
+                    //             BoxComponentBuilder::builder()
+                    //                 ->setLayout(ComponentLayout::VERTICAL)
+                    //                 ->setContents([
+                    //                     new TextComponentBuilder('今天'),
+                    //                     new TextComponentBuilder('明天')
+                    //                 ])
+                    //         )
+                    // );
+    
+    
+    
+                    // $messageBuilder = FlexMessageBuilder::builder()
+                    // ->setAltText('AltText')
+                    // ->setContents(BubbleContainerBuilder::builder()
+                    //     ->setBody(BoxComponentBuilder::builder()
+                    //         ->setLayout(ComponentLayout::VERTICAL)
+                    //         ->setContents([
+                    //             TextComponentBuilder::builder()
+                    //                 ->setText("Are you sure?")
+                    //                 ->setMargin(ComponentMargin::MD)
+                    //         ])
+                    //         ->setAction(new UriTemplateActionBuilder("View detail", "http://linecorp.com/", new AltUriBuilder("[object Object]"))))
+                    //     ->setFooter(BoxComponentBuilder::builder()
+                    //         ->setLayout(ComponentLayout::HORIZONTAL)
+                    //         ->setSpacing(ComponentSpacing::SM)
+                    //         ->setFlex(0)
+                    //         ->setContents([
+                    //             ButtonComponentBuilder::builder()
+                    //                 ->setHeight(ComponentButtonHeight::SM)
+                    //                 ->setAction(new MessageTemplateActionBuilder("Yes")),
+                    //             ButtonComponentBuilder::builder()
+                    //                 ->setHeight(ComponentButtonHeight::SM)
+                    //                 ->setAction(new MessageTemplateActionBuilder("No"))
+                    //         ]))
+                    //     ->setStyles(new BlockStyleBuilder())
+                    // );
+    
+                    $fix1 = $this->sendMessageWeather(0, $text);
+                    $fix2 = $this->sendMessageWeather(1, $text);
+    
+                    $messageBuilder =  new RawMessageBuilder(
+                        [
+                            'type' => 'flex',
+                            'altText' => 'alt test',
+                            'contents' => [
+                                'type'=> 'bubble',
+                                'body'=> [
+                                    'type'=> 'box',
+                                    'layout'=> 'vertical',
+                                    'contents'=> [
+                                        [
+                                            'type'=>'text',
+                                            'text'=>'請問要選擇哪一天?',
+                                            'margin'=>'md'
+                                        ],
+                                        [
+                                            'type'=>'spacer'
+                                        ],
+                                    ],
+                                ],
+                                'footer'=> [
+                                    'type'=>'box',
+                                    'layout'=>'horizontal',
+                                    'spacing'=>'sm',
+                                    'contents'=> [
+                                        [
+                                            'type'=>'button',
+                                            'action'=>[
+                                                'type'=>'postback',
+                                                'label' => '今天',
+                                                'text'=> '今天',
+                                                'data' => $fix1,
+                                            ],
+                                            'height'=>'sm'
+                                        ],
+                                        [
+                                            'type'=>'button',
+                                            'action'=>[
+                                                'type'=>'postback',
+                                                'label' => '明天',
+                                                'text'=> '明天',
+                                                'data' => $fix2,
+                                            ],
+                                            'height'=>'sm'
+                                        ]
+                                    ],
+                                    'flex'=> 0,
+                                ],
+                                'styles'=>[
+                                    'footer'=>[
+                                        'separator'=> true
+                                    ],
+                                ],
+                            ]
+                        ],
+                    );
+                }
             }
         }
-        
+       
+
+        $response = $this->bot->replyMessage($replyToken, $messageBuilder);
+
+        if ($response->isSucceeded()) {
+            echo 'Succeeded!';
+            return;
+        }
+    }
+
+    public function sendFlexMessageBuilder(FlexMessageBuilder $flexMessageBuilder){
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
 
         if ($response->isSucceeded()) {
