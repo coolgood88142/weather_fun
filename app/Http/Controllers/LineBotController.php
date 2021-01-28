@@ -125,9 +125,8 @@ class LineBotController extends Controller
 
     public function getMessageWeather(Request $request)
     {
-        Log::info($request->all());
         $replyToken = $request->events[0]['replyToken'];
-        $messageBuilder =  new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入【氣候】');
+        $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入【氣候】');
         if(isset($request->events[0]['postback'])){
             $messageBuilder =  new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($request->events[0]['postback']['data']);
         }else{
@@ -135,8 +134,8 @@ class LineBotController extends Controller
             $cityData = Config::get('city');
             $len = mb_strlen($text, 'utf-8');
             $text = str_replace('台','臺',$text);
-            
-    
+            $messageBuilder = '';
+
             if($len = 3){
                 // $text = mb_substr($text , 0 , 3, 'utf-8');
                 // $messageBuilder = null;
@@ -149,108 +148,6 @@ class LineBotController extends Controller
                     $cityText = rtrim($cityText, "\n");
                     $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
                 }else if(in_array($text, $cityData)){
-                    // $Flex1 = FlexMessageBuilder::builder()
-                    // ->setAltText('alt test')
-                    // ->setContents(
-                    //     BubbleContainerBuilder::builder()
-                    //         ->setBody(
-                    //             BoxComponentBuilder::builder()
-                    //                 ->setLayout(ComponentLayout::VERTICAL)
-                    //                 ->setContents([
-                    //                     $this->sendMessageWeather(0, $text)
-                    //                 ])
-                    //         )
-                    // );
-    
-                    // $Flex2 = FlexMessageBuilder::builder()
-                    // ->setAltText('alt test')
-                    // ->setContents(
-                    //     BubbleContainerBuilder::builder()
-                    //         ->setBody(
-                    //             BoxComponentBuilder::builder()
-                    //                 ->setLayout(ComponentLayout::VERTICAL)
-                    //                 ->setContents([
-                    //                     $this->sendMessageWeather(1, $text)
-                    //                 ])
-                    //         )
-                    // );
-    
-                    // $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
-                    //     '詢問'. $text .'的氣候',
-                    //     new ConfirmTemplateBuilder('請問要選擇哪一天?', [
-                    //         new MessageTemplateActionBuilder('今天', $this->bot->replyMessage($replyToken, $Flex1)),
-                    //         new MessageTemplateActionBuilder('明天', $this->bot->replyMessage($replyToken, $Flex2)),
-                    //     ])
-                    // );
-                    
-    
-                    // $messageBuilder = new \LINE\LINEBot\MessageBuilder\TemplateMessageBuilder(
-                    //     FlexMessageBuilder::builder()
-                    // ->setAltText('alt test')
-                    // ->setContents(
-                    //     BubbleContainerBuilder::builder()
-                    //         ->setBody(
-                    //             BoxComponentBuilder::builder()
-                    //                 ->setLayout(ComponentLayout::VERTICAL)
-                    //                 ->setContents([
-                    //                     new MessageTemplateActionBuilder('今天', '今天'),
-                    //                     new MessageTemplateActionBuilder('明天', '明天'),
-                    //                 ])
-                    //         )
-                    // )
-                    // ->setQuickReply(
-                    //     new QuickReplyMessageBuilder([
-                    //         new QuickReplyButtonBuilder(
-                    //             new MessageTemplateActionBuilder('reply1', 'Reply1')
-                    //         ),
-                    //         new QuickReplyButtonBuilder(
-                    //             new MessageTemplateActionBuilder('reply2', 'Reply2')
-                    //         )
-                    //     ])
-                    //         ));
-    
-                    // $messageBuilder = FlexMessageBuilder::builder()
-                    // ->setAltText('alt test')
-                    // ->setContents(
-                    //     BubbleContainerBuilder::builder()
-                    //         ->setBody(
-                    //             BoxComponentBuilder::builder()
-                    //                 ->setLayout(ComponentLayout::VERTICAL)
-                    //                 ->setContents([
-                    //                     new TextComponentBuilder('今天'),
-                    //                     new TextComponentBuilder('明天')
-                    //                 ])
-                    //         )
-                    // );
-    
-    
-    
-                    // $messageBuilder = FlexMessageBuilder::builder()
-                    // ->setAltText('AltText')
-                    // ->setContents(BubbleContainerBuilder::builder()
-                    //     ->setBody(BoxComponentBuilder::builder()
-                    //         ->setLayout(ComponentLayout::VERTICAL)
-                    //         ->setContents([
-                    //             TextComponentBuilder::builder()
-                    //                 ->setText("Are you sure?")
-                    //                 ->setMargin(ComponentMargin::MD)
-                    //         ])
-                    //         ->setAction(new UriTemplateActionBuilder("View detail", "http://linecorp.com/", new AltUriBuilder("[object Object]"))))
-                    //     ->setFooter(BoxComponentBuilder::builder()
-                    //         ->setLayout(ComponentLayout::HORIZONTAL)
-                    //         ->setSpacing(ComponentSpacing::SM)
-                    //         ->setFlex(0)
-                    //         ->setContents([
-                    //             ButtonComponentBuilder::builder()
-                    //                 ->setHeight(ComponentButtonHeight::SM)
-                    //                 ->setAction(new MessageTemplateActionBuilder("Yes")),
-                    //             ButtonComponentBuilder::builder()
-                    //                 ->setHeight(ComponentButtonHeight::SM)
-                    //                 ->setAction(new MessageTemplateActionBuilder("No"))
-                    //         ]))
-                    //     ->setStyles(new BlockStyleBuilder())
-                    // );
-    
                     $fix1 = $this->sendMessageWeather(0, $text);
                     $fix2 = $this->sendMessageWeather(1, $text);
     
@@ -260,6 +157,13 @@ class LineBotController extends Controller
                             'altText' => 'alt test',
                             'contents' => [
                                 'type'=> 'bubble',
+                                'hero'=> [
+                                    'type'=> 'image',
+                                    'url'=> 'https://f2473c9c84b5.ngrok.io/image/weather.jpg',
+                                    'size'=> 'full',
+                                    'aspectRatio'=> '20:13',
+                                    'aspectMode'=> 'cover'
+                                ],
                                 'body'=> [
                                     'type'=> 'box',
                                     'layout'=> 'vertical',
@@ -267,6 +171,8 @@ class LineBotController extends Controller
                                         [
                                             'type'=>'text',
                                             'text'=>'請問要選擇哪一天?',
+                                            'weight'=> 'bold',
+                                            'size'=> 'xl',
                                             'margin'=>'md'
                                         ],
                                         [
@@ -276,7 +182,7 @@ class LineBotController extends Controller
                                 ],
                                 'footer'=> [
                                     'type'=>'box',
-                                    'layout'=>'horizontal',
+                                    'layout'=>'vertical',
                                     'spacing'=>'sm',
                                     'contents'=> [
                                         [
@@ -310,11 +216,12 @@ class LineBotController extends Controller
                             ]
                         ],
                     );
+                    Log::info('組好了');
                 }
             }
         }
        
-
+        Log::info('發送前');
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
 
         if ($response->isSucceeded()) {
