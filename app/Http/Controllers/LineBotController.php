@@ -86,7 +86,7 @@ class LineBotController extends Controller
         $yesterday = $now->yesterday()->format('m/d');
         $today = $now->format('m/d');
         $tomorrow = $now->tomorrow()->format('m/d');
-        $carouselContentsData = [];
+        $carouselData = [];
         
         foreach($datas as $data){
             $city = $data->city;
@@ -97,31 +97,46 @@ class LineBotController extends Controller
             
             if($type == 1){
                 $time_period = $data->time_period;
+                $date = $today;
                 $temperature_text = $today . ' 06:00 - 18:00';
                 if($time_period == 0){
                     $message = $message . $city . '明天氣候：' . "\n";
                 }else if($time_period == 1){
                     $temperature_text = $today . ' 18:00 - ' . $tomorrow . ' 06:00';
+                    $date = $today . '-' . $tomorrow;
                 }else if($time_period == 2){ 
                     $temperature_text = $tomorrow . ' 06:00 - 18:00';
+                    $date = $tomorrow;
                 }
 
                 $message = $message . '【'. $temperature_text . ' 溫度為' . $temperature;
                 $message = $message . '， 降雨機率為' . $probability_of_precipitation . '%】' . "\n";
+                $url = $this->getProbabilityOfPrecipitationImage($probability_of_precipitation);
+                $carousel = $this->getCarouselArray($url, $date, $temperature_text, $temperature, $probability_of_precipitation);
+                array_push($carouselData, $carousel);
             }else{
                 $message = $city . '今天氣候：' . "\n";
                 $message = $message . '【'. ' 溫度為' . $temperature;
                 $message = $message . '， 降雨機率為' . $probability_of_precipitation . '%】';
-
-                
+                $url = $this->getProbabilityOfPrecipitationImage($probability_of_precipitation);
+                $carousel = $this->getCarouselArray($url, $today, '整天', $temperature, $probability_of_precipitation);
+                array_push($carouselData, $carousel);
             }
         }
         $message = rtrim($message, "\n");
 
+        $carouselContentsData = [
+            'type' => 'carousel',
+            'contents' => $carouselData
+        ];
+
         if($cityText != null){
-            return $messa+ge;
+            return $message;
         }else{
-            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+            // $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+            // $response = $this->sendMessage($textMessageBuilder);
+
+            $textMessageBuilder = new RawMessageBuilder($carouselContentsData);
             $response = $this->sendMessage($textMessageBuilder);
         }
     }
@@ -152,12 +167,14 @@ class LineBotController extends Controller
                     $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
                 }else if(in_array($text, $cityData)){
                     $fix1 = $this->sendMessageWeather(0, $text);
+                    Log::info($fix1);
+
                     $fix2 = $this->sendMessageWeather(1, $text);
     
                     $messageBuilder =  new RawMessageBuilder(
                         [
                             'type' => 'flex',
-                            'altText' => 'alt test',
+                            'altText' => '請問要選擇哪一天?',
                             'contents' => [
                                 'type'=> 'bubble',
                                 'hero'=> [
@@ -242,7 +259,20 @@ class LineBotController extends Controller
         }
     }
 
-    public function getCarouselArray(String $url, String $date, String $beginTime, String $endTime, String $temperature, String $probability_of_precipitation){
+    public function getProbabilityOfPrecipitationImage($probability_of_precipitation){
+        $rain = (int)$probability_of_precipitation;
+        $image = 'https://i.imgur.com/C5CarmM.jpg';
+
+        if($rain < 50){
+            $image = 'https://i.imgur.com/fzUnYi1.jpg';
+        }else if($rain >= 20 && $rain <= 50){
+            $image = 'https://i.imgur.com/WRsK9Dg.jpg';
+        }
+
+        return $image;
+    }
+
+    public function getCarouselArray(String $url, String $date, String $time, String $temperature, String $probability_of_precipitation){
         $carousel = [
             'type' => 'bubble', 
             'size' => 'micro',
@@ -266,20 +296,20 @@ class LineBotController extends Controller
                     ],
                     [
                         'type' => 'text',
-                        'text' => $time_period,
+                        'text' => $time,
                         'size' => 'sm',
                         'weight' => 'bold',
                         'wrap' => true
                     ],
                     [
                         'type' => 'text',
-                        'text' => ' 🌡️17°-19°',
+                        'text' => ' 🌡️' . $temperature,
                         'size' => 'sm',
                         'weight' => 'bold'
                     ],
                     [
                         'type' => 'text',
-                        'text' => ' 💧30%',
+                        'text' => ' 💧' . $probability_of_precipitation . '%',
                         'size' => 'sm',
                         'weight' => 'bold'
                     ],
