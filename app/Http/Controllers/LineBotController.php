@@ -86,12 +86,14 @@ class LineBotController extends Controller
         $yesterday = $now->yesterday()->format('m/d');
         $today = $now->format('m/d');
         $tomorrow = $now->tomorrow()->format('m/d');
+        $carouselContentsData = [];
         
         foreach($datas as $data){
             $city = $data->city;
             $temperature = $data->temperature;
             $probability_of_precipitation = $data->probability_of_precipitation;
             $temperature_text = $yesterday . ' 18:00 - '. $today .' 06:00';
+            $carousel = [];
             
             if($type == 1){
                 $time_period = $data->time_period;
@@ -110,13 +112,14 @@ class LineBotController extends Controller
                 $message = $city . '今天氣候：' . "\n";
                 $message = $message . '【'. ' 溫度為' . $temperature;
                 $message = $message . '， 降雨機率為' . $probability_of_precipitation . '%】';
+
+                
             }
         }
-
         $message = rtrim($message, "\n");
 
         if($cityText != null){
-            return $message;
+            return $messa+ge;
         }else{
             $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
             $response = $this->sendMessage($textMessageBuilder);
@@ -159,7 +162,7 @@ class LineBotController extends Controller
                                 'type'=> 'bubble',
                                 'hero'=> [
                                     'type'=> 'image',
-                                    'url'=> 'https://fierce-headland-21046.herokuapp.com/image/weather.jpg',
+                                    'url'=> 'https://i.imgur.com/l8yNat5.jpg',
                                     'size'=> 'full',
                                     'aspectRatio'=> '20:13',
                                     'aspectMode'=> 'cover'
@@ -237,5 +240,55 @@ class LineBotController extends Controller
             echo 'Succeeded!';
             return;
         }
+    }
+
+    public function getCarouselArray(String $url, String $date, String $beginTime, String $endTime, String $temperature, String $probability_of_precipitation){
+        $carousel = [
+            'type' => 'bubble', 
+            'size' => 'micro',
+            'hero' => [
+                'type' => 'image',
+                'url' => $url,
+                'size' => 'full',
+                'aspectMode' => 'cover',
+                'aspectRatio' => '320:213'
+            ],
+            'body' => [
+                'type' => 'box',
+                'layout' => 'vertical',
+                'contents' => [
+                    [
+                        'type' => 'text',
+                        'weight' => 'bold',
+                        'size' => 'sm',
+                        'wrap' => true,
+                        'text' => $date
+                    ],
+                    [
+                        'type' => 'text',
+                        'text' => $time_period,
+                        'size' => 'sm',
+                        'weight' => 'bold',
+                        'wrap' => true
+                    ],
+                    [
+                        'type' => 'text',
+                        'text' => ' 🌡️17°-19°',
+                        'size' => 'sm',
+                        'weight' => 'bold'
+                    ],
+                    [
+                        'type' => 'text',
+                        'text' => ' 💧30%',
+                        'size' => 'sm',
+                        'weight' => 'bold'
+                    ],
+                ],
+                'spacin' => 'sm',
+                'paddingAll' => '13px',
+            ],
+        ];
+
+        return $carousel;
     }
 }
