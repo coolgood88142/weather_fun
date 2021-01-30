@@ -63,7 +63,7 @@ class LineBotController extends Controller
         $now = Carbon::now()->timezone('Asia/Taipei');
         $yesterday = $now->yesterday()->format('m/d');
         $today = $now->format('m/d');
-        $tomorrow = $now->tomorrow()->format('m/d');
+        $tomorrow = $now->tomorrow('Asia/Taipei')->format('m/d');
         $carouselData = [];
         
         foreach($datas as $data){
