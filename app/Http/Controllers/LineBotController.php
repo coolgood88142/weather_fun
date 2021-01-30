@@ -6,36 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\WeatherController;
 use App\Services\LineBotService;
-use App\Services\WebhookResponseService;
-use App\Transformers\Requests\WebhookRequestTransformer;
 use LINE\LINEBot;
 use LINE\LINEBot\Event\MessageEvent;
 use LINE\LINEBot\Constant\HTTPHeader;
-use LINE\LINEBot\Constant\Flex\ComponentMargin;
-use LINE\LINEBot\Constant\Flex\ComponentLayout;
-use LINE\LINEBot\Constant\Flex\ComponentSpacing;
-use LINE\LINEBot\Constant\Flex\ComponentButtonHeight;
-use LINE\LINEBot\SignatureValidator;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 use LINE\LINEBot\MessageBuilder\RawMessageBuilder;
-use LINE\LINEBot\MessageBuilder\Flex\ContainerBuilder\BubbleContainerBuilder;
-use LINE\LINEBot\MessageBuilder\Flex\ComponentBuilder\BoxComponentBuilder;
-use LINE\LINEBot\MessageBuilder\Flex\ComponentBuilder\TextComponentBuilder;
-use LINE\LINEBot\MessageBuilder\Flex\ComponentBuilder\ButtonComponentBuilder;
-use LINE\LINEBot\MessageBuilder\Flex\ComponentBuilder\SpacerComponentBuilder;
 use LINE\LINEBot\MessageBuilder\FlexMessageBuilder;
-use LINE\LINEBot\MessageBuilder\TemplateMessageBuilder;
 use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
-use LINE\LINEBot\MessageBuilder\TemplateBuilder\ButtonTemplateBuilder;
-use LINE\LINEBot\MessageBuilder\TemplateBuilder\ConfirmTemplateBuilder;
-use LINE\LINEBot\TemplateActionBuilder\UriTemplateActionBuilder;
-use LINE\LINEBot\TemplateActionBuilder\MessageTemplateActionBuilder;
-use LINE\LINEBot\TemplateActionBuilder\PostbackTemplateActionBuilder;
-use LINE\LINEBot\QuickReplyBuilder\QuickReplyMessageBuilder;
-use LINE\LINEBot\TemplateActionBuilder\Uri\AltUriBuilder;
-use LINE\LINEBot\QuickReplyBuilder\ButtonBuilder\QuickReplyButtonBuilder;
+use LINE\LINEBot\RichMenuBuilder;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Config;
@@ -44,7 +23,6 @@ use Exception;
 class LineBotController extends Controller
 {
     private $lineBotService;
-    private $weatherController;
     private $client;
     private $bot;
     private $channel_access_token;
@@ -53,13 +31,13 @@ class LineBotController extends Controller
     public function __construct()
     {
         $this->lineBotService = app(LineBotService::class);
-        $this->weatherController = app(WeatherController::class);
 
         $this->channel_access_token = env('LINE_BOT_CHANNEL_ACCESS_TOKEN');
         $this->channel_secret = env('LINE_BOT_CHANNEL_SECRET');
 
         $httpClient = new CurlHTTPClient($this->channel_access_token);
         $this->bot = new LINEBot($httpClient, ['channelSecret' => $this->channel_secret]);
+        $httpClient = new \LINE\LINEBot\HTTPClient\CurlHTTPClient('<channel access token>');
         $this->client = $httpClient;
     }
 
@@ -98,14 +76,14 @@ class LineBotController extends Controller
             if($type == 1){
                 $time_period = $data->time_period;
                 $date = $today;
-                $temperature_text = $today . ' 06:00 - 18:00';
+                $temperature_text = ' 06:00 - 18:00';
                 if($time_period == 0){
                     $message = $message . $city . '明天氣候：' . "\n";
                 }else if($time_period == 1){
-                    $temperature_text = $today . ' 18:00 - ' . $tomorrow . ' 06:00';
+                    $temperature_text = ' 18:00 - ' . ' 06:00';
                     $date = $today . '-' . $tomorrow;
                 }else if($time_period == 2){ 
-                    $temperature_text = $tomorrow . ' 06:00 - 18:00';
+                    // $temperature_text = $tomorrow . ' 06:00 - 18:00';
                     $date = $tomorrow;
                 }
 
@@ -126,17 +104,18 @@ class LineBotController extends Controller
         $message = rtrim($message, "\n");
 
         $carouselContentsData = [
-            'type' => 'carousel',
-            'contents' => $carouselData
+            'type' => 'flex',
+            'altText' => '氣候',
+            'contents' => [
+                'type' => 'carousel',
+                'contents' => $carouselData
+            ]
         ];
 
         if($cityText != null){
-            return $message;
+            return $carouselContentsData;
         }else{
-            // $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
-            // $response = $this->sendMessage($textMessageBuilder);
-
-            $textMessageBuilder = new RawMessageBuilder($carouselContentsData);
+            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
             $response = $this->sendMessage($textMessageBuilder);
         }
     }
@@ -154,95 +133,103 @@ class LineBotController extends Controller
             $text = str_replace('台','臺',$text);
             $messageBuilder = '';
 
-            if($len = 3){
-                // $text = mb_substr($text , 0 , 3, 'utf-8');
-                // $messageBuilder = null;
-                if($text == '氣候'){
-                    $cityText = '請輸入要查詢的縣市：' . "\n";
-                    foreach($cityData as $city){
-                        $cityText = $cityText . $city . "\n";
-                    }
-        
-                    $cityText = rtrim($cityText, "\n");
-                    $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
-                }else if(in_array($text, $cityData)){
-                    $fix1 = $this->sendMessageWeather(0, $text);
-                    Log::info($fix1);
-
-                    $fix2 = $this->sendMessageWeather(1, $text);
-    
-                    $messageBuilder =  new RawMessageBuilder(
-                        [
-                            'type' => 'flex',
-                            'altText' => '請問要選擇哪一天?',
-                            'contents' => [
-                                'type'=> 'bubble',
-                                'hero'=> [
-                                    'type'=> 'image',
-                                    'url'=> 'https://i.imgur.com/l8yNat5.jpg',
-                                    'size'=> 'full',
-                                    'aspectRatio'=> '20:13',
-                                    'aspectMode'=> 'cover'
-                                ],
-                                'body'=> [
-                                    'type'=> 'box',
-                                    'layout'=> 'vertical',
-                                    'contents'=> [
-                                        [
-                                            'type'=>'text',
-                                            'text'=>'請問要選擇哪一天?',
-                                            'weight'=> 'bold',
-                                            'size'=> 'xl',
-                                            'margin'=>'md'
-                                        ],
-                                        [
-                                            'type'=>'spacer'
-                                        ],
-                                    ],
-                                ],
-                                'footer'=> [
-                                    'type'=>'box',
-                                    'layout'=>'vertical',
-                                    'spacing'=>'sm',
-                                    'contents'=> [
-                                        [
-                                            'type'=>'button',
-                                            'action'=>[
-                                                'type'=>'postback',
-                                                'label' => '今天',
-                                                'text'=> '今天',
-                                                'data' => $fix1,
-                                            ],
-                                            'height'=>'sm'
-                                        ],
-                                        [
-                                            'type'=>'button',
-                                            'action'=>[
-                                                'type'=>'postback',
-                                                'label' => '明天',
-                                                'text'=> '明天',
-                                                'data' => $fix2,
-                                            ],
-                                            'height'=>'sm'
-                                        ]
-                                    ],
-                                    'flex'=> 0,
-                                ],
-                                'styles'=>[
-                                    'footer'=>[
-                                        'separator'=> true
-                                    ],
-                                ],
-                            ]
-                        ],
-                    );
-                    Log::info('組好了');
+            if($text == '氣候'){
+                $cityText = '請輸入要查詢的縣市：' . "\n";
+                foreach($cityData as $city){
+                    $cityText = $cityText . $city . "\n";
                 }
+    
+                $cityText = rtrim($cityText, "\n");
+                $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
+            }else if(in_array($text, $cityData)){
+                // $fix1 = $this->sendMessageWeather(0, $text);
+                // $fix2 = $this->sendMessageWeather(1, $text);
+
+                $messageBuilder =  new RawMessageBuilder(
+                    [
+                        'type' => 'flex',
+                        'altText' => '請問要選擇哪一天?',
+                        'contents' => [
+                            'type'=> 'bubble',
+                            'hero'=> [
+                                'type'=> 'image',
+                                'url'=> 'https://i.imgur.com/l8yNat5.jpg',
+                                'size'=> 'full',
+                                'aspectRatio'=> '20:13',
+                                'aspectMode'=> 'cover'
+                            ],
+                            'body'=> [
+                                'type'=> 'box',
+                                'layout'=> 'vertical',
+                                'contents'=> [
+                                    [
+                                        'type'=>'text',
+                                        'text'=>'請問要選擇哪一天?',
+                                        'weight'=> 'bold',
+                                        'size'=> 'xl',
+                                        'margin'=>'md'
+                                    ],
+                                    [
+                                        'type'=>'spacer'
+                                    ],
+                                ],
+                            ],
+                            'footer'=> [
+                                'type'=>'box',
+                                'layout'=>'vertical',
+                                'spacing'=>'sm',
+                                'contents'=> [
+                                    [
+                                        'type'=>'button',
+                                        'action'=>[
+                                            'type'=>'message',
+                                            'label' => '今天',
+                                            'text'=> $text . '今天氣候',
+                                        ],
+                                        'height'=>'sm'
+                                    ],
+                                    [
+                                        'type'=>'button',
+                                        'action'=>[
+                                            'type'=>'message',
+                                            'label' => '明天',
+                                            'text'=> $text . '明天氣候',
+                                        ],
+                                        'height'=>'sm'
+                                    ]
+                                ],
+                                'flex'=> 0,
+                            ],
+                            'styles'=>[
+                                'footer'=>[
+                                    'separator'=> true
+                                ],
+                            ],
+                        ]
+                    ],
+                );
+                Log::info('組好了');
+            }else if(strpos($text,'今天氣候') || strpos($text,'明天氣候')){
+                $cityWeather = mb_substr($text , 0 , 3, 'utf-8');
+                if(in_array($cityWeather, $cityData)){
+                    $fix = '';
+                    if(strpos($text,'今天氣候')){
+                        $fix = $this->sendMessageWeather(0, $cityWeather);
+                    }else if(strpos($text,'明天氣候')){
+                        $fix = $this->sendMessageWeather(1, $cityWeather);
+                    }
+                }
+
+                $messageBuilder = new RawMessageBuilder($fix);
             }
         }
        
         Log::info('發送前');
+        // $richMenuBuilder = new \LINE\LINEBot\RichMenuBuilder();
+        // $response = $this->$bot->createRichMenu($richMenuBuilder);
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
+        
+
 
         if ($response->isSucceeded()) {
             echo 'Succeeded!';
@@ -259,13 +246,14 @@ class LineBotController extends Controller
         }
     }
 
-    public function getProbabilityOfPrecipitationImage($probability_of_precipitation){
+    public function getProbabilityOfPrecipitationImage(String $probability_of_precipitation){
         $rain = (int)$probability_of_precipitation;
+        Log::info($rain);
         $image = 'https://i.imgur.com/C5CarmM.jpg';
 
-        if($rain < 50){
+        if($rain >= 50){
             $image = 'https://i.imgur.com/fzUnYi1.jpg';
-        }else if($rain >= 20 && $rain <= 50){
+        }else if($rain > 20 && $rain < 50){
             $image = 'https://i.imgur.com/WRsK9Dg.jpg';
         }
 
@@ -303,19 +291,17 @@ class LineBotController extends Controller
                     ],
                     [
                         'type' => 'text',
-                        'text' => ' 🌡️' . $temperature,
+                        'text' => '🌡️' . $temperature,
                         'size' => 'sm',
                         'weight' => 'bold'
                     ],
                     [
                         'type' => 'text',
-                        'text' => ' 💧' . $probability_of_precipitation . '%',
+                        'text' => '💧' . $probability_of_precipitation . '%',
                         'size' => 'sm',
                         'weight' => 'bold'
                     ],
-                ],
-                'spacin' => 'sm',
-                'paddingAll' => '13px',
+                ]
             ],
         ];
 
