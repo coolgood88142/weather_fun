@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\WeatherController;
 use App\Services\LineBotService;
 use LINE\LINEBot;
 use LINE\LINEBot\Event\MessageEvent;
@@ -47,17 +48,6 @@ class LineBotController extends Controller
 
     public function sendMessageWeather(int $type, String $cityText){
         $cityArray = ['臺北市', '新北市'];
-        $tableName = 'weather_info';
-
-        if($type == 1){
-            $tableName = 'weather_tomorrow';
-        }
-
-        if($cityText != null){
-            $cityArray = [$cityText];
-        }
-
-        $datas = DB::table($tableName)->whereIn('city', $cityArray)->get();
         $count = 0;
         $message = '';
         $now = Carbon::now()->timezone('Asia/Taipei');
@@ -65,22 +55,29 @@ class LineBotController extends Controller
         $today = $now->format('m/d');
         $tomorrow = $now->tomorrow('Asia/Taipei')->format('m/d');
         $carouselData = [];
-        
-        foreach($datas as $data){
-            $city = $data->city;
-            $temperature = $data->temperature;
-            $probability_of_precipitation = $data->probability_of_precipitation;
-            $temperature_text = $yesterday . ' 18:00 - '. $today .' 06:00';
-            $carousel = [];
-            
-            if($type == 1){
+        $carouselContentsData = [];
+
+        if($type == 1){
+            if($cityText != null){
+                $cityArray = [$cityText];
+            }
+
+            $datas = DB::table('weather_tomorrow')->whereIn('city', $cityArray)->get();
+
+            foreach($datas as $data){
+                $city = $data->city;
+                $temperature = $data->temperature;
+                $probability_of_precipitation = $data->probability_of_precipitation;
+                $temperature_text = $yesterday . ' 18:00 - '. $today .' 06:00';
+                $carousel = [];
+
                 $time_period = $data->time_period;
                 $date = $today;
                 $temperature_text = ' 06:00 - 18:00';
                 if($time_period == 0){
                     $message = $message . $city . '明天氣候：' . "\n";
                 }else if($time_period == 1){
-                    $temperature_text = ' 18:00 - ' . ' 06:00';
+                    $temperature_text = ' 18:00 - 06:00';
                     $date = $today . '-' . $tomorrow;
                 }else if($time_period == 2){ 
                     // $temperature_text = $tomorrow . ' 06:00 - 18:00';
@@ -92,25 +89,90 @@ class LineBotController extends Controller
                 $url = $this->getProbabilityOfPrecipitationImage($probability_of_precipitation);
                 $carousel = $this->getCarouselArray($url, $date, $temperature_text, $temperature, $probability_of_precipitation);
                 array_push($carouselData, $carousel);
-            }else{
-                $message = $city . '今天氣候：' . "\n";
-                $message = $message . '【'. ' 溫度為' . $temperature;
-                $message = $message . '， 降雨機率為' . $probability_of_precipitation . '%】';
-                $url = $this->getProbabilityOfPrecipitationImage($probability_of_precipitation);
-                $carousel = $this->getCarouselArray($url, $today, '整天', $temperature, $probability_of_precipitation);
-                array_push($carouselData, $carousel);
             }
-        }
-        $message = rtrim($message, "\n");
 
-        $carouselContentsData = [
-            'type' => 'flex',
-            'altText' => '氣候',
-            'contents' => [
-                'type' => 'carousel',
-                'contents' => $carouselData
-            ]
-        ];
+            $message = rtrim($message, "\n");
+
+            $carouselContentsData = [
+                'type' => 'flex',
+                'altText' => '氣候',
+                'contents' => [
+                    'type' => 'carousel',
+                    'contents' => $carouselData
+                ]
+            ];
+        }else{
+            $weatherController = app(WeatherController::class);
+            $client = new \GuzzleHttp\Client();
+            $weathers = Config::get('weather');
+            $locationName = urlencode($cityText);
+            $todayDate = $now->format('Y-m-d');
+            $hour = (int)$now->format('H');
+            $count = 0;
+            $probabilityNum = 0;
+            $messageArray = [
+                [
+                    'type' => 'text',
+                    'text' => $now->format('m/d'),
+                    'weight' =>'bold',
+                    'size'=>'xl'
+                ]
+            ];
+
+            $weatherData = $weatherController->getCrawlerData($client, $weathers[13], $locationName);
+            if(isset($weatherData->locations[0])){
+                $weatherForecast = $weatherData->locations[0]->location[0]->weatherElement[6]->time;
+                foreach($weatherForecast as $forecast){
+                    $startTime = mb_substr($forecast->startTime, 0, 10, "utf-8");
+                    $time = mb_substr($forecast->startTime, 11, 5, "utf-8");
+                    $nowHour = (int)mb_substr($time, 0, 2, "utf-8");
+                    if($startTime == $todayDate){
+                        $data = mb_split('。', $forecast->elementValue[0]->value);
+                        $probabilityOfPrecipitation = mb_substr($data[1], 5, 2, "utf-8");
+                        $probabilityOfPrecipitation = str_replace('%','',$probabilityOfPrecipitation);
+                        $probabilityNum = $probabilityNum . (int)$probabilityOfPrecipitation;
+                        $temperature = mb_substr($data[2], 4, 2, "utf-8");
+                        $temperature = str_replace('度','',$temperature);
+
+                        $timeWeatherData = [
+                            'type' => 'text',
+                            'size'=>'xl',
+                            'weight' =>'bold',
+                            'text' => $time . ' 🌡️' . $temperature . '° 💧' . $probabilityOfPrecipitation . '%',
+                        ];
+
+                        array_push($messageArray, $timeWeatherData);
+                        $count++;
+                    }
+                }
+            }
+
+            $rain = $count > 1 ? round($probabilityNum/$count) : $probabilityNum;
+
+            $carouselContentsData = [
+                'type' => 'flex',
+                'altText' => '氣候',
+                'contents' => [
+                    "type"=> "bubble",
+                    "size"=> "giga",
+                    "hero"=> [
+                        "type"=> "image",
+                        "url"=> $this->getProbabilityOfPrecipitationImage((string) $rain),
+                        "size"=> "full",
+                        "aspectRatio"=> "20:13",
+                    ],
+                    "body"=> [
+                        "type"=> "box",
+                        "layout"=> "vertical",
+                        "contents"=> $messageArray
+                    ]
+                ]
+            ];
+
+
+        }
+
+        
 
         if($cityText != null){
             return $carouselContentsData;
@@ -227,6 +289,7 @@ class LineBotController extends Controller
         Log::info('發送前');
         // $richMenuBuilder = new \LINE\LINEBot\RichMenuBuilder();
         // $response = $this->$bot->createRichMenu($richMenuBuilder);
+        // $response = $this->bot->getRichMenuList();
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
         
 
@@ -248,7 +311,6 @@ class LineBotController extends Controller
 
     public function getProbabilityOfPrecipitationImage(String $probability_of_precipitation){
         $rain = (int)$probability_of_precipitation;
-        Log::info($rain);
         $image = 'https://i.imgur.com/C5CarmM.jpg';
 
         if($rain >= 50){

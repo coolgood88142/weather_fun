@@ -50,6 +50,9 @@ class WeatherController extends Controller
             $weatherArray = [];
             $acidRainPh = 0;
             $locationName = urlencode($city);
+            $temperature = '';
+            $probabilityOfPrecipitation = '';
+
             $weatherForecastData = $this->getCrawlerData($client, $weathers[0], $locationName);
             if(isset($weatherForecastData->location[0])){
                 $mint = $weatherForecastData->location[0]->weatherElement[2]->time[$type]->parameter->parameterName;
@@ -58,11 +61,16 @@ class WeatherController extends Controller
                 $probabilityOfPrecipitation = $weatherForecastData->location[0]->weatherElement[1]->time[$type]->parameter->parameterName;
             }
 
+            $nextWeekWeather = '';
             $townshipWeatherForecastData = $this->getCrawlerData($client, $weathers[1], $locationName);
             if(isset($townshipWeatherForecastData->locations[0])){
                 $nextWeekWeather = $townshipWeatherForecastData->locations[0]->location[0]->weatherElement[10]->time[$type]->elementValue[0]->value;
             }
 
+            $windDirection = '';
+            $anemometer = '';
+            $relativeHumidity = '';
+            $barometricPressure = '';
             $automaticWeatherData = $this->getCrawlerData($client, $weathers[2], urlencode($automatic[$city][0]));
             if(isset($automaticWeatherData->location[0])){
                 $windDirection = $automaticWeatherData->location[0]->weatherElement[1]->elementValue;
@@ -72,6 +80,7 @@ class WeatherController extends Controller
             }
             
 
+            $acidRainPh = 0;
             $acidRainData = $this->getCrawlerData($client, $weathers[5], $locationName);
             $rainPh = $acidRainData->weatherElement[0]->location;
             if(count($rainPh) > 0){
