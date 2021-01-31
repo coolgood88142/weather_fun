@@ -147,8 +147,8 @@ class LineBotController extends Controller
                 }
             }
 
-            $rain = $count > 1 ? round($probabilityNum/$count) : $probabilityNum;
-
+            $rain = $probabilityNum != 0 && $count > 1 ? round($probabilityNum/$count) : $probabilityNum;
+            
             $carouselContentsData = [
                 'type' => 'flex',
                 'altText' => '氣候',
