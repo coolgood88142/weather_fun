@@ -48,8 +48,6 @@ class LineBotController extends Controller
 
     public function sendMessageWeather(int $type, String $cityText){
         $cityArray = ['臺北市', '新北市'];
-        $count = 0;
-        $message = '';
         $now = Carbon::now()->timezone('Asia/Taipei');
         $yesterday = $now->yesterday()->format('m/d');
         $today = $now->format('m/d');
@@ -74,24 +72,18 @@ class LineBotController extends Controller
                 $time_period = $data->time_period;
                 $date = $today;
                 $temperature_text = ' 06:00 - 18:00';
-                if($time_period == 0){
-                    $message = $message . $city . '明天氣候：' . "\n";
-                }else if($time_period == 1){
+                if($time_period == 1){
                     $temperature_text = ' 18:00 - 06:00';
                     $date = $today . '-' . $tomorrow;
                 }else if($time_period == 2){ 
-                    // $temperature_text = $tomorrow . ' 06:00 - 18:00';
                     $date = $tomorrow;
                 }
 
-                $message = $message . '【'. $temperature_text . ' 溫度為' . $temperature;
-                $message = $message . '， 降雨機率為' . $probability_of_precipitation . '%】' . "\n";
                 $url = $this->getProbabilityOfPrecipitationImage($probability_of_precipitation);
                 $carousel = $this->getCarouselArray($url, $date, $temperature_text, $temperature, $probability_of_precipitation);
                 array_push($carouselData, $carousel);
             }
 
-            $message = rtrim($message, "\n");
 
             $carouselContentsData = [
                 'type' => 'flex',
@@ -172,13 +164,8 @@ class LineBotController extends Controller
 
         }
 
-        
-
         if($cityText != null){
             return $carouselContentsData;
-        }else{
-            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
-            $response = $this->sendMessage($textMessageBuilder);
         }
     }
 
@@ -204,9 +191,6 @@ class LineBotController extends Controller
                 $cityText = rtrim($cityText, "\n");
                 $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($cityText);
             }else if(in_array($text, $cityData)){
-                // $fix1 = $this->sendMessageWeather(0, $text);
-                // $fix2 = $this->sendMessageWeather(1, $text);
-
                 $messageBuilder =  new RawMessageBuilder(
                     [
                         'type' => 'flex',
@@ -283,16 +267,15 @@ class LineBotController extends Controller
                 }
 
                 $messageBuilder = new RawMessageBuilder($fix);
+            }else if($text == '雷達'){
+                $url = 'https://www.cwb.gov.tw/V8/C/W/OBS_Radar.html';
+                $content = $this->crawlerService->getOriginalData($url);
+                $date = $content->filter('div.tab-content showIMG > img ')->text();
             }
         }
        
         Log::info('發送前');
-        // $richMenuBuilder = new \LINE\LINEBot\RichMenuBuilder();
-        // $response = $this->$bot->createRichMenu($richMenuBuilder);
-        // $response = $this->bot->getRichMenuList();
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
-        
-
 
         if ($response->isSucceeded()) {
             echo 'Succeeded!';
