@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\WeatherController;
 use App\Services\LineBotService;
+use App\Services\CrawlerService;
 use LINE\LINEBot;
 use LINE\LINEBot\Event\MessageEvent;
 use LINE\LINEBot\Constant\HTTPHeader;
@@ -24,6 +25,7 @@ use Exception;
 class LineBotController extends Controller
 {
     private $lineBotService;
+    private $crawlerService;
     private $client;
     private $bot;
     private $channel_access_token;
@@ -32,6 +34,7 @@ class LineBotController extends Controller
     public function __construct()
     {
         $this->lineBotService = app(LineBotService::class);
+        $this->crawlerService = app(CrawlerService::class);
 
         $this->channel_access_token = env('LINE_BOT_CHANNEL_ACCESS_TOKEN');
         $this->channel_secret = env('LINE_BOT_CHANNEL_SECRET');
@@ -268,22 +271,87 @@ class LineBotController extends Controller
 
                 $messageBuilder = new RawMessageBuilder($fix);
             }else if($text == '雷達'){
-                $url = 'https://www.cwb.gov.tw/V8/C/W/OBS_Radar.html';
-                $content = $this->crawlerService->getOriginalData($url);
-                $date = $content->filter('div.tab-content showIMG > img ')->text();
+                $url = 'https://www.cwb.gov.tw';
+                $radarUrl = $url . '/V8/C/W/OBS_Radar.html';
+                $content = $this->crawlerService->getOriginalData($radarUrl);
+                $image =  $content->filter('div > img')->first()->attr('src');
+                $radarImage = $url . $image;
+
+                $messageBuilder =  new RawMessageBuilder(
+                    [
+                        'type' => 'flex',
+                        'altText' => '氣象雷達圖',
+                        'contents' => [
+                            'type'=> 'bubble',
+                            'body'=> [
+                            'type'=> 'box',
+                            'layout'=> 'vertical',
+                                'contents'=> [
+                                    [
+                                        'type'=> 'image',
+                                        'url'=> $radarImage,
+                                        'size'=> 'full',
+                                        'aspectMode'=> 'cover',
+                                        'aspectRatio'=> '1:1',
+                                        'gravity'=> 'center'
+                                    ],
+                                    [
+                                        'type'=> 'box',
+                                        'layout'=> 'vertical',
+                                        'contents'=> [],
+                                        'position'=> 'absolute',
+                                        'background'=> [
+                                            'type'=> 'linearGradient',
+                                            'angle'=> '0deg',
+                                            'endColor'=> '#00000000',
+                                            'startColor'=> '#00000099'
+                                        ],
+                                        'width'=> '100%',
+                                        'height'=> '40%',
+                                        'offsetBottom'=> '0px',
+                                        'offsetStart'=> '0px',
+                                        'offsetEnd'=> '0px'
+                                    ],
+                                    [
+                                        'type'=> 'box',
+                                        'layout'=> 'horizontal',
+                                        'contents'=> [
+                                            [
+                                                'type'=> 'box',
+                                                'layout'=> 'vertical',
+                                                'contents'=> [
+                                                    [
+                                                        'type'=> 'box',
+                                                        'layout'=> 'horizontal',
+                                                        'contents'=> [
+                                                            [
+                                                                'type'=> 'text',
+                                                                'text'=> '氣象雷達圖',
+                                                                'size'=> 'xl',
+                                                                'color'=> '#ffffff'
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ],
+                                                'spacing'=> 'xs'
+                                            ]
+                                        ],
+                                        'position'=> 'absolute',
+                                        'offsetBottom'=> '0px',
+                                        'offsetStart'=>'0px',
+                                        'offsetEnd'=> '0px',
+                                        'paddingAll'=> '20px'
+                                    ],
+                                ],
+                                'paddingAll'=> '0px'
+                            ]
+                        ]
+                    ]
+                );
             }
         }
        
         Log::info('發送前');
-        $response = $this->bot->replyMessage($replyToken, $messageBuilder);
-
-        if ($response->isSucceeded()) {
-            echo 'Succeeded!';
-            return;
-        }
-    }
-
-    public function sendFlexMessageBuilder(FlexMessageBuilder $flexMessageBuilder){
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
 
         if ($response->isSucceeded()) {

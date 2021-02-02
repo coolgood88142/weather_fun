@@ -170,7 +170,12 @@ class WeatherController extends Controller
     public function getCrawlerData(Client $client, String $weather, String $locationName){
         $token = 'CWB-96170F0C-F4B6-4626-B946-D6892DA6D584';
         $weatherUrl = 'https://opendata.cwb.gov.tw/api';
-        $url = $weatherUrl . $weather . '?Authorization=' . $token . '&locationName=' . $locationName;
+        $url = $weatherUrl . $weather . '?Authorization=' . $token;
+        
+        if($locationName!=null && $locationName!=''){
+            $url = $url . '&locationName=' . $locationName;
+        }
+        
         $response = $client->get($url);
         $weatherData = json_decode($response->getBody())->records;
 
