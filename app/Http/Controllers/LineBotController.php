@@ -175,10 +175,11 @@ class LineBotController extends Controller
     public function getMessageWeather(Request $request)
     {
         $replyToken = $request->events[0]['replyToken'];
-        $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入【氣候】');
+        $messageBuilder = null;
         if(isset($request->events[0]['postback'])){
             $messageBuilder =  new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($request->events[0]['postback']['data']);
         }else{
+            $messageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('請輸入【氣候】');
             $text = $request->events[0]['message']['text'];
             $cityData = Config::get('city');
             $len = mb_strlen($text, 'utf-8');
@@ -348,6 +349,85 @@ class LineBotController extends Controller
                         ]
                     ]
                 );
+            }else if($text == '富果'){
+                $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
+                $symbolId = '3515';
+                $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/meta';
+                $url = $fugleUrl . '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+                $Guzzleclient = new \GuzzleHttp\Client();
+                                        
+                $response = $Guzzleclient->get($url);
+                $json = json_decode($response->getBody());
+                $meta = $json->data->meta;
+
+                $fugles = Config::get('fugle');
+                $messageArray = [
+                    [
+                        'type'=> 'text',
+                        'text'=> '華擎股票',
+                        'weight'=> 'bold',
+                        'size'=> 'xxl',
+                        'margin'=> 'md'
+                    ],
+                    [
+                        'type'=> 'separator',
+                        'margin'=> 'xxl'
+                    ],
+                ];
+                $count = 0;
+                foreach($fugles as $fugle){
+                    foreach($fugle as $key => $value){
+                        $fugleValue = $meta->$key;
+                        // $fugleText = $fugleValue == true ? '是' : ($fugleValue == false ? '否' : $fugleValue);
+                        $fugleText = is_numeric($fugleValue) ? '$' . $fugleValue : $fugleValue;
+                        
+                        $message = [
+                            'type'=> 'box',
+                            'layout'=> 'horizontal',
+                            'contents'=> [
+                                [
+                                    'type'=> 'text',
+                                    'text'=> $value,
+                                    'size'=> 'sm',
+                                    'color'=> '#555555',
+                                    'flex'=> 0
+                                ],
+                                [
+                                    'type'=> 'text',
+                                    'text'=> $fugleText,
+                                    'size'=> 'sm',
+                                    'color'=> '#111111',
+                                    'align'=> 'end'
+                                ]
+                            ]
+                        ];
+                        array_push($messageArray, $message);
+                    }
+
+                    if($count == 0){
+                        array_push($messageArray, [
+                            'type'=> 'separator',
+                            'margin'=> 'xxl'
+                        ]);
+                    }
+                    $count++;
+                }
+
+                $messageBuilder =  new RawMessageBuilder(
+                    [
+                        'type' => 'flex',
+                        'altText' => '華擎股票資訊',
+                        'contents' => [
+                            'type'=> 'bubble',
+                                'body'=> [
+                                  'type'=> 'box',
+                                  'layout'=> 'vertical',
+                                  'contents'=> $messageArray
+                                ]  
+                        ]
+                        
+                    ]
+                );
             }
         }
        
@@ -358,6 +438,78 @@ class LineBotController extends Controller
             echo 'Succeeded!';
             return;
         }
+    }
+
+    public function testSymboData(){
+        $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
+        $symbolId = '3515';
+        $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/meta';
+        $url = $fugleUrl . '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+        $Guzzleclient = new \GuzzleHttp\Client();
+                                
+        $response = $Guzzleclient->get($url);
+        $json = json_decode($response->getBody());
+        $meta = $json->data->meta;
+        
+
+        $fugles = Config::get('fugle');
+        $messageArray = [
+            [
+                'type'=> 'text',
+                'text'=> '華擎股票',
+                'weight'=> 'bold',
+                'size'=> 'xxl',
+                'margin'=> 'md'
+            ],
+            [
+                'type'=> 'separator',
+                'margin'=> 'xxl'
+            ],
+        ];
+        $count = 0;
+        $typeArray = [];
+        foreach($fugles as $fugle){
+            foreach($fugle as $key => $value){
+                $fugleValue = $meta->$key;
+                // $fugleText = '';
+                // $fugleText = is_bool($fugleValue) ? (($fugleValue == true) ? '是' : '否') :  $fugleValue;
+                // $fugleText = is_numeric($fugleValue) ? '$' . $fugleValue : $fugleValue;
+
+                
+                array_push($typeArray, is_bool($fugleValue));
+
+                $message = [
+                    'type'=> 'box',
+                    'layout'=> 'horizontal',
+                    'contents'=> [
+                        [
+                            'type'=> 'text',
+                            'text'=> $value,
+                            'size'=> 'sm',
+                            'color'=> '#555555',
+                            'flex'=> 0
+                        ],
+                        [
+                            'type'=> 'text',
+                            'text'=> $fugleValue,
+                            'size'=> 'sm',
+                            'color'=> '#111111',
+                            'align'=> 'end'
+                        ]
+                    ]
+                ];
+                array_push($messageArray, $message);
+            }
+
+            if($count == 0){
+                array_push($messageArray, [
+                    'type'=> 'separator',
+                    'margin'=> 'xxl'
+                ]);
+            }
+            $count++;
+        }
+            dd($typeArray);
     }
 
     public function getProbabilityOfPrecipitationImage(String $probability_of_precipitation){

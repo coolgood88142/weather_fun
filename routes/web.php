@@ -36,3 +36,7 @@ Route::post('/showWeather','LineBotController@showWeatherTemplate')->name('showW
 Route::get('/tomorrowWeatherApi','WeatherController@saveTomorrowWeatherApiData');
 
 // Route::post('/callback', 'LineController@webhook');
+
+Route::get('/testSymboData','LineBotController@testSymboData');
+
+Route::post('/stock','StockController@getMessageStock')->name('stock');
