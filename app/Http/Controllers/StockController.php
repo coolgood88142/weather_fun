@@ -11,6 +11,7 @@ use App\Services\CrawlerService;
 use LINE\LINEBot;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
+use LINE\LINEBot\MessageBuilder\RawMessageBuilder;
 use Config;
 
 class StockController extends Controller
@@ -122,8 +123,10 @@ class StockController extends Controller
                     ]
                 ],
             );
+        }else if($text == '線圖'){
+
         }
-        
+
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
 
         if ($response->isSucceeded()) {
