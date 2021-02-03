@@ -124,7 +124,83 @@ class StockController extends Controller
                 ],
             );
         }else if($text == '線圖'){
+            $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
+            $symbolId = '3515';
+            $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/chart';
+            $url = $fugleUrl . '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+            $Guzzleclient = new \GuzzleHttp\Client();
+                                        
+            $response = $Guzzleclient->get($url);
+            $json = json_decode($response->getBody());
+            $dealts = $json->data->chart;
+            $deatsKeys = array_keys(get_object_vars($dealts));
+            $lastKey = $deatsKeys[count($deatsKeys) - 1];
+            $lastDeatlsData = $dealts->$lastKey;
+            $charts = Config::get('chart');
 
+            $messageArray = [
+                [
+                    'type'=> 'text',
+                    'text'=> '華擎股票',
+                    'weight'=> 'bold',
+                    'size'=> 'xxl',
+                    'margin'=> 'md'
+                ],
+                [
+                    'type'=> 'separator',
+                    'margin'=> 'xxl'
+                ],
+            ];
+
+            foreach($charts as $chart){
+                foreach($chart as $key => $value){
+                    $chartValue = $lastDeatlsData->$key;
+                    $message = [
+                        'type'=> 'box',
+                        'layout'=> 'horizontal',
+                        'contents'=> [
+                            [
+                                'type'=> 'text',
+                                'text'=> $value,
+                                'size'=> 'sm',
+                                'color'=> '#555555',
+                                'flex'=> 0
+                            ],
+                            [
+                                'type'=> 'text',
+                                'text'=> (string)$chartValue,
+                                'size'=> 'sm',
+                                'color'=> '#111111',
+                                'align'=> 'end'
+                            ]
+                        ]
+                    ];
+                    array_push($messageArray, $message);
+                }
+            }
+
+            $messageBuilder =  new RawMessageBuilder(
+                [
+                    'type' => 'flex',
+                    'altText' => '華擎線圖',
+                    'contents' => [
+                        'type'=> 'bubble',
+                            'body'=> [
+                              'type'=> 'box',
+                              'layout'=> 'vertical',
+                              'contents'=> $messageArray
+                            ]  
+                    ]
+                    
+                ]
+            );
+
+        }else if($text == '統計資訊'){
+            $messageBuilder = new TextMessageBuilder('');
+        }else if($text == '當日資訊'){
+            $messageBuilder = new TextMessageBuilder('');
+        }else if($text == '當日成交資訊'){
+            $messageBuilder = new TextMessageBuilder('');
         }
 
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);

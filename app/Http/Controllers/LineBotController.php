@@ -442,17 +442,21 @@ class LineBotController extends Controller
 
     public function testSymboData(){
         $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
-        $symbolId = '3515';
-        $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/meta';
-        $url = $fugleUrl . '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
-        $Guzzleclient = new \GuzzleHttp\Client();
-                                
-        $response = $Guzzleclient->get($url);
-        $json = json_decode($response->getBody());
-        $meta = $json->data->meta;
-        
+            $symbolId = '3515';
+            $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/chart';
+            $url = $fugleUrl . '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+            $Guzzleclient = new \GuzzleHttp\Client();
+                                        
+            $response = $Guzzleclient->get($url);
+            $json = json_decode($response->getBody());
+            $dealts = $json->data->chart;
+            $deatsKeys = array_keys(get_object_vars($dealts));
+            $lastKey = $deatsKeys[count($deatsKeys) - 1];
+            $lastDeatlsData = $dealts->$lastKey;
+            // $last = array_slice($dealts,-1,1);
+            // dd($lastDeatlsData);       
 
-        $fugles = Config::get('fugle');
+        $fugles = Config::get('chart');
         $messageArray = [
             [
                 'type'=> 'text',
@@ -470,13 +474,13 @@ class LineBotController extends Controller
         $typeArray = [];
         foreach($fugles as $fugle){
             foreach($fugle as $key => $value){
-                $fugleValue = $meta->$key;
+                $fugleValue = $lastDeatlsData->$key;
                 // $fugleText = '';
                 // $fugleText = is_bool($fugleValue) ? (($fugleValue == true) ? '是' : '否') :  $fugleValue;
                 // $fugleText = is_numeric($fugleValue) ? '$' . $fugleValue : $fugleValue;
 
                 
-                array_push($typeArray, is_bool($fugleValue));
+                // array_push($typeArray, is_bool($fugleValue));
 
                 $message = [
                     'type'=> 'box',
@@ -491,7 +495,7 @@ class LineBotController extends Controller
                         ],
                         [
                             'type'=> 'text',
-                            'text'=> $fugleValue,
+                            'text'=> (string)$fugleValue,
                             'size'=> 'sm',
                             'color'=> '#111111',
                             'align'=> 'end'
@@ -509,7 +513,7 @@ class LineBotController extends Controller
             }
             $count++;
         }
-            dd($typeArray);
+            dd($messageArray);
     }
 
     public function getProbabilityOfPrecipitationImage(String $probability_of_precipitation){
