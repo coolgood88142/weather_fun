@@ -352,15 +352,16 @@ class LineBotController extends Controller
             }else if($text == '富果'){
                 $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
                 $symbolId = '3515';
-                $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/meta';
-                $url = $fugleUrl . '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+                $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/dealts';
+                $url = $fugleUrl . '?symbolId='. $symbolId . '&apiToken=' . $apiToken . '&limit=1';
                 $Guzzleclient = new \GuzzleHttp\Client();
                                         
                 $response = $Guzzleclient->get($url);
                 $json = json_decode($response->getBody());
-                $meta = $json->data->meta;
+                $dealts = $json->data->dealts;
+                dd($json);
 
-                $fugles = Config::get('fugle');
+                $fugles = Config::get('dealts');
                 $messageArray = [
                     [
                         'type'=> 'text',
@@ -443,20 +444,22 @@ class LineBotController extends Controller
     public function testSymboData(){
         $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
             $symbolId = '3515';
-            $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/chart';
+            $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/meta';
             $url = $fugleUrl . '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
             $Guzzleclient = new \GuzzleHttp\Client();
                                         
             $response = $Guzzleclient->get($url);
             $json = json_decode($response->getBody());
-            $dealts = $json->data->chart;
-            $deatsKeys = array_keys(get_object_vars($dealts));
-            $lastKey = $deatsKeys[count($deatsKeys) - 1];
-            $lastDeatlsData = $dealts->$lastKey;
+            $data = get_object_vars($json->data->meta);
+      
+            // $deatsKeys = array_keys($dealts);
+            // $lastKey = $deatsKeys[count($deatsKeys) - 1];
+            // $lastDeatlsData = $dealts->$lastKey;
             // $last = array_slice($dealts,-1,1);
-            // dd($lastDeatlsData);       
+            // $test = $dealts[0]->at;
+            dd($data);       
 
-        $fugles = Config::get('chart');
+        $fugles = Config::get('meta');
         $messageArray = [
             [
                 'type'=> 'text',
@@ -473,8 +476,8 @@ class LineBotController extends Controller
         $count = 0;
         $typeArray = [];
         foreach($fugles as $fugle){
-            foreach($fugle as $key => $value){
-                $fugleValue = $lastDeatlsData->$key;
+            // foreach($fugle as $key => $value){
+                $fugleValue = $data->$key;
                 // $fugleText = '';
                 // $fugleText = is_bool($fugleValue) ? (($fugleValue == true) ? '是' : '否') :  $fugleValue;
                 // $fugleText = is_numeric($fugleValue) ? '$' . $fugleValue : $fugleValue;
@@ -503,17 +506,53 @@ class LineBotController extends Controller
                     ]
                 ];
                 array_push($messageArray, $message);
-            }
 
-            if($count == 0){
-                array_push($messageArray, [
-                    'type'=> 'separator',
-                    'margin'=> 'xxl'
-                ]);
-            }
-            $count++;
+                // if(count($messageArray) == 1){
+                //     array_push($messageArray[0], [
+                //         'margin'=> 'xxl',
+                //         'spacing'=> 'sm',
+                //     ]);
+                //     dd($messageArray);
+                // }
+            // }
+
+            // if($count == 0){
+            //     array_push($messageArray, [
+            //         'type'=> 'separator',
+            //         'margin'=> 'xxl'
+            //     ]);
+            // }
+            // $count++;
         }
-            dd($messageArray);
+
+        $messageBuilder =  new RawMessageBuilder(
+            [
+                'type' => 'flex',
+                'altText' => '華擎線圖',
+                'contents' => [
+                    'type'=> 'bubble',
+                        'body'=> [
+                        'type'=> 'box',
+                        'layout'=> 'vertical',
+                        'contents'=> $messageArray
+                        ]  
+                ]
+                
+            ]
+        );
+            dd([
+                'type' => 'flex',
+                'altText' => '華擎線圖',
+                'contents' => [
+                    'type'=> 'bubble',
+                        'body'=> [
+                        'type'=> 'box',
+                        'layout'=> 'vertical',
+                        'contents'=> $messageArray
+                        ]  
+                ]
+                
+            ]);
     }
 
     public function getProbabilityOfPrecipitationImage(String $probability_of_precipitation){

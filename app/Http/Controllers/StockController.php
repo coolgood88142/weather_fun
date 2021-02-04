@@ -39,7 +39,12 @@ class StockController extends Controller
     public function getMessageStock(Request $request){
         $replyToken = $request->events[0]['replyToken'];
         $text = $request->events[0]['message']['text'];
-        $messageBuilder = new TextMessageBuilder('請輸入【股票】');
+        $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
+        $symbolId = '3515';
+        $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/';
+        $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+        
+        $messageBuilder = new TextMessageBuilder('請輸入【股票代碼】');
 
         if($text == '股票'){
             $messageBuilder =  new RawMessageBuilder(
@@ -50,7 +55,7 @@ class StockController extends Controller
                         'type'=> 'bubble',
                         'hero'=> [
                             'type'=> 'image',
-                            'url'=> 'https://i.imgur.com/FMmIbdw.jpg',
+                            'url'=> 'https://i.imgur.com/Yx8s4WL.png',
                             'size'=> 'full',
                             'aspectRatio'=> '20:13',
                             'aspectMode'=> 'cover'
@@ -124,83 +129,227 @@ class StockController extends Controller
                 ],
             );
         }else if($text == '線圖'){
-            $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
-            $symbolId = '3515';
-            $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/chart';
-            $url = $fugleUrl . '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+            $url = $fugleUrl . 'chart' . $parameter;
             $Guzzleclient = new \GuzzleHttp\Client();
-                                        
             $response = $Guzzleclient->get($url);
             $json = json_decode($response->getBody());
-            $dealts = $json->data->chart;
-            $deatsKeys = array_keys(get_object_vars($dealts));
-            $lastKey = $deatsKeys[count($deatsKeys) - 1];
-            $lastDeatlsData = $dealts->$lastKey;
-            $charts = Config::get('chart');
+            $datas = $json->data->chart;
+            $deatsKeys = array_keys(get_object_vars($datas));
 
-            $messageArray = [
-                [
-                    'type'=> 'text',
-                    'text'=> '華擎股票',
-                    'weight'=> 'bold',
-                    'size'=> 'xxl',
-                    'margin'=> 'md'
-                ],
-                [
-                    'type'=> 'separator',
-                    'margin'=> 'xxl'
-                ],
-            ];
+            if(count($deatsKeys) > 0){
+                $lastKey = $deatsKeys[count($deatsKeys) - 1];
+                $lastDeatlsData = $datas->$lastKey;
+                $charts = Config::get('chart');
 
-            foreach($charts as $chart){
-                foreach($chart as $key => $value){
-                    $chartValue = $lastDeatlsData->$key;
-                    $message = [
-                        'type'=> 'box',
-                        'layout'=> 'horizontal',
-                        'contents'=> [
-                            [
-                                'type'=> 'text',
-                                'text'=> $value,
-                                'size'=> 'sm',
-                                'color'=> '#555555',
-                                'flex'=> 0
-                            ],
-                            [
-                                'type'=> 'text',
-                                'text'=> (string)$chartValue,
-                                'size'=> 'sm',
-                                'color'=> '#111111',
-                                'align'=> 'end'
+                $messageArray = [
+                    [
+                        'type'=> 'text',
+                        'text'=> '華擎股票',
+                        'weight'=> 'bold',
+                        'size'=> 'xxl',
+                        'margin'=> 'md'
+                    ],
+                    [
+                        'type'=> 'separator',
+                        'margin'=> 'xxl'
+                    ],
+                ];
+
+                foreach($charts as $chart){
+                    foreach($chart as $key => $value){
+                        $chartValue = $lastDeatlsData->$key;
+                        $message = [
+                            'type'=> 'box',
+                            'layout'=> 'horizontal',
+                            'contents'=> [
+                                [
+                                    'type'=> 'text',
+                                    'text'=> $value,
+                                    'size'=> 'sm',
+                                    'color'=> '#555555',
+                                    'flex'=> 0
+                                ],
+                                [
+                                    'type'=> 'text',
+                                    'text'=> (string)$chartValue,
+                                    'size'=> 'sm',
+                                    'color'=> '#111111',
+                                    'align'=> 'end'
+                                ]
                             ]
-                        ]
-                    ];
-                    array_push($messageArray, $message);
-                }
-            }
+                        ];
+                        array_push($messageArray, $message);
 
-            $messageBuilder =  new RawMessageBuilder(
-                [
-                    'type' => 'flex',
-                    'altText' => '華擎線圖',
-                    'contents' => [
-                        'type'=> 'bubble',
-                            'body'=> [
-                              'type'=> 'box',
-                              'layout'=> 'vertical',
-                              'contents'=> $messageArray
-                            ]  
+                        if(count($messageArray) == 1){
+                            array_push($messageArray[1], [
+                                'margin'=> 'xxl',
+                                'spacing'=> 'sm',
+                            ]);
+                        }
+                    }
+                }
+
+                $messageBuilder =  new RawMessageBuilder(
+                    [
+                        'type' => 'flex',
+                        'altText' => '華擎線圖',
+                        'contents' => [
+                            'type'=> 'bubble',
+                                'body'=> [
+                                'type'=> 'box',
+                                'layout'=> 'vertical',
+                                'contents'=> $messageArray
+                                ]  
+                        ]
+                        
                     ]
-                    
-                ]
-            );
+                );
+            }else{
+                $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
+            }
+            
 
         }else if($text == '統計資訊'){
             $messageBuilder = new TextMessageBuilder('');
         }else if($text == '當日資訊'){
-            $messageBuilder = new TextMessageBuilder('');
+            $url = $fugleUrl . 'meta' . $parameter;
+            $Guzzleclient = new \GuzzleHttp\Client();
+            $response = $Guzzleclient->get($url);
+            $json = json_decode($response->getBody());
+            $datas = get_object_vars($json->data->meta);
+
+            if(count($datas) > 0){
+                $metas = Config::get('meta');
+
+                $messageArray = [
+                    [
+                        'type'=> 'text',
+                        'text'=> '華擎股票',
+                        'weight'=> 'bold',
+                        'size'=> 'xxl',
+                        'margin'=> 'md'
+                    ],
+                    [
+                        'type'=> 'separator',
+                        'margin'=> 'xxl'
+                    ],
+                ];
+    
+                foreach($metas as $meta){
+                    foreach($meta as $key => $value){
+                        $fugleValue = $datas[$key];
+                        $message = [
+                            'type'=> 'box',
+                            'layout'=> 'horizontal',
+                            'contents'=> [
+                                [
+                                    'type'=> 'text',
+                                    'text'=> (string)$value,
+                                    'size'=> 'sm',
+                                    'color'=> '#555555',
+                                    'flex'=> 0
+                                ],
+                                [
+                                    'type'=> 'text',
+                                    'text'=> (string)$fugleValue,
+                                    'size'=> 'sm',
+                                    'color'=> '#111111',
+                                    'align'=> 'end'
+                                ]
+                            ]
+                        ];
+                        array_push($messageArray, $message);
+                    }
+                }
+    
+                $messageBuilder =  new RawMessageBuilder(
+                    [
+                        'type' => 'flex',
+                        'altText' => '華擎線圖',
+                        'contents' => [
+                            'type'=> 'bubble',
+                                'body'=> [
+                                'type'=> 'box',
+                                'layout'=> 'vertical',
+                                'contents'=> $messageArray
+                                ]  
+                        ]
+                        
+                    ]
+                );
+            }else{
+                $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
+            }
         }else if($text == '當日成交資訊'){
-            $messageBuilder = new TextMessageBuilder('');
+            $url = $fugleUrl . 'dealts' . $parameter . '&limit=1';
+            $Guzzleclient = new \GuzzleHttp\Client();
+            $response = $Guzzleclient->get($url);
+            $json = json_decode($response->getBody());
+            $datas = $json->data->dealts;
+            
+            
+            if(count($datas) > 0){
+                $dealts = Config::get('dealts');
+
+                $messageArray = [
+                    [
+                        'type'=> 'text',
+                        'text'=> '華擎股票',
+                        'weight'=> 'bold',
+                        'size'=> 'xxl',
+                        'margin'=> 'md'
+                    ],
+                    [
+                        'type'=> 'separator',
+                        'margin'=> 'xxl'
+                    ],
+                ];
+    
+                foreach($dealts as $dealt){
+                    foreach($dealt as $key => $value){
+                        $fugleValue = $datas[0]->$key;
+                        $message = [
+                            'type'=> 'box',
+                            'layout'=> 'horizontal',
+                            'contents'=> [
+                                [
+                                    'type'=> 'text',
+                                    'text'=> (string)$value,
+                                    'size'=> 'sm',
+                                    'color'=> '#555555',
+                                    'flex'=> 0
+                                ],
+                                [
+                                    'type'=> 'text',
+                                    'text'=> (string)$fugleValue,
+                                    'size'=> 'sm',
+                                    'color'=> '#111111',
+                                    'align'=> 'end'
+                                ]
+                            ]
+                        ];
+                        array_push($messageArray, $message);
+                    }
+                }
+    
+                $messageBuilder =  new RawMessageBuilder(
+                    [
+                        'type' => 'flex',
+                        'altText' => '華擎線圖',
+                        'contents' => [
+                            'type'=> 'bubble',
+                                'body'=> [
+                                'type'=> 'box',
+                                'layout'=> 'vertical',
+                                'contents'=> $messageArray
+                                ]  
+                        ]
+                        
+                    ]
+                );
+            }else{
+                $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
+            }
         }
 
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
