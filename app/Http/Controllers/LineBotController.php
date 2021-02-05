@@ -457,9 +457,11 @@ class LineBotController extends Controller
             // $lastDeatlsData = $dealts->$lastKey;
             // $last = array_slice($dealts,-1,1);
             // $test = $dealts[0]->at;
-            dd($data);       
+            // dd($data);
+               
 
         $fugles = Config::get('meta');
+          
         $messageArray = [
             [
                 'type'=> 'text',
@@ -476,8 +478,17 @@ class LineBotController extends Controller
         $count = 0;
         $typeArray = [];
         foreach($fugles as $fugle){
-            // foreach($fugle as $key => $value){
-                $fugleValue = $data->$key;
+            foreach($fugle as $key => $value){
+                $fugleValue = $data[$key];
+                if(is_bool($fugleValue)){
+                    if($fugleValue){
+                        $fugleValue = '是';
+                    }else{
+                        $fugleValue = '否';
+                    }
+                }else if(is_numeric($fugleValue)){
+                    $fugleValue = '$' . $fugleValue;
+                }
                 // $fugleText = '';
                 // $fugleText = is_bool($fugleValue) ? (($fugleValue == true) ? '是' : '否') :  $fugleValue;
                 // $fugleText = is_numeric($fugleValue) ? '$' . $fugleValue : $fugleValue;
@@ -491,7 +502,7 @@ class LineBotController extends Controller
                     'contents'=> [
                         [
                             'type'=> 'text',
-                            'text'=> $value,
+                            'text'=> (string)$value,
                             'size'=> 'sm',
                             'color'=> '#555555',
                             'flex'=> 0
@@ -514,7 +525,7 @@ class LineBotController extends Controller
                 //     ]);
                 //     dd($messageArray);
                 // }
-            // }
+            }
 
             // if($count == 0){
             //     array_push($messageArray, [
@@ -540,19 +551,7 @@ class LineBotController extends Controller
                 
             ]
         );
-            dd([
-                'type' => 'flex',
-                'altText' => '華擎線圖',
-                'contents' => [
-                    'type'=> 'bubble',
-                        'body'=> [
-                        'type'=> 'box',
-                        'layout'=> 'vertical',
-                        'contents'=> $messageArray
-                        ]  
-                ]
-                
-            ]);
+            dd($messageBuilder);
     }
 
     public function getProbabilityOfPrecipitationImage(String $probability_of_precipitation){

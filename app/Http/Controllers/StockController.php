@@ -238,6 +238,16 @@ class StockController extends Controller
                 foreach($metas as $meta){
                     foreach($meta as $key => $value){
                         $fugleValue = $datas[$key];
+                        if(is_bool($fugleValue)){
+                            if($fugleValue){
+                                $fugleValue = '是';
+                            }else{
+                                $fugleValue = '否';
+                            }
+                        }else if(is_numeric($fugleValue)){
+                            $fugleValue = '$' . $fugleValue;
+                        }
+
                         $message = [
                             'type'=> 'box',
                             'layout'=> 'horizontal',
@@ -357,6 +367,13 @@ class StockController extends Controller
         if ($response->isSucceeded()) {
             echo 'Succeeded!';
             return;
+        }
+    }
+
+    public function getStockTemplateData(Array $datas, Array $infos){
+        foreach($dealts as $dealt){
+            foreach($dealt as $key => $value){
+            }
         }
     }
 }

@@ -16,10 +16,10 @@ $fugle = [
         'priceReference'=> '今日參考價',
         'priceHighLimit'=> '漲停價',
         'priceLowLimit'=> '跌停價',
-        // 'canDayBuySell'=> '是否可先買後賣現股當沖',
-        // 'canDaySellBuy'=> '是否可先賣後買現股當沖',
-        // 'canShortLend'=> '是否豁免平盤下借券賣出',
-        // 'canShortMargin'=> '是否豁免平盤下融券賣出',
+        'canDayBuySell'=> '是否可先買後賣現股當沖',
+        'canDaySellBuy'=> '是否可先賣後買現股當沖',
+        'canShortLend'=> '是否豁免平盤下借券賣出',
+        'canShortMargin'=> '是否豁免平盤下融券賣出',
     ]
 ];
 
