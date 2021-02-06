@@ -444,13 +444,13 @@ class LineBotController extends Controller
     public function testSymboData(){
         $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
             $symbolId = '3515';
-            $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/meta';
+            $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/quote';
             $url = $fugleUrl . '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
             $Guzzleclient = new \GuzzleHttp\Client();
                                         
             $response = $Guzzleclient->get($url);
             $json = json_decode($response->getBody());
-            $data = get_object_vars($json->data->meta);
+            $data = get_object_vars($json->data->quote);
       
             // $deatsKeys = array_keys($dealts);
             // $lastKey = $deatsKeys[count($deatsKeys) - 1];
@@ -460,7 +460,8 @@ class LineBotController extends Controller
             // dd($data);
                
 
-        $fugles = Config::get('meta');
+        $fugles = Config::get('quote');
+        // dd($data);
           
         $messageArray = [
             [
@@ -479,16 +480,22 @@ class LineBotController extends Controller
         $typeArray = [];
         foreach($fugles as $fugle){
             foreach($fugle as $key => $value){
-                $fugleValue = $data[$key];
-                if(is_bool($fugleValue)){
-                    if($fugleValue){
-                        $fugleValue = '是';
-                    }else{
-                        $fugleValue = '否';
+                $fugleValue = '';
+                if(is_numeric($key)){
+                    dd($value);
+                }else{
+                    $fugleValue = $data[$key];
+                    if(is_bool($fugleValue)){
+                        if($fugleValue){
+                            $fugleValue = '是';
+                        }else{
+                            $fugleValue = '否';
+                        }
+                    }else if(is_numeric($fugleValue)){
+                        $fugleValue = '$' . $fugleValue;
                     }
-                }else if(is_numeric($fugleValue)){
-                    $fugleValue = '$' . $fugleValue;
                 }
+                
                 // $fugleText = '';
                 // $fugleText = is_bool($fugleValue) ? (($fugleValue == true) ? '是' : '否') :  $fugleValue;
                 // $fugleText = is_numeric($fugleValue) ? '$' . $fugleValue : $fugleValue;
@@ -551,7 +558,7 @@ class LineBotController extends Controller
                 
             ]
         );
-            dd($messageBuilder);
+            dd($messageArray);
     }
 
     public function getProbabilityOfPrecipitationImage(String $probability_of_precipitation){

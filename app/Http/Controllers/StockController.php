@@ -210,7 +210,87 @@ class StockController extends Controller
             
 
         }else if($text == '統計資訊'){
-            $messageBuilder = new TextMessageBuilder('');
+            $url = $fugleUrl . 'quote' . $parameter;
+            $Guzzleclient = new \GuzzleHttp\Client();
+            $response = $Guzzleclient->get($url);
+            $json = json_decode($response->getBody());
+            $datas = get_object_vars($json->data->quote);
+
+            if(count($datas) > 0){
+                $quotes = Config::get('quote');
+
+                $messageArray = [
+                    [
+                        'type'=> 'text',
+                        'text'=> '華擎股票',
+                        'weight'=> 'bold',
+                        'size'=> 'xxl',
+                        'margin'=> 'md'
+                    ],
+                    [
+                        'type'=> 'separator',
+                        'margin'=> 'xxl'
+                    ],
+                ];
+
+                foreach($quotes as $quote){
+                    foreach($quote as $key => $value){
+                        $fugleValue = $datas[$key];
+                        if(is_bool($fugleValue)){
+                            if($fugleValue){
+                                $fugleValue = '是';
+                            }else{
+                                $fugleValue = '否';
+                            }
+                        }else if(is_numeric($fugleValue)){
+                            $fugleValue = '$' . $fugleValue;
+                        }else if($fugleValue == null){
+                            $fugleValue = '無';
+                        }
+
+                        $message = [
+                            'type'=> 'box',
+                            'layout'=> 'horizontal',
+                            'contents'=> [
+                                [
+                                    'type'=> 'text',
+                                    'text'=> (string)$value,
+                                    'size'=> 'sm',
+                                    'color'=> '#555555',
+                                    'flex'=> 0
+                                ],
+                                [
+                                    'type'=> 'text',
+                                    'text'=> (string)$fugleValue,
+                                    'size'=> 'sm',
+                                    'color'=> '#111111',
+                                    'align'=> 'end'
+                                ]
+                            ]
+                        ];
+                        array_push($messageArray, $message);
+                    }
+                }
+    
+                $messageBuilder =  new RawMessageBuilder(
+                    [
+                        'type' => 'flex',
+                        'altText' => '華擎線圖',
+                        'contents' => [
+                            'type'=> 'bubble',
+                                'body'=> [
+                                'type'=> 'box',
+                                'layout'=> 'vertical',
+                                'contents'=> $messageArray
+                                ]  
+                        ]
+                        
+                    ]
+                );
+
+            }else{
+                $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
+            }
         }else if($text == '當日資訊'){
             $url = $fugleUrl . 'meta' . $parameter;
             $Guzzleclient = new \GuzzleHttp\Client();
