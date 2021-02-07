@@ -481,8 +481,72 @@ class LineBotController extends Controller
         foreach($fugles as $fugle){
             foreach($fugle as $key => $value){
                 $fugleValue = '';
+                $message = [];
                 if(is_numeric($key)){
-                    dd($value);
+                    $keys = array_keys($value);
+                    $firstKey = $keys[0];
+                    
+                    $message = [
+                        'type'=> 'box',
+                        'layout'=> 'horizontal',
+                        'contents'=> [
+                            [
+                                'type'=> 'text',
+                                'text'=> (string)$value[$firstKey],
+                                'size'=> 'sm',
+                                'color'=> '#555555',
+                                'flex'=> 0
+                            ],
+                            [
+                                'type'=> 'box',
+                                'layout'=> 'vertical',
+                                'margin'=> 'xxl',
+                                'spacing'=> 'sm',
+                                'contents'=> [
+                                    [
+                                        'type'=> 'text',
+                                        'text'=> 'info',
+                                        'size'=> 'md',
+                                        'color'=> '555555',
+                                        'flex'=> 0,
+                                    ]
+                                ]
+                            ],
+                            [
+                                [
+                                    'type'=> 'separator',
+                                    'margin'=> 'none',
+                                ]
+                            ],
+                        ]
+                    ];
+
+                    foreach($keys as $index => $key){
+                        if($index != 0){
+                            $keyMessage = [
+                                'type'=> 'box',
+                                'layout'=> 'horizontal',
+                                'contents'=> [
+                                    [
+                                        'type'=> 'text',
+                                        'text'=> (string)$value[$key],
+                                        'size'=> 'sm',
+                                        'color'=> '#555555',
+                                        'flex'=> 0
+                                    ],
+                                    [
+                                        'type'=> 'text',
+                                        'text'=> (string)$data[$firstKey]->$key,
+                                        'size'=> 'sm',
+                                        'color'=> '#111111',
+                                        'align'=> 'end'
+                                    ]
+                                ]
+                            ];
+
+                            array_push($message['contents'], $keyMessage);
+                        }
+                    }
                 }else{
                     $fugleValue = $data[$key];
                     if(is_bool($fugleValue)){
@@ -494,6 +558,27 @@ class LineBotController extends Controller
                     }else if(is_numeric($fugleValue)){
                         $fugleValue = '$' . $fugleValue;
                     }
+
+                    $message = [
+                        'type'=> 'box',
+                        'layout'=> 'horizontal',
+                        'contents'=> [
+                            [
+                                'type'=> 'text',
+                                'text'=> (string)$value,
+                                'size'=> 'sm',
+                                'color'=> '#555555',
+                                'flex'=> 0
+                            ],
+                            [
+                                'type'=> 'text',
+                                'text'=> (string)$fugleValue,
+                                'size'=> 'sm',
+                                'color'=> '#111111',
+                                'align'=> 'end'
+                            ]
+                        ]
+                    ];
                 }
                 
                 // $fugleText = '';
@@ -503,26 +588,7 @@ class LineBotController extends Controller
                 
                 // array_push($typeArray, is_bool($fugleValue));
 
-                $message = [
-                    'type'=> 'box',
-                    'layout'=> 'horizontal',
-                    'contents'=> [
-                        [
-                            'type'=> 'text',
-                            'text'=> (string)$value,
-                            'size'=> 'sm',
-                            'color'=> '#555555',
-                            'flex'=> 0
-                        ],
-                        [
-                            'type'=> 'text',
-                            'text'=> (string)$fugleValue,
-                            'size'=> 'sm',
-                            'color'=> '#111111',
-                            'align'=> 'end'
-                        ]
-                    ]
-                ];
+                
                 array_push($messageArray, $message);
 
                 // if(count($messageArray) == 1){
@@ -533,6 +599,8 @@ class LineBotController extends Controller
                 //     dd($messageArray);
                 // }
             }
+
+            dd($messageArray);
 
             // if($count == 0){
             //     array_push($messageArray, [

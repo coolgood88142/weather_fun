@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use Symfony\Component\DomCrawler\Crawler;
@@ -195,11 +196,12 @@ class StockController extends Controller
                         'altText' => '華擎線圖',
                         'contents' => [
                             'type'=> 'bubble',
-                                'body'=> [
+                            'size'=> 'mega',
+                            'body'=> [
                                 'type'=> 'box',
                                 'layout'=> 'vertical',
                                 'contents'=> $messageArray
-                                ]  
+                            ]  
                         ]
                         
                     ]
@@ -220,58 +222,136 @@ class StockController extends Controller
                 $quotes = Config::get('quote');
 
                 $messageArray = [
-                    [
-                        'type'=> 'text',
-                        'text'=> '華擎股票',
-                        'weight'=> 'bold',
-                        'size'=> 'xxl',
-                        'margin'=> 'md'
-                    ],
-                    [
-                        'type'=> 'separator',
-                        'margin'=> 'xxl'
-                    ],
+                    // 'type'=>'carousel',
+                    // 'contents'=> [
+                        [
+                            'type'=> 'text',
+                            'text'=> '華擎股票',
+                            'weight'=> 'bold',
+                            'size'=> 'xxl',
+                            'margin'=> 'md'
+                        ],
+                        [
+                            'type'=> 'separator',
+                            'margin'=> 'xxl'
+                        ],
+                    // ]
                 ];
+
+                
 
                 foreach($quotes as $quote){
                     foreach($quote as $key => $value){
-                        $fugleValue = $datas[$key];
-                        if(is_bool($fugleValue)){
-                            if($fugleValue){
-                                $fugleValue = '是';
-                            }else{
-                                $fugleValue = '否';
-                            }
-                        }else if(is_numeric($fugleValue)){
-                            $fugleValue = '$' . $fugleValue;
-                        }else if($fugleValue == null){
-                            $fugleValue = '無';
-                        }
+                        $fugleValue = '';
+                        $message = [];
+                        if(is_numeric($key)){
+                            $keys = array_keys($value);
+                            $firstKey = $keys[0];
 
-                        $message = [
-                            'type'=> 'box',
-                            'layout'=> 'horizontal',
-                            'contents'=> [
-                                [
-                                    'type'=> 'text',
-                                    'text'=> (string)$value,
-                                    'size'=> 'sm',
-                                    'color'=> '#555555',
-                                    'flex'=> 0
-                                ],
-                                [
-                                    'type'=> 'text',
-                                    'text'=> (string)$fugleValue,
-                                    'size'=> 'sm',
-                                    'color'=> '#111111',
-                                    'align'=> 'end'
+                            $message = [
+                                'type'=> 'box',
+                                'layout'=> 'horizontal',
+                                'contents'=> [
+                                    [
+                                        'type'=> 'text',
+                                        'text'=> (string)$value[$firstKey],
+                                        'size'=> 'sm',
+                                        'color'=> '#555555',
+                                        'flex'=> 0
+                                    ],
+                                    [
+                                        'type'=> 'box',
+                                        'layout'=> 'vertical',
+                                        'margin'=> 'xxl',
+                                        'spacing'=> 'sm',
+                                        'contents'=> [
+                                            [
+                                                'type'=> 'box',
+                                                'layout'=> 'horizontal',
+                                                'contents'=> [
+                                                    [
+                                                        'type'=> 'text',
+                                                        'text'=> 'info',
+                                                        'size'=> 'md',
+                                                        'color'=> '#555555',
+                                                    ]
+                                                ]
+                                            ],
+                                            [
+                                                'type'=> 'separator',
+                                                'margin'=> 'none',
+                                            ]
+                                        ]
+                                    ],
                                 ]
-                            ]
-                        ];
+                            ];
+
+                            foreach($keys as $index => $key){
+                                if($index != 0){
+                                    $keyMessage = [
+                                        'type'=> 'box',
+                                        'layout'=> 'horizontal',
+                                        'contents'=> [
+                                            [
+                                                'type'=> 'text',
+                                                'text'=> (string)$value[$key],
+                                                'size'=> 'sm',
+                                                'color'=> '#555555',
+                                            ],
+                                            [
+                                                'type'=> 'text',
+                                                'text'=> (string)$datas[$firstKey]->$key,
+                                                'size'=> 'sm',
+                                                'color'=> '#111111',
+                                                'align'=> 'end'
+                                            ]
+                                        ]
+                                    ];
+
+                                    array_push($message['contents'][1]['contents'], $keyMessage);
+                                }
+                            }
+                            
+                        }else{
+                            $fugleValue = $datas[$key]; 
+                            if(is_bool($fugleValue)){
+                                if($fugleValue){
+                                    $fugleValue = '是';
+                                }else{
+                                    $fugleValue = '否';
+                                }
+                            }else if(is_numeric($fugleValue)){
+                                $fugleValue = '$' . $fugleValue;
+                            }else if($fugleValue == null){
+                                $fugleValue = '無';
+                            }
+
+                            $message = [
+                                'type'=> 'box',
+                                'layout'=> 'horizontal',
+                                'contents'=> [
+                                    [
+                                        'type'=> 'text',
+                                        'text'=> (string)$value,
+                                        'size'=> 'sm',
+                                        'color'=> '#555555',
+                                        'flex'=> 0
+                                    ],
+                                    [
+                                        'type'=> 'text',
+                                        'text'=> (string)$fugleValue,
+                                        'size'=> 'sm',
+                                        'color'=> '#111111',
+                                        'align'=> 'end'
+                                    ]
+                                ]
+                            ];
+                        }
+                        
                         array_push($messageArray, $message);
                     }
                 }
-    
+
                 $messageBuilder =  new RawMessageBuilder(
                     [
                         'type' => 'flex',
