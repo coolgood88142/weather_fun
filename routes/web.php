@@ -40,3 +40,9 @@ Route::get('/tomorrowWeatherApi','WeatherController@saveTomorrowWeatherApiData')
 Route::get('/testSymboData','LineBotController@testSymboData');
 
 Route::post('/stock','StockController@getMessageStock')->name('stock');
+
+// Route::get('/stockChart','StockController@getMessageStock')->name('stock');
+
+Route::get('/stockChart', function () {
+    return view('stock');
+});

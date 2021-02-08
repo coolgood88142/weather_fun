@@ -2,5 +2,6 @@
     "/js/app.js": "/js/app.js",
     "/css/app.css": "/css/app.css",
     "/js/d3.v3.min.js": "/js/d3.v3.min.js",
+    "/js/stock.js": "/js/stock.js",
     "/js/taiwan.js": "/js/taiwan.js"
 }

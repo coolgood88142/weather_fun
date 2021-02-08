@@ -159,26 +159,7 @@ class StockController extends Controller
                 foreach($charts as $chart){
                     foreach($chart as $key => $value){
                         $chartValue = $lastDeatlsData->$key;
-                        $message = [
-                            'type'=> 'box',
-                            'layout'=> 'horizontal',
-                            'contents'=> [
-                                [
-                                    'type'=> 'text',
-                                    'text'=> $value,
-                                    'size'=> 'sm',
-                                    'color'=> '#555555',
-                                    'flex'=> 0
-                                ],
-                                [
-                                    'type'=> 'text',
-                                    'text'=> (string)$chartValue,
-                                    'size'=> 'sm',
-                                    'color'=> '#111111',
-                                    'align'=> 'end'
-                                ]
-                            ]
-                        ];
+                        $message = $this->getStockHorizontalTemplate((string)$value, (string)$chartValue);
                         array_push($messageArray, $message);
 
                         if(count($messageArray) == 1){
@@ -438,7 +419,6 @@ class StockController extends Controller
                                                         ]
                                                     ]
                                                 ];
-                                                Log::info($keyMessage);
                                                 array_push($message['contents'][1]['contents'], $keyMessage);
                                             }
                                             $sumCount++;
@@ -662,10 +642,38 @@ class StockController extends Controller
         }
     }
 
-    public function getStockTemplateData(Array $datas, Array $infos){
-        foreach($dealts as $dealt){
-            foreach($dealt as $key => $value){
-            }
-        }
+    public function getStockHorizontalTemplate(String $key, String $value){
+        $message = [
+            'type'=> 'box',
+            'layout'=> 'horizontal',
+            'contents'=> [
+                [
+                    'type'=> 'text',
+                    'text'=> $key,
+                    'size'=> 'sm',
+                    'color'=> '#555555',
+                    'flex'=> 0
+                ],
+                [
+                    'type'=> 'text',
+                    'text'=> $value,
+                    'size'=> 'sm',
+                    'color'=> '#111111',
+                    'align'=> 'end'
+                ]
+            ]
+        ];
+
+        return $message;
+    }
+
+    public function getFugleApiStockData(Request $request){
+        $replyToken = $request->events[0]['replyToken'];
+        $text = $request->events[0]['message']['text'];
+        $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
+        $symbolId = '3515';
+        $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/';
+        $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+
     }
 }
