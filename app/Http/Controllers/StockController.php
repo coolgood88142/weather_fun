@@ -13,6 +13,7 @@ use LINE\LINEBot;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
 use LINE\LINEBot\MessageBuilder\RawMessageBuilder;
+use Carbon\Carbon;
 use Config;
 
 class StockController extends Controller
@@ -586,10 +587,15 @@ class StockController extends Controller
                         'margin'=> 'xxl'
                     ],
                 ];
-    
-                foreach($dealts as $dealt){
+
+                $dealt = end($dealts);
+                
                     foreach($dealt as $key => $value){
-                        $fugleValue = $datas[0]->$key;
+                        $fugleValue = $value;
+                        if($key == 'at'){
+                            $date = (new Carbon($fugleValue))->timezone('Asia/Taipei');
+                            $fugleValue = $date->format('Y-m-d h:m');
+                        }
                         $message = [
                             'type'=> 'box',
                             'layout'=> 'horizontal',
@@ -612,7 +618,7 @@ class StockController extends Controller
                         ];
                         array_push($messageArray, $message);
                     }
-                }
+                
     
                 $messageBuilder =  new RawMessageBuilder(
                     [
@@ -667,13 +673,73 @@ class StockController extends Controller
         return $message;
     }
 
-    public function getFugleApiStockData(Request $request){
-        $replyToken = $request->events[0]['replyToken'];
-        $text = $request->events[0]['message']['text'];
+    public function getFugleApiStockData(){
         $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
         $symbolId = '3515';
-        $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/';
+        $intraday = 'chart';
+        $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/' . $intraday;
         $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+        $url = $fugleUrl . $parameter;
 
+        $Guzzleclient = new \GuzzleHttp\Client();
+        $response = $Guzzleclient->get($url);
+        $json = json_decode($response->getBody());
+        $datas = $json->data->chart;
+        $length = count((array)$datas) - 20 - 1;
+        $count = 0;
+        $timeData = [];
+        $openData = [];
+        $closeData = [];
+        $highData = [];
+        $lowData = [];
+        $unitData = [];
+        $volumeData = [];
+        $testarray = [];
+        foreach($datas as $key => $data){
+            if($count > $length){
+                $now = new Carbon($key);
+                $date = $now->timezone('Asia/Taipei');
+                array_push($timeData, $date->format('h:i'));
+                foreach($data as $chartKey => $chart){
+                    switch ($chartKey) {
+                        case 'open':
+                            array_push($openData, $chart);
+                            break;
+                        case 'close':
+                            array_push($closeData, $chart);
+                            break;
+                        case 'high':
+                            array_push($highData, $chart);
+                            break;
+                        case 'low':
+                            array_push($lowData, $chart);
+                            break;
+                        case 'unit':
+                            array_push($unitData, $chart);
+                            break;
+                        case 'volume':
+                            array_push($volumeData, $chart);
+                            break;
+                    }
+                    
+                }
+                
+            }
+            $count++;
+        }
+
+        $dataArray =[
+            'chart' => [
+                'time' => $timeData,
+                'open' => $openData,
+                'close' => $closeData,
+                'high' => $highData,
+                'low' => $lowData,
+                'unit' => $unitData,
+                'volume' => $volumeData,
+            ]
+        ];
+
+        return view('stock', $dataArray);
     }
 }

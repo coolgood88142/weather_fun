@@ -51,11 +51,18 @@
   </style>
   <body>
     <figure class="highcharts-figure">
-      <div id="container"></div>
+      <div id="chart"></div>
     </figure>
+    <input type="hidden" id="time" value="{{ json_encode($chart['time']) }}"/>
+    <input type="hidden" id="open" value="{{ json_encode($chart['open']) }}"/>
+    <input type="hidden" id="close" value="{{ json_encode($chart['close']) }}"/>
+    <input type="hidden" id="high" value="{{ json_encode($chart['high']) }}"/>
+    <input type="hidden" id="low" value="{{ json_encode($chart['low']) }}"/>
+    <input type="hidden" id="unit" value="{{ json_encode($chart['unit']) }}"/>
+    <input type="hidden" id="volume" value="{{ json_encode($chart['volume']) }}"/>
    
     <script>
-      Highcharts.chart('container', {
+      Highcharts.chart('chart', {
     chart: {
         zoomType: 'xy'
     },
@@ -68,9 +75,7 @@
         align: 'left'
     },
     xAxis: [{
-        categories: ['12:32', '12:33', '12:41', '12:47', '12:49', '12:50',
-            '12:54', '13:01', '13:03', '13:04', '13:11', '13:12',
-            '12:54', '13:01', '13:03', '13:04', '13:11', '13:12','12:54','13:12'],
+        categories: JSON.parse(document.getElementById("time").value),
         crosshair: true
     }],
     yAxis: [{ // Primary yAxis
@@ -137,9 +142,7 @@
         name: '張數',
         type: 'column',
         yAxis: 1,
-        data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 
-              135.6, 148.5, 216.4, 194.1, 95.6, 54.4,
-               49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 95.6, 54.4,],
+        data: JSON.parse(document.getElementById("unit").value),
         tooltip: {
             valueSuffix: ' 張'
         }
@@ -148,9 +151,7 @@
         name: '卷數',
         type: 'column',
         yAxis: 1,
-        data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 
-              135.6, 148.5, 216.4, 194.1, 95.6, 54.4,
-               49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 95.6, 54.4,],
+        data: JSON.parse(document.getElementById("volume").value),
         tooltip: {
             valueSuffix: ' 卷'
         }
@@ -159,43 +160,35 @@
         name: '開盤價',
         type: 'spline',
         yAxis: 2,
-        data: [1016, 1016, 1015.9, 1015.5, 1012.3, 1009.5, 
-               1009.6, 1010.2, 1013.1, 1016.9, 1018.2, 1016.7,
-               1016, 1016, 1015.9, 1015.5, 1012.3, 1009.5, 1013.1, 1016.9,],
+        data: JSON.parse(document.getElementById("open").value),
         marker: {
             enabled: false
         },
         dashStyle: 'shortdot',
         tooltip: {
-            valueSuffix: ' mb'
+            valueSuffix: ' 元'
         }
 
     }, {
         name: '最高價',
         type: 'spline',
-        data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5,
-               23.3, 18.3, 13.9, 9.6, 7.0, 6.9, 9.5, 14.5, 
-               18.2, 21.5, 25.2, 26.5,],
+        data: JSON.parse(document.getElementById("high").value),
         tooltip: {
-            valueSuffix: ' °C'
+            valueSuffix: ' 元'
         }
     },{
         name: '最低價',
         type: 'spline',
-        data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5,
-               23.3, 18.3, 13.9, 9.6, 7.0, 6.9, 9.5, 14.5, 
-               18.2, 21.5, 25.2, 26.5,],
+        data: JSON.parse(document.getElementById("low").value),
         tooltip: {
-            valueSuffix: ' °C'
+            valueSuffix: ' 元'
         }
     },{
         name: '收盤價',
         type: 'spline',
-        data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5,
-               23.3, 18.3, 13.9, 9.6, 7.0, 6.9, 9.5, 14.5, 
-               18.2, 21.5, 25.2, 26.5,],
+        data: JSON.parse(document.getElementById("close").value),
         tooltip: {
-            valueSuffix: ' °C'
+            valueSuffix: ' 元'
         }
     }],
     responsive: {
