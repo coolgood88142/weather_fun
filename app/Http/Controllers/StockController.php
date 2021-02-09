@@ -676,69 +676,70 @@ class StockController extends Controller
     public function getFugleApiStockData(){
         $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
         $symbolId = '3515';
-        $intraday = 'chart';
-        $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/' . $intraday;
-        $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
-        $url = $fugleUrl . $parameter;
-
-        $Guzzleclient = new \GuzzleHttp\Client();
-        $response = $Guzzleclient->get($url);
-        $json = json_decode($response->getBody());
-        $datas = $json->data->chart;
-        $length = count((array)$datas) - 20 - 1;
-        $count = 0;
-        $timeData = [];
-        $openData = [];
-        $closeData = [];
-        $highData = [];
-        $lowData = [];
-        $unitData = [];
-        $volumeData = [];
-        $testarray = [];
-        foreach($datas as $key => $data){
-            if($count > $length){
-                $now = new Carbon($key);
-                $date = $now->timezone('Asia/Taipei');
-                array_push($timeData, $date->format('h:i'));
-                foreach($data as $chartKey => $chart){
-                    switch ($chartKey) {
-                        case 'open':
-                            array_push($openData, $chart);
-                            break;
-                        case 'close':
-                            array_push($closeData, $chart);
-                            break;
-                        case 'high':
-                            array_push($highData, $chart);
-                            break;
-                        case 'low':
-                            array_push($lowData, $chart);
-                            break;
-                        case 'unit':
-                            array_push($unitData, $chart);
-                            break;
-                        case 'volume':
-                            array_push($volumeData, $chart);
-                            break;
-                    }
-                    
-                }
-                
-            }
-            $count++;
-        }
-
+        $categorys = ['chart', 'dealts'];
         $dataArray =[
             'chart' => [
-                'time' => $timeData,
-                'open' => $openData,
-                'close' => $closeData,
-                'high' => $highData,
-                'low' => $lowData,
-                'unit' => $unitData,
-                'volume' => $volumeData,
-            ]
+                'time' => [],
+                'open' => [],
+                'close' => [],
+                'high' => [],
+                'low' => [],
+                'unit' => [],
+                'volume' => [],
+                'source' => 'https://developer.fugle.tw/realtime/v0/intraday/chart',
+            ],
+            'dealts' => [
+                'at' => [],
+                'price' => [],
+                'unit' => [],
+                'serial' => [],
+                'source' => 'https://developer.fugle.tw/realtime/v0/intraday/dealts',
+            ],
         ];
+
+        foreach($categorys as $category){
+            $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/' . $category;
+            $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+            $url = $fugleUrl . $parameter;
+
+            $Guzzleclient = new \GuzzleHttp\Client();
+            $response = $Guzzleclient->get($url);
+            $json = json_decode($response->getBody());
+            $datas = $json->data->$category;
+            $length = count((array)$datas) - 20 - 1;
+            $count = 0;
+
+            foreach($datas as $key => $data){
+                if($category == 'chart'){
+                    if($count > $length){
+                        $now = new Carbon($key);
+                        $date = $now->timezone('Asia/Taipei');
+                        array_push($dataArray['chart']['time'], $date->format('h:i'));
+                        array_push($dataArray['chart']['open'], $data->open);
+                        array_push($dataArray['chart']['close'], $data->close);
+                        array_push($dataArray['chart']['high'], $data->high);
+                        array_push($dataArray['chart']['low'], $data->low);
+                        array_push($dataArray['chart']['unit'], $data->unit);
+                        array_push($dataArray['chart']['volume'], $data->volume);
+                    }
+                }else if($category == 'dealts'){
+                    if($count < 20){
+                        $now = new Carbon($data->at);
+                        $date = $now->timezone('Asia/Taipei');
+                        array_push($dataArray['dealts']['at'], $date->format('h:i'));
+                        array_push($dataArray['dealts']['price'], $data->price);
+                        array_push($dataArray['dealts']['unit'], $data->unit);
+                        array_push($dataArray['dealts']['serial'], $data->serial);
+                    }
+                }
+                $count++;
+            }
+        }
+
+        $dataArray['dealts']['at'] = array_reverse($dataArray['dealts']['at']);
+        $dataArray['dealts']['price'] = array_reverse($dataArray['dealts']['price']);
+        $dataArray['dealts']['unit'] = array_reverse($dataArray['dealts']['unit']);
+        $dataArray['dealts']['serial'] = array_reverse($dataArray['dealts']['serial']);
 
         return view('stock', $dataArray);
     }
