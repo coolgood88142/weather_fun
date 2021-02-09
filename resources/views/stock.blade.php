@@ -1,7 +1,6 @@
 <html>
     <head>
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta http-equiv="Access-Control-Allow-Origin" content="*" />
     </head>
     <style>
         #container {
@@ -44,17 +43,36 @@
 
     </style>
     <body>
-        <div class="container">
-            <nav class="nav justify-content-center">
-                <a class="nav-link active" href="#" onclick="changeChart(1)">線圖</a>
-                <a class="nav-link" href="#">統計資訊</a>
-                <a class="nav-link" href="#">當日資訊</a>
-                <a class="nav-link" href="#" >當日成交資訊</a>
+        <div class="container" style="width:900px;">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                  <li class="nav-item active">
+                    <a class="nav-link" href="#" onclick="changeChart(1)">線圖</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">統計資訊</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">當日資訊</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="changeChart(4)">當日成交資訊</a>
+                  </li>
+                </ul>
+              </div>
             </nav>
-            <figure class="highcharts-figure">
-                <div id="chart"></div>
-                <div id="dealts"></div>
-            </figure>
+            <form id="fugle_form" name="fugle_form" action="{{ route('fugle') }}" method="POST" class="sidebar-form">
+                <h2 id="title" class="text-center text-black font-weight-bold" style="margin-bottom:20px;">股票圖表</h2>
+                <input type="text" id="symbolId" name="symbolId" class="form-control" placeholder="請輸入股票代碼" style="margin-bottom: 20px;" value="">    
+                    <div style="text-align:right">
+                    <input type="submit" id="btn_insert" class="btn btn-primary" value="查詢" />
+                    </div>
+                <figure class="highcharts-figure">
+                    <div id="chart"></div>
+                    <div id="dealts"></div>
+                </figure>
+            </form>
         </div>
         
         <input type="hidden" id="chartArray" value="{{ json_encode($chart) }}"/>
@@ -67,8 +85,5 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script src="{{mix('js/app.js')}}"></script>
     <script src="{{mix('js/stock.js')}}"></script>
-    {{-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script> --}}
+    <link rel="stylesheet" href="/css/stock.css">
 </html>

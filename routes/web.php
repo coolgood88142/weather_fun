@@ -41,8 +41,10 @@ Route::get('/testSymboData','LineBotController@testSymboData');
 
 Route::post('/stock','StockController@getMessageStock')->name('stock');
 
-Route::get('/fugle','StockController@getFugleApiStockData');
+Route::get('/fugle','StockController@getFugleDefaultData');
 
-Route::get('/stockChart', function () {
-    return view('stock');
-});
+Route::post('/fugle','StockController@getFugleApiStockData')->name('fugle');
+
+// Route::get('/fugle', function () {
+//     return view('stock');
+// });

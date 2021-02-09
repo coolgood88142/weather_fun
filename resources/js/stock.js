@@ -1,4 +1,3 @@
-
 let chartArray = JSON.parse(document.getElementById("chartArray").value);
 let dealtsArray = JSON.parse(document.getElementById("dealtsArray").value);
 
@@ -317,3 +316,14 @@ Highcharts.chart('dealts', {
         }]
     }
 });
+
+function changeChart(num){
+    if(num == 1){
+        $("#dealts").hide();
+        $("#chart").show();
+    }else if(num == 4){
+        $("#chart").hide();
+        $("#dealts").show();
+
+    }
+}

@@ -673,9 +673,34 @@ class StockController extends Controller
         return $message;
     }
 
-    public function getFugleApiStockData(){
+    public function getFugleDefaultData(){
+        $dataArray =[
+            'chart' => [
+                'time' => [],
+                'open' => [],
+                'close' => [],
+                'high' => [],
+                'low' => [],
+                'unit' => [],
+                'volume' => [],
+                'source' => 'https://developer.fugle.tw/realtime/v0/intraday/chart',
+            ],
+            'dealts' => [
+                'at' => [],
+                'price' => [],
+                'unit' => [],
+                'serial' => [],
+                'source' => 'https://developer.fugle.tw/realtime/v0/intraday/dealts',
+            ],
+            'symbolId' => ''
+        ];
+
+        return view('stock', $dataArray);
+    }
+
+    public function getFugleApiStockData(Request $request){
         $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
-        $symbolId = '3515';
+        $symbolId = $request->symbolId;
         $categorys = ['chart', 'dealts'];
         $dataArray =[
             'chart' => [
@@ -695,6 +720,7 @@ class StockController extends Controller
                 'serial' => [],
                 'source' => 'https://developer.fugle.tw/realtime/v0/intraday/dealts',
             ],
+            'symbolId' => ''
         ];
 
         foreach($categorys as $category){
@@ -740,6 +766,7 @@ class StockController extends Controller
         $dataArray['dealts']['price'] = array_reverse($dataArray['dealts']['price']);
         $dataArray['dealts']['unit'] = array_reverse($dataArray['dealts']['unit']);
         $dataArray['dealts']['serial'] = array_reverse($dataArray['dealts']['serial']);
+        $dataArray['symbolId'] = $symbolId;
 
         return view('stock', $dataArray);
     }

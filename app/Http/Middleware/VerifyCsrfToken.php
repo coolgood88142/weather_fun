@@ -22,5 +22,6 @@ class VerifyCsrfToken extends Middleware
         '/callback',
         '/webhook',
         '/stock',
+        '/fugle',
     ];
 }
