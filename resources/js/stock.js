@@ -1,3 +1,4 @@
+
 let chartArray = JSON.parse(document.getElementById("chartArray").value);
 let dealtsArray = JSON.parse(document.getElementById("dealtsArray").value);
 
