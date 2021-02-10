@@ -460,6 +460,7 @@ class StockController extends Controller
                             'contents' => [
                                 [
                                     'type'=> 'bubble',
+                                    'size'=> 'giga',
                                     'body'=> [
                                         'type'=> 'box',
                                         'layout'=> 'vertical',
@@ -468,6 +469,7 @@ class StockController extends Controller
                                 ],
                                 [
                                     'type'=> 'bubble',
+                                    'size'=> 'giga',
                                     'body'=> [
                                         'type'=> 'box',
                                         'layout'=> 'vertical',
@@ -480,7 +482,6 @@ class StockController extends Controller
                         
                     ]
                 );
-
             }else{
                 $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
             }
@@ -537,7 +538,7 @@ class StockController extends Controller
                                     'text'=> (string)$fugleValue,
                                     'size'=> 'sm',
                                     'color'=> '#111111',
-                                    'align'=> 'end'
+                                    'align'=> 'start'
                                 ]
                             ]
                         ];
@@ -593,7 +594,7 @@ class StockController extends Controller
                     foreach($dealt as $key => $value){
                         $fugleValue = $value;
                         if($key == 'at'){
-                            $date = (new Carbon($fugleValue))->timezone('Asia/Taipei');
+                            $date = (new Carbon($value))->timezone('Asia/Taipei');
                             $fugleValue = $date->format('Y-m-d h:m');
                         }
                         $message = [
@@ -728,6 +729,10 @@ class StockController extends Controller
             $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
             $url = $fugleUrl . $parameter;
 
+            if($category == 'dealts'){
+                $url = $url . '&limit=20';
+            }
+
             $Guzzleclient = new \GuzzleHttp\Client();
             $response = $Guzzleclient->get($url);
             $json = json_decode($response->getBody());
@@ -749,14 +754,12 @@ class StockController extends Controller
                         array_push($dataArray['chart']['volume'], $data->volume);
                     }
                 }else if($category == 'dealts'){
-                    if($count < 20){
-                        $now = new Carbon($data->at);
-                        $date = $now->timezone('Asia/Taipei');
-                        array_push($dataArray['dealts']['at'], $date->format('h:i'));
-                        array_push($dataArray['dealts']['price'], $data->price);
-                        array_push($dataArray['dealts']['unit'], $data->unit);
-                        array_push($dataArray['dealts']['serial'], $data->serial);
-                    }
+                    $now = new Carbon($data->at);
+                    $date = $now->timezone('Asia/Taipei');
+                    array_push($dataArray['dealts']['at'], $date->format('h:i'));
+                    array_push($dataArray['dealts']['price'], $data->price);
+                    array_push($dataArray['dealts']['unit'], $data->unit);
+                    array_push($dataArray['dealts']['serial'], $data->serial);
                 }
                 $count++;
             }

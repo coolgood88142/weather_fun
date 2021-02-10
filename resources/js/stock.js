@@ -1,3 +1,14 @@
+$(document).ready(function () {
+    var sideslider = $('[data-toggle=collapse-side]');
+    var get_sidebar = sideslider.attr('data-target-sidebar');
+    var get_content = sideslider.attr('data-target-content');
+    sideslider.click(function(event){
+        $(get_sidebar).toggleClass('in');
+        $(get_content).toggleClass('out');
+    });
+    
+});
+
 let chartArray = JSON.parse(document.getElementById("chartArray").value);
 let dealtsArray = JSON.parse(document.getElementById("dealtsArray").value);
 
@@ -18,7 +29,6 @@ Highcharts.chart('chart', {
         crosshair: true
     }],
     yAxis: [ { // Secondary yAxis
-        gridLineWidth: 0,
         title: {
             text: '張數',
             style: {
@@ -30,17 +40,18 @@ Highcharts.chart('chart', {
             style: {
                 color: Highcharts.getOptions().colors[0]
             }
-        }
+        },
+        opposite: true
 
     },{ // Primary yAxis
-        labels: {
-            format: '{value}卷',
+        title: {
+            text: '股數',
             style: {
                 color: Highcharts.getOptions().colors[1]
             }
         },
-        title: {
-            text: '卷數',
+        labels: {
+            format: '{value} 股',
             style: {
                 color: Highcharts.getOptions().colors[1]
             }
@@ -60,8 +71,7 @@ Highcharts.chart('chart', {
             style: {
                 color: Highcharts.getOptions().colors[2]
             }
-        },
-        opposite: true
+        }
     }],
     tooltip: {
         shared: true
@@ -87,12 +97,12 @@ Highcharts.chart('chart', {
         }
 
     }, {
-        name: '卷數',
+        name: '股數',
         type: 'column',
         yAxis: 1,
         data: chartArray.volume,
         tooltip: {
-            valueSuffix: ' 卷'
+            valueSuffix: ' 股'
         }
 
     },{
@@ -215,21 +225,6 @@ Highcharts.chart('dealts', {
             }
         },
         opposite: true
-    },{ // Tertiary yAxis
-        gridLineWidth: 0,
-        title: {
-            text: '交易編號',
-            style: {
-                color: Highcharts.getOptions().colors[2]
-            }
-        },
-        labels: {
-            format: '{value} 號',
-            style: {
-                color: Highcharts.getOptions().colors[2]
-            }
-        },
-        opposite: true
     }],
     tooltip: {
         shared: true
@@ -265,19 +260,6 @@ Highcharts.chart('dealts', {
         dashStyle: 'shortdot',
         tooltip: {
             valueSuffix: ' 元'
-        }
-
-    },{
-        name: '交易序號',
-        type: 'spline',
-        yAxis: 2,
-        data: dealtsArray.serial,
-        marker: {
-            enabled: false
-        },
-        dashStyle: 'shortdot',
-        tooltip: {
-            valueSuffix: ' 號'
         }
 
     }],
@@ -316,14 +298,3 @@ Highcharts.chart('dealts', {
         }]
     }
 });
-
-function changeChart(num){
-    if(num == 1){
-        $("#dealts").hide();
-        $("#chart").show();
-    }else if(num == 4){
-        $("#chart").hide();
-        $("#dealts").show();
-
-    }
-}
