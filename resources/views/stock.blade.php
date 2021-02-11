@@ -2,6 +2,7 @@
     <head>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="stylesheet" href="/css/stock.css">
+        <link rel="stylesheet" href="/css/datepicker.css"/>
     </head>
     <style>
         #container {
@@ -70,10 +71,22 @@
               </div>
             </nav>
             <form id="fugle_form" name="fugle_form" action="{{ route('fugle') }}" method="POST" class="sidebar-form" style="margin-top:70px;">
-                <h2 id="title" class="text-center text-black font-weight-bold" style="margin-bottom:20px;">股票圖表</h2>
-                <input type="text" id="symbolId" name="symbolId" class="form-control" placeholder="請輸入股票代碼" style="margin-bottom: 10px;" value="{{ $symbolId }}">    
-                    <div style="text-align:right">
-                        <input type="submit" id="btn_insert" class="btn btn-primary" value="查詢" />
+               
+                    <div class="row justify-content-center align-items-center">
+                        <h2 id="title" class="text-center text-black font-weight-bold" style="margin-bottom:20px;">股票圖表</h2>
+                        <input type="text" id="symbolId" name="symbolId" class="form-control" placeholder="請輸入股票代碼" style="margin-bottom: 10px;" value="{{ $symbolId }}">    
+                            
+                        <label class="col-min-text col-md-3 col-lg-2 datetext control-label">起始日期:</label>
+                        <div class=" col-md-3 col-lg-2 col-xl-2">
+                          <input type="text" class="form-control" name="begin_date" data-provide="datepicker">
+                        </div>
+                        <label class="col-min-text col-md-3 col-lg-2 datetext control-label">截止日期:</label>
+                        <div class="col-md-3 col-lg-2 col-xl-2">
+                          <input type="text" class="form-control" name="end_date" data-provide="datepicker">
+                        </div>
+                        <div id="query" class="col-min-btn col-md-3 col-lg-2" style="text-align:right;">
+                          <input type="submit" name="query_data" class="btn btn-primary" value="查詢">
+                        </div>
                     </div>
                 <figure class="highcharts-figure">
                     <div id="chart"></div>
@@ -92,6 +105,7 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script src="{{mix('js/app.js')}}"></script>
     <script src="{{mix('js/stock.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/bootstrap.datepicker-fork/1.3.0/js/bootstrap-datepicker.js"></script>
     <script>
         function changeChart(num){
             if(num == 1){

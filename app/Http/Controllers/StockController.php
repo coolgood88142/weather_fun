@@ -592,9 +592,9 @@ class StockController extends Controller
                 $dealt = end($dealts);
                 
                     foreach($dealt as $key => $value){
-                        $fugleValue = $value;
+                        $fugleValue = $datas[0]->$key;
                         if($key == 'at'){
-                            $date = (new Carbon($value))->timezone('Asia/Taipei');
+                            $date = (new Carbon($fugleValue))->timezone('Asia/Taipei');
                             $fugleValue = $date->format('Y-m-d h:m');
                         }
                         $message = [
