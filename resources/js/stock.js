@@ -6,8 +6,22 @@ $(document).ready(function () {
         $(get_sidebar).toggleClass('in');
         $(get_content).toggleClass('out');
     });
-    
+
+    openDate($("input[name='begin_date']"));
+    openDate($("input[name='end_date']"));
 });
+
+function openDate(name){
+  $(name).datepicker({
+    uiLibrary: 'bootstrap4',
+      format: "yyyy-mm-dd",
+      language:"zh-TW",
+      weekStart: 1,
+      daysOfWeekHighlighted: "6,0",
+      autoclose: true,
+      todayHighlight: true,
+  });
+}
 
 let chartArray = JSON.parse(document.getElementById("chartArray").value);
 let dealtsArray = JSON.parse(document.getElementById("dealtsArray").value);
