@@ -3,6 +3,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="stylesheet" href="/css/stock.css">
         <link rel="stylesheet" href="/css/datepicker.css"/>
+        <link rel="stylesheet" href="/css/datepicker.css"/>
     </head>
     <style>
         #container {
@@ -76,11 +77,19 @@
                         <h2 id="title" class="text-center text-black font-weight-bold" style="margin-bottom:20px;">股票圖表</h2>
                         <input type="text" id="symbolId" name="symbolId" class="form-control" placeholder="請輸入股票代碼" style="margin-bottom: 10px;" value="{{ $symbolId }}">    
                             
-                        <label class="col-min-text col-md-3 col-lg-2 datetext control-label">起始日期:</label>
+                        <label>24hr Date-Time:</label>
+                        <div class="input-group date" id="id_1">
+                            <input type="text" value="05/16/2018 11:31:00" class="form-control" required/>
+                            <span class="input-group-addon">
+                                <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                            </span>
+                        </div>
+
+                        <label class="col-min-text col-md-3 col-lg-2 datetext control-label">起始時間:</label>
                         <div class=" col-md-3 col-lg-2 col-xl-2">
                           <input type="text" class="form-control" name="begin_date" data-provide="datepicker">
                         </div>
-                        <label class="col-min-text col-md-3 col-lg-2 datetext control-label">截止日期:</label>
+                        <label class="col-min-text col-md-3 col-lg-2 datetext control-label">截止時間:</label>
                         <div class="col-md-3 col-lg-2 col-xl-2">
                           <input type="text" class="form-control" name="end_date" data-provide="datepicker">
                         </div>
@@ -105,7 +114,10 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script src="{{mix('js/app.js')}}"></script>
     <script src="{{mix('js/stock.js')}}"></script>
-    <script src="https://cdn.jsdelivr.net/bootstrap.datepicker-fork/1.3.0/js/bootstrap-datepicker.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/bootstrap.datepicker-fork/1.3.0/js/bootstrap-datepicker.js"></script> --}}
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
     <script>
         function changeChart(num){
             if(num == 1){

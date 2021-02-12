@@ -745,7 +745,7 @@ class StockController extends Controller
                     if($count > $length){
                         $now = new Carbon($key);
                         $date = $now->timezone('Asia/Taipei');
-                        array_push($dataArray['chart']['time'], $date->format('h:i'));
+                        array_push($dataArray['chart']['time'], $date->format('H:i'));
                         array_push($dataArray['chart']['open'], $data->open);
                         array_push($dataArray['chart']['close'], $data->close);
                         array_push($dataArray['chart']['high'], $data->high);
@@ -756,7 +756,7 @@ class StockController extends Controller
                 }else if($category == 'dealts'){
                     $now = new Carbon($data->at);
                     $date = $now->timezone('Asia/Taipei');
-                    array_push($dataArray['dealts']['at'], $date->format('h:i'));
+                    array_push($dataArray['dealts']['at'], $date->format('H:i'));
                     array_push($dataArray['dealts']['price'], $data->price);
                     array_push($dataArray['dealts']['unit'], $data->unit);
                     array_push($dataArray['dealts']['serial'], $data->serial);

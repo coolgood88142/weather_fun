@@ -7,21 +7,29 @@ $(document).ready(function () {
         $(get_content).toggleClass('out');
     });
 
-    openDate($("input[name='begin_date']"));
-    openDate($("input[name='end_date']"));
+    $('#id_1').datetimepicker({
+        "allowInputToggle": true,
+        "showClose": true,
+        "showClear": true,
+        "showTodayButton": true,
+        "format": "MM/DD/YYYY HH:mm:ss",
+    });
+
+    // openDate($("input[name='begin_date']"));
+    // openDate($("input[name='end_date']"));
 });
 
-function openDate(name){
-  $(name).datepicker({
-    uiLibrary: 'bootstrap4',
-      format: "yyyy-mm-dd",
-      language:"zh-TW",
-      weekStart: 1,
-      daysOfWeekHighlighted: "6,0",
-      autoclose: true,
-      todayHighlight: true,
-  });
-}
+// function openDate(name){
+//   $(name).datepicker({
+//     uiLibrary: 'bootstrap4',
+//       format: "HH:MM",
+//       language:"zh-TW",
+//       weekStart: 1,
+//       daysOfWeekHighlighted: "6,0",
+//       autoclose: true,
+//       todayHighlight: true,
+//   });
+// }
 
 let chartArray = JSON.parse(document.getElementById("chartArray").value);
 let dealtsArray = JSON.parse(document.getElementById("dealtsArray").value);
