@@ -773,4 +773,50 @@ class StockController extends Controller
 
         return view('stock', $dataArray);
     }
+
+    public function checkFugleApiStockData(Request $request){
+        $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
+        $symbolId = $request->symbolId;
+        $categorys = ['chart', 'dealts'];
+        $bTime = $request->bTime;
+        $eTime = $request->eTime;
+
+        foreach($categorys as $category){
+            $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/' . $category;
+            $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+            $url = $fugleUrl . $parameter;
+
+            if($category == 'dealts'){
+                $url = $url . '&limit=20';
+            }
+
+            $Guzzleclient = new \GuzzleHttp\Client();
+            $response = $Guzzleclient->get($url);
+            $json = json_decode($response->getBody());
+            $datas = $json->data->$category;
+            $length = count((array)$datas) - 20 - 1;
+            $count = 0;
+            $status = 'error';
+
+            foreach($datas as $key => $data){
+                if($category == 'chart'){
+                    if($count > $length){
+                        $now = new Carbon($key);
+                        $date = $now->timezone('Asia/Taipei')->format('H:i');
+                        if($bTime >= $date || $date <= $eTime){
+                            $status = 'success';
+                        }
+                    }
+                }else if($category == 'dealts'){
+                    $now = new Carbon($data->at);
+                    $date = $now->timezone('Asia/Taipei')->format('H:i');
+                    if($bTime >= $date || $date <= $eTime){
+                        $status = 'success';
+                    }
+                }
+                $count++;
+            }
+        }
+        return [ 'status' => $status];
+    }
 }

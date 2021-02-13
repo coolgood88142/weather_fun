@@ -45,6 +45,4 @@ Route::get('/fugle','StockController@getFugleDefaultData');
 
 Route::post('/fugle','StockController@getFugleApiStockData')->name('fugle');
 
-// Route::get('/fugle', function () {
-//     return view('stock');
-// });
+Route::post('/checkFugleDataTime','StockController@checkFugleApiStockData')->name('checkFugle');

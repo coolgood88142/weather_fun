@@ -7,13 +7,13 @@ $(document).ready(function () {
         $(get_content).toggleClass('out');
     });
 
-    $('#id_1').datetimepicker({
-        "allowInputToggle": true,
-        "showClose": true,
-        "showClear": true,
-        "showTodayButton": true,
-        "format": "MM/DD/YYYY HH:mm:ss",
-    });
+    // $('#id_1').datetimepicker({
+    //     "allowInputToggle": true,
+    //     "showClose": true,
+    //     "showClear": true,
+    //     "showTodayButton": true,
+    //     "format": "MM/DD/YYYY HH:mm:ss",
+    // });
 
     // openDate($("input[name='begin_date']"));
     // openDate($("input[name='end_date']"));
