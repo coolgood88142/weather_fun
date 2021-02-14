@@ -7,13 +7,21 @@ $(document).ready(function () {
         $(get_content).toggleClass('out');
     });
 
-    // $('#id_1').datetimepicker({
-    //     "allowInputToggle": true,
-    //     "showClose": true,
-    //     "showClear": true,
-    //     "showTodayButton": true,
-    //     "format": "MM/DD/YYYY HH:mm:ss",
-    // });
+    $('#time1').datetimepicker({
+        "allowInputToggle": true,
+        "showClose": true,
+        "showClear": true,
+        "showTodayButton": true,
+        "format": "HH:mm",
+    });
+
+    $('#time2').datetimepicker({
+        "allowInputToggle": true,
+        "showClose": true,
+        "showClear": true,
+        "showTodayButton": true,
+        "format": "HH:mm",
+    });
 
     // openDate($("input[name='begin_date']"));
     // openDate($("input[name='end_date']"));

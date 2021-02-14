@@ -1,6 +1,7 @@
 {
     "/js/app.js": "/js/app.js",
     "/css/stock.css": "/css/stock.css",
+    "/css/bootstrap-datetimepicker.min.css": "/css/bootstrap-datetimepicker.min.css",
     "/css/datepicker.css": "/css/datepicker.css",
     "/css/app.css": "/css/app.css",
     "/js/bootstrap-datetimepicker.min.js": "/js/bootstrap-datetimepicker.min.js",
