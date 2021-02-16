@@ -14,9 +14,11 @@ const mix = require('laravel-mix');
 mix.js('resources/js/app.js', 'public/js')
    .js('resources/js/taiwan.js', 'public/js')
    .js('resources/js/stock.js', 'public/js')
+   .js('resources/js/weather.js', 'public/js')
    .js('resources/js/d3.v3.min.js', 'public/js')
-   .js('resources/js/bootstrap-datetimepicker.min.js', 'public/js')
+   .js('resources/js/datetimepicker.js', 'public/js')
+   .js('resources/js/user.js', 'public/js')
     .sass('resources/sass/stock.scss', 'public/css')
-    .sass('resources/sass/bootstrap-datetimepicker.min.scss', 'public/css')
+    .sass('resources/sass/datetimepicker.scss', 'public/css')
     .sass('resources/sass/datepicker.scss', 'public/css')
     .sass('resources/sass/app.scss', 'public/css');

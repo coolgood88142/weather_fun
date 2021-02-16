@@ -23,5 +23,6 @@ class VerifyCsrfToken extends Middleware
         '/webhook',
         '/stock',
         '/fugle',
+        '/weatherChart',
     ];
 }

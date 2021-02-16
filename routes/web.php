@@ -19,6 +19,10 @@ Route::get('/test', function () {
     return view('weather');
 });
 
+Route::get('/user', function () {
+    return view('user');
+});
+
 Route::get('/weather','WeatherController@getWeatherData');
 
 Route::get('/articles','WeatherController@getArticlesApiData');
@@ -46,3 +50,7 @@ Route::get('/fugle','StockController@getFugleDefaultData');
 Route::post('/fugle','StockController@getFugleApiStockData')->name('fugle');
 
 Route::post('/checkFugleDataTime','StockController@checkFugleApiStockData')->name('checkFugle');
+
+Route::get('/weatherChart','WeatherController@getWeatherApiData');
+
+Route::get('/getFugle', 'StockController@getDataTable');

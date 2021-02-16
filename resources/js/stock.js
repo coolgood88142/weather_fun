@@ -1,43 +1,11 @@
-$(document).ready(function () {
-    var sideslider = $('[data-toggle=collapse-side]');
-    var get_sidebar = sideslider.attr('data-target-sidebar');
-    var get_content = sideslider.attr('data-target-content');
-    sideslider.click(function(event){
-        $(get_sidebar).toggleClass('in');
-        $(get_content).toggleClass('out');
-    });
+import chart from "./components/stock/chart.vue"
 
-    $('#time1').datetimepicker({
-        "allowInputToggle": true,
-        "showClose": true,
-        "showClear": true,
-        "showTodayButton": true,
-        "format": "HH:mm",
-    });
-
-    $('#time2').datetimepicker({
-        "allowInputToggle": true,
-        "showClose": true,
-        "showClear": true,
-        "showTodayButton": true,
-        "format": "HH:mm",
-    });
-
-    // openDate($("input[name='begin_date']"));
-    // openDate($("input[name='end_date']"));
-});
-
-// function openDate(name){
-//   $(name).datepicker({
-//     uiLibrary: 'bootstrap4',
-//       format: "HH:MM",
-//       language:"zh-TW",
-//       weekStart: 1,
-//       daysOfWeekHighlighted: "6,0",
-//       autoclose: true,
-//       todayHighlight: true,
-//   });
-// }
+let user = new Vue({
+	el: "#app",
+    components: {
+        'chart': chart,
+    },
+})
 
 let chartArray = JSON.parse(document.getElementById("chartArray").value);
 let dealtsArray = JSON.parse(document.getElementById("dealtsArray").value);
@@ -48,10 +16,6 @@ Highcharts.chart('chart', {
     },
     title: {
         text: '富果API-線圖',
-        align: 'left'
-    },
-    subtitle: {
-        text: 'Source: ' + chartArray.source,
         align: 'left'
     },
     xAxis: [{
@@ -215,10 +179,6 @@ Highcharts.chart('dealts', {
     },
     title: {
         text: '富果API-當日成交資訊',
-        align: 'left'
-    },
-    subtitle: {
-        text: 'Source: ' + dealtsArray.source,
         align: 'left'
     },
     xAxis: [{

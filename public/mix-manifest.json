@@ -1,11 +1,13 @@
 {
     "/js/app.js": "/js/app.js",
     "/css/stock.css": "/css/stock.css",
-    "/css/bootstrap-datetimepicker.min.css": "/css/bootstrap-datetimepicker.min.css",
+    "/css/datetimepicker.css": "/css/datetimepicker.css",
     "/css/datepicker.css": "/css/datepicker.css",
     "/css/app.css": "/css/app.css",
-    "/js/bootstrap-datetimepicker.min.js": "/js/bootstrap-datetimepicker.min.js",
     "/js/d3.v3.min.js": "/js/d3.v3.min.js",
+    "/js/datetimepicker.js": "/js/datetimepicker.js",
     "/js/stock.js": "/js/stock.js",
-    "/js/taiwan.js": "/js/taiwan.js"
+    "/js/taiwan.js": "/js/taiwan.js",
+    "/js/user.js": "/js/user.js",
+    "/js/weather.js": "/js/weather.js"
 }
