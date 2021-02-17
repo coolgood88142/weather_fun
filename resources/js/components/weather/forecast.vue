@@ -1,8 +1,9 @@
 <template>
     <data-table
+        :order-by="order"
         :columns="columns"
         :per-page="perPage"
-        url="http://127.0.0.1:8000/getFugle/chart/3515"
+        url="http://127.0.0.1:8000/getWeather/0"
     >
     </data-table>
 </template>
@@ -15,41 +16,42 @@ export default {
     name: 'app',
     data() {
         return {
-            perPage: ['10', '25', '50'],
+            order: 'no',
+            perPage: ['23'],
             columns: [
                 {
-                    label: '時間',
-                    name: 'time',
+                    label: '序號',
+                    name: 'no',
                     orderable: true,
                 },
                 {
-                    label: '張數',
-                    name: 'unit',
+                    label: '縣市',
+                    name: 'city',
                     orderable: true,
                 },
                 {
-                    label: '股數',
-                    name: 'volume',
+                    label: '天氣現象',
+                    name: 'wx',
                     orderable: true,
                 },
                 {
-                    label: '開盤價',
-                    name: 'open',
+                    label: '最高溫度',
+                    name: 'maxt',
                     orderable: true,
                 },
                 {
-                    label: '收盤價',
-                    name: 'close',
+                    label: '最低溫度',
+                    name: 'mint',
                     orderable: true,
                 },
                 {
-                    label: '最高價',
-                    name: 'high',
+                    label: '舒適度',
+                    name: 'ci',
                     orderable: true,
                 },
                 {
-                    label: '最低價',
-                    name: 'low',
+                    label: '降雨機率',
+                    name: 'pop',
                     orderable: true,
                 },
             ]

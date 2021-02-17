@@ -78,7 +78,9 @@
                     <div id="dealts" style="display: none;"></div>
                 </figure>
             </form>
-            <chart></chart>
+            <metas></metas>
+            <dealts></dealts>
+            <quote></quote>
         </div>
         
         <input type="hidden" id="symbolIdMessage" value="{{ $symbolIdMessage }}"/>
@@ -112,7 +114,6 @@
                 let chartMessage = $("#chartMessage").val();
                 let dealtsMessage = $("#dealtsMessage").val();
                 let nowChart = $("#nowChart").val();
-                console.log($("#datatable").val())
 
                 if(symbolIdMessage != ''){
                     showMessage(true, symbolIdMessage)

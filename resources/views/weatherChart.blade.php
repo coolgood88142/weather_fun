@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="/css/datetimepicker.css">
     </head>
     <body>
-        <div class="container" style="width:900px;">
+        <div id="app" class="container" style="width:900px;">
             <nav class="navbar navbar-expand-md navbar-light navbar-dark bg-dark fixed-top navbar-inverse">
                 <button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" >
                     <span class="navbar-toggler-icon"></span>
@@ -75,6 +75,7 @@
                     <div id="total" style="display: none;"></div>
                 </figure>
             </form>
+            <forecast></forecast>
         </div>
         
         <input type="hidden" id="forecastArray" value="{{ json_encode($forecast) }}"/>

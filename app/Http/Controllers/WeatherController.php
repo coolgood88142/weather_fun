@@ -10,6 +10,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use App\Services\CrawlerService;
 use Carbon\Carbon;
 use Config;
+use JamesDordoy\LaravelVueDatatable\Http\Resources\DataTableCollectionResource;
 
 class WeatherController extends Controller
 {
@@ -313,6 +314,150 @@ class WeatherController extends Controller
         
 
         return view('weatherChart', $dataArray);
+    }
+
+    public function getWeatherDataTable(Request $request){
+        $client = new \GuzzleHttp\Client();
+        $token = 'CWB-96170F0C-F4B6-4626-B946-D6892DA6D584';
+        $weatherUrl = 'https://opendata.cwb.gov.tw/api';
+        $cityData = Config::get('city');
+        $weathers = Config::get('weather');
+        $automatic = Config::get('automatic');
+        $length = $request->input('length');
+        $sortBy = $request->input('column');
+        $orderBy = $request->input('dir');
+        $searchValue = $request->input('search');
+        $apiNum = $request->apiNum;
+        $weather = $weathers[(int)$apiNum];
+
+        $startTime = 6;
+        $endTime = 18;
+        $today = Carbon::now()->timezone('Asia/Taipei');
+        $hour = (int)$today->format('H');
+        $type = 0;
+
+        if($hour > $endTime){
+            $type = 2;
+        }else if($hour <= $startTime){ 
+            $type = 1;
+        }
+
+        $dataArray = [];
+        $no = 1;
+        $count = 15;
+        foreach($cityData as $city){
+            $array = [];
+            $acidRainPh = 0;
+            $locationName = urlencode($city);
+            $temperature = '';
+            $probabilityOfPrecipitation = '';
+
+            $weatherData = $this->getCrawlerData($client, $weather, $locationName);
+            $array['no'] = $no;
+            $array['city'] = $city;
+            if($apiNum == 0){
+                if(isset($weatherData->location[0])){
+                    $location = $weatherData->location[0];
+                    $array['wx'] = $location->weatherElement[0]->time[$type]->parameter->parameterName;
+                    $array['pop'] = $location->weatherElement[1]->time[$type]->parameter->parameterName;
+                    $array['mint'] = $location->weatherElement[2]->time[$type]->parameter->parameterName;
+                    $array['ci'] = $location->weatherElement[3]->time[$type]->parameter->parameterName;
+                    $array['maxt'] = $location->weatherElement[4]->time[$type]->parameter->parameterName;
+                }
+
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 1){
+                $array['pop'] = [];
+                $array['t'] = [];
+                $array['rh'] = [];
+                $array['minci'] = [];
+                $array['ws'] = [];
+                $array['maxat'] = [];
+                $array['wx'] = [];
+                $array['maxci'] = [];
+                $array['mini'] = [];
+                $array['uvi'] = [];
+                $array['weatherdescription'] = [];
+                $array['minat'] = [];
+                $array['maxt'] = [];
+                $array['wd'] = [];
+                $array['td'] = [];
+
+                if(isset($weatherData->locations[0])){
+                    $location = $weatherData->locations[0];
+                    $length = count($location->location[0]->weatherElement[0]->time);
+                    for($i = 0; $i < $length; $i++){
+                        dd($location->location[0])->weatherElement;
+                        if(isset($location->weatherElement[0])){
+                            $pop = $location->weatherElement[0]->time[$i]->elementValue[0]->value;
+                            $t = $location->weatherElement[1]->time[$i]->elementValue[0]->value;
+                            $rh = $location->weatherElement[2]->time[$i]->elementValue[0]->value;
+                            $minci = $location->weatherElement[3]->time[$i]->elementValue[0]->value;
+                            $ws = $location->weatherElement[4]->time[$i]->elementValue[0]->value;
+                            $maxat = $location->weatherElement[5]->time[$i]->elementValue[0]->value;
+                            $wx = $location->weatherElement[6]->time[$i]->elementValue[0]->value;
+                            $maxci = $location->weatherElement[7]->time[$i]->elementValue[0]->value;
+                            $mini = $location->weatherElement[8]->time[$i]->elementValue[0]->value;
+                            $uvi = $location->weatherElement[9]->time[$i]->elementValue[0]->value;
+                            $weatherdescription = $location->weatherElement[10]->time[$i]->elementValue[0]->value;
+                            $minat = $location->weatherElement[11]->time[$i]->elementValue[0]->value;
+                            $maxt = $location->weatherElement[12]->time[$i]->elementValue[0]->value;
+                            $wd = $location->weatherElement[13]->time[$i]->elementValue[0]->value;
+                            $td = $location->weatherElement[14]->time[$i]->elementValue[0]->value;
+
+                            array_push($array['pop'], $pop);
+                            dd($array);
+                            array_push($array['t'], $t);
+                            array_push($array['rh'], $rh);
+                            array_push($array['minci'], $minci);
+                            array_push($array['ws'], $ws);
+                            array_push($array['maxat'], $maxat);
+                            array_push($array['wx'], $wx);
+                            array_push($array['maxci'], $maxci);
+                            array_push($array['mini'], $mini);
+                            array_push($array['uvi'], $uvi);
+                            array_push($array['weatherdescription'], $weatherdescription);
+                            array_push($array['minat'], $minat);
+                            array_push($array['maxt'], $maxt);
+                            array_push($array['wd'], $wd);
+                            array_push($array['td'], $td);
+                            dd($array);
+                        }
+                    }
+
+                }
+                array_push($dataArray, (object)$array);
+            }
+            
+            $no++;
+
+            // if(isset($weatherData->location[0])){
+
+            // }
+        }
+        // dd($dataArray);
+
+        $collection = collect($dataArray);
+
+        if($searchValue != ''){
+            $collection->search(function ($item, $key) {
+                return $item->$key == $searchValue;
+            });
+        }
+        
+        if($sortBy != '' && $orderBy != ''){
+            if($orderBy == 'asc'){
+                $collection = $collection->sortBy($sortBy);
+            }else if($orderBy == 'desc'){
+                $collection = $collection->sortByDesc($sortBy);
+            }
+        }
+
+        if($length != ''){
+            $collection = $collection->forPage(1, $length);
+        }
+
+        return new DataTableCollectionResource($collection->values()->all());
     }
 
     public function getArticlesApiData(){

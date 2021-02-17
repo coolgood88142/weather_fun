@@ -1,3 +1,12 @@
+import forecast from "./components/weather/forecast.vue"
+
+new Vue({
+	el: "#app",
+    components: {
+        'forecast': forecast,
+    },
+})
+
 let forecastArray = JSON.parse(document.getElementById("forecastArray").value);
 let observationArray = JSON.parse(document.getElementById("observationArray").value);
 let totalArray = JSON.parse(document.getElementById("totalArray").value);

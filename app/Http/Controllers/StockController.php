@@ -18,6 +18,8 @@ use LINE\LINEBot\MessageBuilder\RawMessageBuilder;
 use Carbon\Carbon;
 use Config;
 use JamesDordoy\LaravelVueDatatable\Http\Resources\DataTableCollectionResource;
+use App\Models\Stocks;
+use App\Repositories\StocksRepository;
 
 class StockController extends Controller
 {
@@ -27,8 +29,9 @@ class StockController extends Controller
     private $bot;
     private $channel_access_token;
     private $channel_secret;
+    private $stockRepo;
 
-    public function __construct()
+    public function __construct(StocksRepository $stockRepo)
     {
         $this->lineBotService = app(LineBotService::class);
         $this->crawlerService = app(CrawlerService::class);
@@ -39,6 +42,7 @@ class StockController extends Controller
         $httpClient = new CurlHTTPClient($this->channel_access_token);
         $this->bot = new LINEBot($httpClient, ['channelSecret' => $this->channel_secret]);
         $this->client = $httpClient;
+        $this->stockRepo = $stockRepo;
     }
 
     public function getMessageStock(Request $request){
@@ -447,11 +451,7 @@ class StockController extends Controller
                             
                             array_push($messageArray2, $message);
                         }
-                            
-                            
                     }
-                    
-                    
                 }
 
                 $messageBuilder =  new RawMessageBuilder(
@@ -873,135 +873,133 @@ class StockController extends Controller
         return $isAdd;
     }
 
-    public function getDataTable(Request $request){
+    public function getStockDataTable(Request $request){
         $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
+        $length = $request->input('length');
+        $sortBy = $request->input('column');
+        $orderBy = $request->input('dir');
+        $searchValue = $request->input('search');
         $symbolId = $request->symbolId;
-        $beginTime = (String)$request->begintime;
-        $endTime = (String)$request->endtime;
-        $nowChart = (int)$request->nowChart;
-        $categorys = ['chart', 'dealts'];
-        $noData = '此區間無資料';
-        $noSymbolId = '無此股票代號';
-        $dataArray =[
-            'chart' => [
-                'time' => [],
-                'open' => [],
-                'close' => [],
-                'high' => [],
-                'low' => [],
-                'unit' => [],
-                'volume' => [],
-            ],
-            'dealts' => [
-                'at' => [],
-                'price' => [],
-                'unit' => [],
-                'serial' => [],
-            ],
-            'datatable' => [],
-            'symbolId' => '',
-            'symbolIdMessage' => '',
-            'chartMessage' => '',
-            'dealtsMessage' => '',
-            'bTime' => '',
-            'eTime' => '',
-            'nowChart' => 1
-        ];
+        $category = $request->category;
 
-        if($beginTime != ''){
-            $dataArray['bTime'] = $beginTime;
-        }
+        $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/' . $category;
+        $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+        $url = $fugleUrl . $parameter;
 
-        if($endTime != ''){
-            $dataArray['eTime'] = $endTime;
-        }
+        $dataArray = [];
 
-        if($nowChart != ''){
-            $dataArray['nowChart'] = $nowChart;
-        }
+        $Guzzleclient = new \GuzzleHttp\Client();
+        $response = $Guzzleclient->get($url);
+        $json = json_decode($response->getBody());
+        $datas = $json->data->$category;
 
-        if($symbolId != ''){
-            $dataArray['symbolId'] = $symbolId;
-        }
-
-        try {
-            foreach($categorys as $category){
-                $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/' . $category;
-                $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
-                $url = $fugleUrl . $parameter;
-
-                if($category == 'dealts' && $beginTime == '' && $endTime == ''){
-                    $url = $url . '&limit=20';
-                }
-
-                $Guzzleclient = new \GuzzleHttp\Client();
-                $response = $Guzzleclient->get($url);
-                $json = json_decode($response->getBody());
-                $datas = $json->data->$category;
-                $length = count((array)$datas) - 20 - 1;
-                $count = 0;
-
-                foreach($datas as $key => $data){
-                    $bTime = '';
-                    $eTime = '';
-
-                    if($category == 'chart'){
-                        if(($count > $length) || ($beginTime != '' || $endTime != '')){
-                            $now = new Carbon($key);
-                            $date = $now->timezone('Asia/Taipei');
-                            $time = $date->format('H:i');
-                            $isAdd = $this->checkDate($date, $beginTime, $endTime);
-
-                            if($isAdd){
-                                array_push($dataArray['chart']['time'], $time);
-                                array_push($dataArray['chart']['open'], $data->open);
-                                array_push($dataArray['chart']['close'], $data->close);
-                                array_push($dataArray['chart']['high'], $data->high);
-                                array_push($dataArray['chart']['low'], $data->low);
-                                array_push($dataArray['chart']['unit'], $data->unit);
-                                array_push($dataArray['chart']['volume'], $data->volume);
-                            }
+        if($category == 'meta'){
+            $metas = Config::get('meta');
+            $datas = get_object_vars($datas);
+            $array = [];
+            foreach($metas as $meta){
+                foreach($meta as $key => $value){
+                    $fugleValue = $datas[$key];
+                    if(is_bool($fugleValue)){
+                        if($fugleValue){
+                            $fugleValue = '是';
+                        }else{
+                            $fugleValue = '否';
                         }
-                    }else if($category == 'dealts'){
-                        $now = new Carbon($data->at);
-                        $date = $now->timezone('Asia/Taipei');
-                        $time = $date->format('H:i');
-                        $isAdd = $this->checkDate($date, $beginTime, $endTime);    
-                        
-                        if($isAdd){
-                            array_push($dataArray['dealts']['at'], $time);
-                            array_push($dataArray['dealts']['price'], $data->price);
-                            array_push($dataArray['dealts']['unit'], $data->unit);
-                            array_push($dataArray['dealts']['serial'], $data->serial);
-                        }
+                    }else if(is_numeric($fugleValue)){
+                        $fugleValue = '$' . $fugleValue;
                     }
-                    $count++;
+
+                    $array[$key] = (String)$fugleValue;
+                    // array_push($array, (object)$datasArray);
                 }
             }
-        } catch (RequestException $e) {;
-            $dataArray['symbolIdMessage'] = $symbolId . $noSymbolId;
-            $dataArray['symbolId'] = '';
-        }
+            
+            array_push($dataArray, (object)$array);
+        }else if($category == 'quote'){
+            $quotes = Config::get('quote');
+            $datas = get_object_vars($datas);
+            foreach($quotes as $quote){
+                foreach($quote as $key => $value){
+                    $fugleValue = '';
+                    $array = [];
+                    if(end($quotes) != $quote){
+                        if(is_numeric($key)){
+                            $keys = array_keys($value);
+                            $firstKey = $keys[0];
 
-        if(count($dataArray['dealts']) > 0){
-            $dataArray['dealts']['at'] = array_reverse($dataArray['dealts']['at']);
-            $dataArray['dealts']['price'] = array_reverse($dataArray['dealts']['price']);
-            $dataArray['dealts']['unit'] = array_reverse($dataArray['dealts']['unit']);
-            $dataArray['dealts']['serial'] = array_reverse($dataArray['dealts']['serial']);
+                            $array['type'] = (string)$value[$firstKey];
+    
+                            foreach($keys as $index => $key){
+                                if($index != 0){
+                                    if($key == 'at'){
+                                        $now = new Carbon($datas[$firstKey]->$key);
+                                        $date = $now->timezone('Asia/Taipei');
+                                        $time = $date->format('H:i');
+                                        $array[$key] = $time;
+                                    }else{
+                                        $array[$key] = (string)$datas[$firstKey]->$key;
+                                    }
+                                }
+                            }
+                            array_push($dataArray, (object)$array);
+                        }
+                        
+                    }
+                }
+            }
+        }else{
+            foreach($datas as $key => $data){
+                if($category == 'chart'){
+                    $now = new Carbon($key);
+                    $date = $now->timezone('Asia/Taipei');
+                    $time = $date->format('H:i');
+                    $array = [
+                        'time' => $time,
+                        'open' => $data->open,
+                        'close' => $data->close,
+                        'high' => $data->high,
+                        'low' => $data->low,
+                        'unit' => $data->unit,
+                        'volume' => $data->volume,
+                    ];
+                    array_push($dataArray, (object)$array);
+                }else if($category == 'dealts'){
+                    $now = new Carbon($data->at);
+                    $date = $now->timezone('Asia/Taipei');
+                    $time = $date->format('H:i');    
+                    
+                    $array = [
+                        'at' => $time,
+                        'price' => $data->price,
+                        'unit' => $data->unit,
+                        'serial' => $data->serial,
+                    ];
+                    array_push($dataArray, (object)$array);
+                }
+            }
         }
+        $collection = collect($dataArray);
 
-        if(count($dataArray['chart']['time']) == 0 && ($beginTime != '' || $endTime != '')){
-            $dataArray['chartMessage'] = '線圖-' . $noData;
+        if($searchValue != ''){
+            $collection->search(function ($item, $key) {
+                return $item->$key == $searchValue;
+            });
         }
-
-        if(count($dataArray['dealts']['at']) == 0 && ($beginTime != '' || $endTime != '')){
-            $dataArray['dealtsMessage'] = '當日成交資訊-' . $noData;
-        }
-
-        $dataArray['datatable'] = new DataTableCollectionResource($dataArray['chart']);
         
-        // dd($dataArray);
+        if($sortBy != '' && $orderBy != ''){
+            if($orderBy == 'asc'){
+                $collection = $collection->sortBy($sortBy);
+            }else if($orderBy == 'desc'){
+                $collection = $collection->sortByDesc($sortBy);
+            }
+            
+        }
 
-        return $dataArray['chart'];
+        if($length != ''){
+            $collection = $collection->forPage(1, $length);
+        }
+
+        return new DataTableCollectionResource($collection->values()->all());
     }
 }

@@ -2,7 +2,7 @@
     <data-table
         :columns="columns"
         :per-page="perPage"
-        url="http://127.0.0.1:8000/getFugle/chart/3515"
+        url="http://127.0.0.1:8000/getFugle/quote/3515"
     >
     </data-table>
 </template>
@@ -18,8 +18,18 @@ export default {
             perPage: ['10', '25', '50'],
             columns: [
                 {
-                    label: '時間',
-                    name: 'time',
+                    label: '資料類別',
+                    name: 'type',
+                    orderable: true,
+                },
+                {
+                    label: '總成交價',
+                    name: 'price',
+                    orderable: true,
+                },
+                {
+                    label: '最新一筆成交時間',
+                    name: 'at',
                     orderable: true,
                 },
                 {
@@ -30,26 +40,6 @@ export default {
                 {
                     label: '股數',
                     name: 'volume',
-                    orderable: true,
-                },
-                {
-                    label: '開盤價',
-                    name: 'open',
-                    orderable: true,
-                },
-                {
-                    label: '收盤價',
-                    name: 'close',
-                    orderable: true,
-                },
-                {
-                    label: '最高價',
-                    name: 'high',
-                    orderable: true,
-                },
-                {
-                    label: '最低價',
-                    name: 'low',
                     orderable: true,
                 },
             ]
