@@ -2,7 +2,7 @@
     <data-table
         :columns="columns"
         :per-page="perPage"
-        url="http://127.0.0.1:8000/getFugle/quote/3515"
+        url="./getFugle/quote/3515"
     >
     </data-table>
 </template>

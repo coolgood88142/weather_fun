@@ -3,7 +3,7 @@
         :order-by="order"
         :columns="columns"
         :per-page="perPage"
-        url="http://127.0.0.1:8000/getWeather/1"
+        url="./getWeather/1"
     >
     </data-table>
 </template>
