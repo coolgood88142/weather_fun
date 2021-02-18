@@ -13,13 +13,13 @@ Vue.use(DataTable);
 
 export default {
     props: {
-		weekForecastUrl: {
+		weatherObservationUrl: {
 			type: String,
 		},
     },
     data() {
         return {
-            url: this.weekForecastUrl,
+            url: this.weatherObservationUrl,
             data: {},
             tableProps: {
                 search: '',
@@ -39,78 +39,73 @@ export default {
                     orderable: true,
                 },
                 {
-                    label: '降雨機率',
-                    name: 'pop',
-                    orderable: true,
-                },
-                {
-                    label: '溫度',
-                    name: 't',
-                    orderable: true,
-                },
-                {
-                    label: '相對溼度',
-                    name: 'rh',
-                    orderable: true,
-                },
-                {
-                    label: '最高舒適度',
-                    name: 'minci',
-                    orderable: true,
-                },
-                {
-                    label: '最大風速',
-                    name: 'ws',
-                    orderable: true,
-                },
-                {
-                    label: '最高體感溫度',
-                    name: 'maxat',
-                    orderable: true,
-                },
-                {
-                    label: '天氣現象',
-                    name: 'wx',
-                    orderable: true,
-                },
-                {
-                    label: '最大舒適度指數',
-                    name: 'maxci',
-                    orderable: true,
-                },
-                {
-                    label: '最低溫度',
-                    name: 'mini',
-                    orderable: true,
-                },
-                {
-                    label: '紫外線指數',
-                    name: 'uvi',
-                    orderable: true,
-                },
-                {
-                    label: '天氣預報綜合描述',
-                    name: 'weatherdescription',
-                    orderable: true,
-                },
-                {
-                    label: '最低體感溫度',
-                    name: 'minat',
-                    orderable: true,
-                },
-                {
-                    label: '最高溫度',
-                    name: 'maxt',
+                    label: '高度',
+                    name: 'elev',
                     orderable: true,
                 },
                 {
                     label: '風向',
-                    name: 'wd',
+                    name: 'wdir',
                     orderable: true,
                 },
                 {
-                    label: '露點溫度',
-                    name: 'td',
+                    label: '風速',
+                    name: 'wdsd',
+                    orderable: true,
+                },
+                {
+                    label: '溫度',
+                    name: 'temp',
+                    orderable: true,
+                },
+                {
+                    label: '相對濕度',
+                    name: 'humd',
+                    orderable: true,
+                },
+                {
+                    label: '氣壓',
+                    name: 'pres',
+                    orderable: true,
+                },
+                {
+                    label: '日累積雨量',
+                    name: 'h_24r',
+                    orderable: true,
+                },
+                {
+                    label: '每小時最大陣風風速',
+                    name: 'h_fx',
+                    orderable: true,
+                },
+                {
+                    label: '每小時最大陣風風向',
+                    name: 'h_xd',
+                    orderable: true,
+                },
+                {
+                    label: '每小時最大陣風時間',
+                    name: 'h_fxt',
+                    orderable: true,
+                },
+                {
+                    label: '本日最高溫',
+                    name: 'd_tx',
+                    orderable: true,
+                },
+                {
+                    label: '本日最高溫發生時間',
+                    name: 'd_txt',
+                    orderable: true,
+                },
+                {
+                    label: '本日最低溫',
+                    name: 'd_tn',
+                    orderable: true,
+                },
+                {
+                    label: '本日最低溫發生時間',
+                    name: 'd_tnt',
                     orderable: true,
                 },
             ]
@@ -137,7 +132,7 @@ export default {
         }
     },
     watch:{
-        weekForecastUrl(val){
+        weatherObservationUrl(val){
             this.url = val
             this.getData(this.url);
         }

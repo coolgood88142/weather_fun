@@ -1,8 +1,8 @@
 <template>
-    <data-table
+    <data-table 
+        :data="data"
         :columns="columns"
-        :per-page="perPage"
-        url="./getFugle/chart/3515"
+        @on-table-props-changed="reloadTable"
     >
     </data-table>
 </template>
@@ -12,10 +12,21 @@ import DataTable from 'laravel-vue-datatable';
 Vue.use(DataTable);
 
 export default {
-    name: 'app',
+    props: {
+		chartUrl: {
+			type: String,
+		},
+    },
     data() {
         return {
-            perPage: ['10', '25', '50'],
+            url: this.chartUrl,
+            data: {},
+            tableProps: {
+                search: '',
+                length: 10,
+                column: 'time',
+                dir: 'asc'
+            },
             columns: [
                 {
                     label: '時間',
@@ -55,5 +66,31 @@ export default {
             ]
         }
     },
+    created() {
+        this.getData(this.url);
+    },
+    methods:{
+        getData(url = this.url, options = this.tableProps) {
+            axios.get(url, {
+                params: options
+            })
+            .then(response => {
+                this.data = response.data;
+            })
+            // eslint-disable-next-line
+            .catch(errors => {
+                //Handle Errors
+            })
+        },
+        reloadTable(tableProps) {
+            this.getData(this.url, tableProps);
+        }
+    },
+    watch:{
+        chartUrl(val){
+            this.url = val
+            this.getData(this.url);
+        }
+    }
 }
 </script>

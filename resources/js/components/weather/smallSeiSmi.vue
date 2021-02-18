@@ -7,36 +7,40 @@
     </data-table>
 </template>
 
-
 <script>
 import DataTable from 'laravel-vue-datatable';
 Vue.use(DataTable);
 
 export default {
     props: {
-		metasUrl: {
+		smallSeiSmiUrl: {
 			type: String,
 		},
     },
     data() {
         return {
-            url: this.metasUrl,
+            url: this.smallSeiSmiUrl,
             data: {},
             tableProps: {
                 search: '',
-                length: 10,
-                column: 'item',
+                length: 23,
+                column: 'no',
                 dir: 'asc'
             },
             columns: [
                 {
-                    label: '項目',
-                    name: 'item',
+                    label: '序號',
+                    name: 'no',
                     orderable: true,
                 },
                 {
-                    label: '現況',
-                    name: 'value',
+                    label: '縣市',
+                    name: 'city',
+                    orderable: true,
+                },
+                {
+                    label: '地震報告',
+                    name: 'smallSeiSmi',
                     orderable: true,
                 },
             ]
@@ -63,7 +67,7 @@ export default {
         }
     },
     watch:{
-        metasUrl(val){
+        smallSeiSmiUrl(val){
             this.url = val
             this.getData(this.url);
         }

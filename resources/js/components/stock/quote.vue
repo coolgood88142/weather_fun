@@ -1,21 +1,33 @@
 <template>
-    <data-table
+    <data-table 
+        :data="data"
         :columns="columns"
-        :per-page="perPage"
-        url="./getFugle/quote/3515"
+        @on-table-props-changed="reloadTable"
     >
     </data-table>
 </template>
+
 
 <script>
 import DataTable from 'laravel-vue-datatable';
 Vue.use(DataTable);
 
 export default {
-    name: 'app',
+    props: {
+		quoteUrl: {
+			type: String,
+		},
+    },
     data() {
         return {
-            perPage: ['10', '25', '50'],
+            url: this.quoteUrl,
+            data: {},
+            tableProps: {
+                search: '',
+                length: 10,
+                column: 'type',
+                dir: 'asc'
+            },
             columns: [
                 {
                     label: '資料類別',
@@ -45,5 +57,31 @@ export default {
             ]
         }
     },
+    created() {
+        this.getData(this.url);
+    },
+    methods:{
+        getData(url = this.url, options = this.tableProps) {
+            axios.get(url, {
+                params: options
+            })
+            .then(response => {
+                this.data = response.data;
+            })
+            // eslint-disable-next-line
+            .catch(errors => {
+                //Handle Errors
+            })
+        },
+        reloadTable(tableProps) {
+            this.getData(this.url, tableProps);
+        }
+    },
+    watch:{
+        quoteUrl(val){
+            this.url = val
+            this.getData(this.url);
+        }
+    }
 }
 </script>

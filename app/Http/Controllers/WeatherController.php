@@ -367,76 +367,172 @@ class WeatherController extends Controller
 
                 array_push($dataArray, (object)$array);
             }else if($apiNum == 1){
-                $array['pop'] = [];
-                $array['t'] = [];
-                $array['rh'] = [];
-                $array['minci'] = [];
-                $array['ws'] = [];
-                $array['maxat'] = [];
-                $array['wx'] = [];
-                $array['maxci'] = [];
-                $array['mini'] = [];
-                $array['uvi'] = [];
-                $array['weatherdescription'] = [];
-                $array['minat'] = [];
-                $array['maxt'] = [];
-                $array['wd'] = [];
-                $array['td'] = [];
-
+                $array1 = [];
+                $array1['no'] = $no;
+                $array1['city'] = $city;
+                $i = 0;
                 if(isset($weatherData->locations[0])){
                     $location = $weatherData->locations[0];
-                    $length = count($location->location[0]->weatherElement[0]->time);
-                    for($i = 0; $i < $length; $i++){
-                        dd($location->location[0])->weatherElement;
-                        if(isset($location->weatherElement[0])){
-                            $pop = $location->weatherElement[0]->time[$i]->elementValue[0]->value;
-                            $t = $location->weatherElement[1]->time[$i]->elementValue[0]->value;
-                            $rh = $location->weatherElement[2]->time[$i]->elementValue[0]->value;
-                            $minci = $location->weatherElement[3]->time[$i]->elementValue[0]->value;
-                            $ws = $location->weatherElement[4]->time[$i]->elementValue[0]->value;
-                            $maxat = $location->weatherElement[5]->time[$i]->elementValue[0]->value;
-                            $wx = $location->weatherElement[6]->time[$i]->elementValue[0]->value;
-                            $maxci = $location->weatherElement[7]->time[$i]->elementValue[0]->value;
-                            $mini = $location->weatherElement[8]->time[$i]->elementValue[0]->value;
-                            $uvi = $location->weatherElement[9]->time[$i]->elementValue[0]->value;
-                            $weatherdescription = $location->weatherElement[10]->time[$i]->elementValue[0]->value;
-                            $minat = $location->weatherElement[11]->time[$i]->elementValue[0]->value;
-                            $maxt = $location->weatherElement[12]->time[$i]->elementValue[0]->value;
-                            $wd = $location->weatherElement[13]->time[$i]->elementValue[0]->value;
-                            $td = $location->weatherElement[14]->time[$i]->elementValue[0]->value;
+                    $el = $location->location[0]->weatherElement;
+                    $array1['pop'] = $el[0]->time[$i]->elementValue[0]->value;
+                    $array1['t'] = $el[1]->time[$i]->elementValue[0]->value;
+                    $array1['rh'] = $el[2]->time[$i]->elementValue[0]->value;
+                    $array1['minci'] = $el[3]->time[$i]->elementValue[0]->value;
+                    $array1['ws'] = $el[4]->time[$i]->elementValue[0]->value;
+                    $array1['maxat'] = $el[5]->time[$i]->elementValue[0]->value;
+                    $array1['wx'] = $el[6]->time[$i]->elementValue[0]->value;
+                    $array1['maxci'] = $el[7]->time[$i]->elementValue[0]->value;
+                    $array1['mini'] = $el[8]->time[$i]->elementValue[0]->value;
 
-                            array_push($array['pop'], $pop);
-                            dd($array);
-                            array_push($array['t'], $t);
-                            array_push($array['rh'], $rh);
-                            array_push($array['minci'], $minci);
-                            array_push($array['ws'], $ws);
-                            array_push($array['maxat'], $maxat);
-                            array_push($array['wx'], $wx);
-                            array_push($array['maxci'], $maxci);
-                            array_push($array['mini'], $mini);
-                            array_push($array['uvi'], $uvi);
-                            array_push($array['weatherdescription'], $weatherdescription);
-                            array_push($array['minat'], $minat);
-                            array_push($array['maxt'], $maxt);
-                            array_push($array['wd'], $wd);
-                            array_push($array['td'], $td);
-                            dd($array);
-                        }
+                    if($i < 6){
+                        $array1['uvi'] = $el[9]->time[$i]->elementValue[0]->value;
+                    }else{
+                        $array1['uvi'] = '';
                     }
+                    
+                    $array1['weatherdescription'] = $el[10]->time[$i]->elementValue[0]->value;
+                    $array1['minat'] = $el[11]->time[$i]->elementValue[0]->value;
+                    $array1['maxt'] = $el[12]->time[$i]->elementValue[0]->value;
+                    $array1['wd'] = $el[13]->time[$i]->elementValue[0]->value;
+                    $array1['td'] = $el[14]->time[$i]->elementValue[0]->value;
 
+                    array_push($dataArray, (object)$array1);    
                 }
+            }else if($apiNum == 2){
+                $automaticWeatherData = $this->getCrawlerData($client, $weathers[$apiNum], urlencode($automatic[$city][0]));
+                if(isset($automaticWeatherData->location[0])){
+                    $array['elev'] = $automaticWeatherData->location[0]->weatherElement[0]->elementValue;
+                    $array['wdir'] = $automaticWeatherData->location[0]->weatherElement[1]->elementValue;
+                    $array['wdsd'] = $automaticWeatherData->location[0]->weatherElement[2]->elementValue;
+                    $array['temp'] = $automaticWeatherData->location[0]->weatherElement[3]->elementValue;
+                    $array['humd'] = $automaticWeatherData->location[0]->weatherElement[4]->elementValue;
+                    $array['pres'] = $automaticWeatherData->location[0]->weatherElement[5]->elementValue;
+                    $array['h_24r'] = $automaticWeatherData->location[0]->weatherElement[6]->elementValue;
+
+                    $h_fx =  (int)$automaticWeatherData->location[0]->weatherElement[7]->elementValue;
+                    $array['h_fx'] = $h_fx > 0 ? $h_fx : 0;
+
+                    $h_xd =  (int)$automaticWeatherData->location[0]->weatherElement[8]->elementValue;
+                    $array['h_xd'] = $h_xd > 0 ? $h_xd : 0;
+
+                    $h_fxt = (int)$automaticWeatherData->location[0]->weatherElement[9]->elementValue;
+                    $array['h_fxt'] = $h_fxt > 0 ? $h_fxt : 0;
+
+                    $array['d_tx'] = $automaticWeatherData->location[0]->weatherElement[10]->elementValue;
+                    $d_txt = $automaticWeatherData->location[0]->weatherElement[11]->elementValue;
+                    $d_Txt = new Carbon($d_txt);
+                    $array['d_txt'] =  $d_Txt->timezone('Asia/Taipei')->format('H:i');
+
+                    $array['d_tn'] = $automaticWeatherData->location[0]->weatherElement[12]->elementValue;
+                    
+                    $d_tnt = $automaticWeatherData->location[0]->weatherElement[13]->elementValue;
+                    $d_Tnt = new Carbon($d_tnt);
+                    $array['d_tnt'] =  $d_Tnt->timezone('Asia/Taipei')->format('H:i');
+                }
+
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 3){
+                $automaticWeatherData = $this->getCrawlerData($client, $weathers[$apiNum], urlencode($automatic[$city][1]));
+                if(isset($automaticWeatherData->location[0])){
+                    $array['elev'] = $automaticWeatherData->location[0]->weatherElement[0]->elementValue;
+
+                    $rain = (float)$automaticWeatherData->location[0]->weatherElement[1]->elementValue;
+                    $rain = $rain > 0 ? $rain : '0.00';
+                    $array['rain'] = $rain;
+
+                    $min_10 = (float)$automaticWeatherData->location[0]->weatherElement[2]->elementValue;
+                    $min_10 = $min_10 > 0 ? $min_10 : '0.00';
+                    $array['min_10'] = $min_10;
+
+                    $hour_3 = (float)$automaticWeatherData->location[0]->weatherElement[3]->elementValue;
+                    $hour_3 = $hour_3 > 0 ? $hour_3 : '0.00';
+                    $array['hour_3'] = $hour_3;
+
+                    $hour_6 = (float)$automaticWeatherData->location[0]->weatherElement[4]->elementValue;
+                    $hour_6 = $hour_6 > 0 ? $hour_6 : '0.00';
+                    $array['hour_6'] = $hour_6;
+
+                    $array['hour_12'] = $automaticWeatherData->location[0]->weatherElement[5]->elementValue;
+                    $array['hour_24'] = $automaticWeatherData->location[0]->weatherElement[6]->elementValue;
+                    $array['now'] = $automaticWeatherData->location[0]->weatherElement[7]->elementValue;
+                    $array['latest_2days'] = $automaticWeatherData->location[0]->weatherElement[8]->elementValue;
+                    $array['latest_3days'] = $automaticWeatherData->location[0]->weatherElement[9]->elementValue;
+                }
+
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 4){
+                $automaticWeatherData = $this->getCrawlerData($client, $weathers[$apiNum], urlencode($automatic[$city][2]));
+                if(isset($automaticWeatherData->location[0])){
+                    $array['elev'] = $automaticWeatherData->location[0]->weatherElement[0]->elementValue;
+                    $array['wdir'] = $automaticWeatherData->location[0]->weatherElement[1]->elementValue;
+                    $array['wdsd'] = $automaticWeatherData->location[0]->weatherElement[2]->elementValue;
+                    $array['temp'] = $automaticWeatherData->location[0]->weatherElement[3]->elementValue;
+                    $array['humd'] = $automaticWeatherData->location[0]->weatherElement[4]->elementValue;
+                    $array['pres'] = $automaticWeatherData->location[0]->weatherElement[5]->elementValue;
+                    $array['24r'] = $automaticWeatherData->location[0]->weatherElement[6]->elementValue;
+                    $array['h_fx'] = $automaticWeatherData->location[0]->weatherElement[7]->elementValue;
+                    $array['h_xd'] = $automaticWeatherData->location[0]->weatherElement[8]->elementValue;
+                    $array['h_fxt'] = $automaticWeatherData->location[0]->weatherElement[9]->elementValue;
+                    $array['h_f10'] = $automaticWeatherData->location[0]->weatherElement[10]->elementValue;
+                    $array['h_10d'] = $automaticWeatherData->location[0]->weatherElement[11]->elementValue;
+                    $array['h_f10t'] = $automaticWeatherData->location[0]->weatherElement[12]->elementValue;
+                    $array['h_uvi'] = $automaticWeatherData->location[0]->weatherElement[13]->elementValue;
+                    $array['d_tx'] = $automaticWeatherData->location[0]->weatherElement[14]->elementValue;
+                    $array['d_txt'] = $automaticWeatherData->location[0]->weatherElement[15]->elementValue;
+                    $array['d_tn'] = $automaticWeatherData->location[0]->weatherElement[16]->elementValue;
+                    $array['d_tnt'] = $automaticWeatherData->location[0]->weatherElement[17]->elementValue;
+                    $array['d_ts'] = $automaticWeatherData->location[0]->weatherElement[18]->elementValue;
+                    $array['vis'] = $automaticWeatherData->location[0]->weatherElement[19]->elementValue;
+                    $array['weather'] = $automaticWeatherData->location[0]->weatherElement[19]->elementValue;
+                }
+
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 5){
+                $automaticWeatherData = $this->getCrawlerData($client, $weathers[$apiNum], urlencode($automatic[$city][3]));
+                if(isset($automaticWeatherData->weatherElement[0]->location[0])){
+                    $array['mean'] = $automaticWeatherData->weatherElement[0]->location[0]->parameter[1]->parameterValue;
+                    $array['max'] = $automaticWeatherData->weatherElement[0]->location[0]->parameter[2]->parameterValue;
+                    $array['min'] = $automaticWeatherData->weatherElement[0]->location[0]->parameter[3]->parameterValue;
+                }
+
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 6){
+                $ultravioletIndex = (String)$weatherData->weatherElement->location[0]->value;
+                $array['uvi'] = (float)$ultravioletIndex;
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 7){
+                $ozoneYearAvg = $weatherData->location->weatherElement[0]->time[29]->elementValue;
+                $array['ozoneYear'] = (int)$ozoneYearAvg;
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 8){
+                $seismicity = $weatherData->earthquake[0]->reportContent;
+                $array['seismi'] = $seismicity;
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 9){
+                $smallAreaSeismicity = $weatherData->earthquake[0]->reportContent;
+                $array['smallSeiSmi'] = $smallAreaSeismicity;
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 10){
+                $alarm = $weatherData->location[0]->hazardConditions->hazards;
+                if(count($alarm) == 0){
+                    $array['alarm'] = '無警報';
+                }else{
+                    $array['alarm'] = $alarm[0];
+                }
+                
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 11){
+                $sunriseData = $weatherData->note;
+                $array['sunrise'] = $sunriseData;
+                array_push($dataArray, (object)$array);
+            }else if($apiNum == 12){
+                $moonriseData = $weatherData->note;
+                $array['moonrise'] = $moonriseData;
                 array_push($dataArray, (object)$array);
             }
-            
+
             $no++;
-
-            // if(isset($weatherData->location[0])){
-
-            // }
         }
-        // dd($dataArray);
-
         $collection = collect($dataArray);
 
         if($searchValue != ''){

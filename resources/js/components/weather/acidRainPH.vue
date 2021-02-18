@@ -7,38 +7,52 @@
     </data-table>
 </template>
 
-
 <script>
 import DataTable from 'laravel-vue-datatable';
 Vue.use(DataTable);
 
 export default {
     props: {
-		metasUrl: {
+		acidRainPhUrl: {
 			type: String,
 		},
     },
     data() {
         return {
-            url: this.metasUrl,
+            url: this.acidRainPhUrl,
             data: {},
             tableProps: {
                 search: '',
-                length: 10,
-                column: 'item',
+                length: 23,
+                column: 'no',
                 dir: 'asc'
             },
             columns: [
                 {
-                    label: '項目',
-                    name: 'item',
+                    label: '序號',
+                    name: 'no',
                     orderable: true,
                 },
                 {
-                    label: '現況',
-                    name: 'value',
+                    label: '縣市',
+                    name: 'city',
                     orderable: true,
                 },
+                {
+                    label: '平均值',
+                    name: 'mean',
+                    orderable: true,
+                },
+                {
+                    label: '最大值',
+                    name: 'max',
+                    orderable: true,
+                },
+                {
+                    label: '最小值',
+                    name: 'min',
+                    orderable: true,
+                }
             ]
         }
     },
@@ -63,7 +77,7 @@ export default {
         }
     },
     watch:{
-        metasUrl(val){
+        acidRainPhUrl(val){
             this.url = val
             this.getData(this.url);
         }

@@ -1,9 +1,8 @@
 <template>
-    <data-table
-        :order-by="order"
+    <data-table 
+        :data="data"
         :columns="columns"
-        :per-page="perPage"
-        url="./getWeather/0"
+        @on-table-props-changed="reloadTable"
     >
     </data-table>
 </template>
@@ -13,11 +12,21 @@ import DataTable from 'laravel-vue-datatable';
 Vue.use(DataTable);
 
 export default {
-    name: 'app',
+    props: {
+		forecastUrl: {
+			type: String,
+		},
+    },
     data() {
         return {
-            order: 'no',
-            perPage: ['23'],
+            url: this.forecastUrl,
+            data: {},
+            tableProps: {
+                search: '',
+                length: 23,
+                column: 'no',
+                dir: 'asc'
+            },
             columns: [
                 {
                     label: '序號',
@@ -57,5 +66,31 @@ export default {
             ]
         }
     },
+    created() {
+        this.getData(this.url);
+    },
+    methods:{
+        getData(url = this.url, options = this.tableProps) {
+            axios.get(url, {
+                params: options
+            })
+            .then(response => {
+                this.data = response.data;
+            })
+            // eslint-disable-next-line
+            .catch(errors => {
+                //Handle Errors
+            })
+        },
+        reloadTable(tableProps) {
+            this.getData(this.url, tableProps);
+        }
+    },
+    watch:{
+        forecastUrl(val){
+            this.url = val
+            this.getData(this.url);
+        }
+    }
 }
 </script>

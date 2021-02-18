@@ -27,55 +27,66 @@
             </nav>
             <ul class="nav nav-tabs" style="margin-top:70px;">
                 <li class="nav-item">
-                    <a class="nav-link" href="javascript:void(0)" onclick="changeChart(1)">天氣預報</a>
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(0)">天氣預報</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="javascript:void(0)" onclick="changeChart(2)">氣象觀測</a>
+                  <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(1)">未來天氣預報</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="javascript:void(0)" onclick="changeChart(3)">統計資訊</a>
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(2)">氣象觀測</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(3)">雨量觀測</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(4)">天氣觀測報告</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(5)">酸雨 pH 值</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(6)">紫外線指數</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(7)">臭氧量觀測</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(8)">有感地震報告</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(9)">小區域有感地震報告</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(10)">天氣警報</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(11)">日出日沒時刻</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(12)">月出日沒時刻</a>
                 </li>
               </ul>
             <form id="fugle_form" name="fugle_form" action="{{ route('fugle') }}" method="POST" class="sidebar-form" style="margin-top:10px;">
                 <h2 id="title" class="text-center text-black font-weight-bold" style="margin-bottom:20px;">氣象圖表</h2>
-                {{-- <div class="form-group row">
-                    <label for="symbolId" class="col-sm-2 col-form-label">股票代號：</label>
-                    <div class="col-sm-10">
-                      <input type="text" class="form-control" id="symbolId" name="symbolId" value="">
-                    </div>
-                </div>
-                <div class="row justify-content-center align-items-center">   
-                    <label class="col-md-3 col-lg-2 col-xl-2">起始時間:</label>
-                    <div class="input-group date col-md-3 col-lg-2 col-xl-3" id="time1">
-                        <input type="text" id="begintime" name="begintime" value="" class="form-control">
-                        <div class="input-group-addon input-group-append">
-                            <div class="input-group-text">
-                                <i class="glyphicon glyphicon-time fa fa-clock-o"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <label class="col-md-3 col-lg-2 col-xl-2">截止時間:</label>
-                        <div class="input-group date col-md-3 col-lg-2 col-xl-3" id="time2">
-                            <input type="text" id="endtime" name="endtime" value="" class="form-control">
-                            <div class="input-group-addon input-group-append">
-                                <div class="input-group-text">
-                                    <i class="glyphicon glyphicon-time fa fa-clock-o"></i>
-                                </div>
-                            </div>
-                        </div>
-                        
-                    <div id="query" class="col-min-btn col-md-3 col-lg-2" style="text-align:right;">
-                        <input type="button" name="query_data" class="btn btn-primary" value="查詢" onclick="checkTime()">
-                    </div>
-                </div> --}}
                 <figure class="highcharts-figure">
                     <div id="forecast"></div>
                     <div id="observation" style="display: none;"></div>
                     <div id="total" style="display: none;"></div>
                 </figure>
             </form>
-            <forecast></forecast>
+            <forecast v-show="showForecast" :forecast-url="forecastUrl"></forecast>
+            <week-forecast v-show="showWeekForecast" :week-forecast-url="weekForecastUrl"></week-forecast>
+            <weather-observation v-show="showWeatherObservation" :weather-observation-url="weatherObservationUrl"></weather-observation>
+            <rain-observation v-show="showRainObservation" :rain-observation-url="rainObservationUrl"></rain-observation>
+            <weather-observation-report v-show="showWeatherObservationReport" :weather-observation-report-url="weatherObservationReportUrl"></weather-observation-report>
+            <acid-rain-ph v-show="showAcidRainPh" :acid-rain-ph-url="acidRainPhUrl"></acid-rain-ph>
+            <ultraviolet v-show="showUltraviolet" :ultraviolet-url="ultravioletUrl"></ultraviolet>
+            <ozone-year v-show="showOzoneYear" :ozone-year-url="ozoneYearUrl"></ozone-year>
+            <seismi v-show="showSeismi" :seismi-url="seismiUrl"></seismi>
+            <small-sei-smi v-show="showSmallSeiSmi" :small-sei-smi-url="smallSeiSmiUrl"></small-sei-smi>
+            <alarm v-show="showAlarm" :alarm-url="alarmUrl"></alarm>
+            <sunrise v-show="showSunrise" :sunrise-url="sunriseUrl"></sunrise>
+            <moonrise v-show="showMoonrise" :moonrise-url="moonriseUrl"></moonrise>
         </div>
         
         <input type="hidden" id="forecastArray" value="{{ json_encode($forecast) }}"/>

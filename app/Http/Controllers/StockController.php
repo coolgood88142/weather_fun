@@ -838,7 +838,7 @@ class StockController extends Controller
         
         // dd($dataArray);
 
-        return view('stock', $dataArray);
+        return $dataArray;
     }
 
     public function checkDate(Carbon $now, String $begin, String $end){
@@ -879,6 +879,8 @@ class StockController extends Controller
         $sortBy = $request->input('column');
         $orderBy = $request->input('dir');
         $searchValue = $request->input('search');
+        $beginTime = (String)$request->begintime;
+        $endTime = (String)$request->endtime;
         $symbolId = $request->symbolId;
         $category = $request->category;
 
@@ -886,12 +888,18 @@ class StockController extends Controller
         $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
         $url = $fugleUrl . $parameter;
 
+        if($category == 'dealts' && $beginTime == '' && $endTime == ''){
+            $url = $url . '&limit=20';
+        }
+
         $dataArray = [];
 
         $Guzzleclient = new \GuzzleHttp\Client();
         $response = $Guzzleclient->get($url);
         $json = json_decode($response->getBody());
         $datas = $json->data->$category;
+        $matchlength = count((array)$datas) - 20 - 1;
+        $count = 0;
 
         if($category == 'meta'){
             $metas = Config::get('meta');
@@ -910,12 +918,13 @@ class StockController extends Controller
                         $fugleValue = '$' . $fugleValue;
                     }
 
-                    $array[$key] = (String)$fugleValue;
-                    // array_push($array, (object)$datasArray);
+                    $array['item'] = (String)$value;
+                    $array['value'] = (String)$fugleValue;
+                    array_push($dataArray, (object)$array);
                 }
             }
             
-            array_push($dataArray, (object)$array);
+            
         }else if($category == 'quote'){
             $quotes = Config::get('quote');
             $datas = get_object_vars($datas);
@@ -951,37 +960,48 @@ class StockController extends Controller
         }else{
             foreach($datas as $key => $data){
                 if($category == 'chart'){
-                    $now = new Carbon($key);
-                    $date = $now->timezone('Asia/Taipei');
-                    $time = $date->format('H:i');
-                    $array = [
-                        'time' => $time,
-                        'open' => $data->open,
-                        'close' => $data->close,
-                        'high' => $data->high,
-                        'low' => $data->low,
-                        'unit' => $data->unit,
-                        'volume' => $data->volume,
-                    ];
-                    array_push($dataArray, (object)$array);
+                    if(($count > $matchlength) || ($beginTime != '' || $endTime != '')){
+                        $now = new Carbon($key);
+                        $date = $now->timezone('Asia/Taipei');
+                        $time = $date->format('H:i');
+                        $isAdd = $this->checkDate($date, $beginTime, $endTime);
+
+                        if($isAdd){
+                            $array = [
+                                'time' => $time,
+                                'open' => $data->open,
+                                'close' => $data->close,
+                                'high' => $data->high,
+                                'low' => $data->low,
+                                'unit' => $data->unit,
+                                'volume' => $data->volume,
+                            ];
+                            array_push($dataArray, (object)$array);
+                        }
+                    }
                 }else if($category == 'dealts'){
                     $now = new Carbon($data->at);
                     $date = $now->timezone('Asia/Taipei');
-                    $time = $date->format('H:i');    
+                    $time = $date->format('H:i'); 
+                    $isAdd = $this->checkDate($date, $beginTime, $endTime);   
                     
-                    $array = [
-                        'at' => $time,
-                        'price' => $data->price,
-                        'unit' => $data->unit,
-                        'serial' => $data->serial,
-                    ];
-                    array_push($dataArray, (object)$array);
+                    if($isAdd){
+                        $array = [
+                            'at' => $time,
+                            'price' => $data->price,
+                            'unit' => $data->unit,
+                            'serial' => $data->serial,
+                        ];
+                        array_push($dataArray, (object)$array);
+                    }
                 }
+                $count++;
             }
         }
+        // dd($dataArray);
         $collection = collect($dataArray);
 
-        if($searchValue != ''){
+        if($searchValue != '' && $searchValue != null){
             $collection->search(function ($item, $key) {
                 return $item->$key == $searchValue;
             });
@@ -993,7 +1013,6 @@ class StockController extends Controller
             }else if($orderBy == 'desc'){
                 $collection = $collection->sortByDesc($sortBy);
             }
-            
         }
 
         if($length != ''){

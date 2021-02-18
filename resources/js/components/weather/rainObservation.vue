@@ -13,13 +13,13 @@ Vue.use(DataTable);
 
 export default {
     props: {
-		weekForecastUrl: {
+		rainObservationUrl: {
 			type: String,
 		},
     },
     data() {
         return {
-            url: this.weekForecastUrl,
+            url: this.rainObservationUrl,
             data: {},
             tableProps: {
                 search: '',
@@ -39,78 +39,53 @@ export default {
                     orderable: true,
                 },
                 {
-                    label: '降雨機率',
-                    name: 'pop',
+                    label: '高度',
+                    name: 'elev',
                     orderable: true,
                 },
                 {
-                    label: '溫度',
-                    name: 't',
+                    label: '每小時累積雨量',
+                    name: 'rain',
                     orderable: true,
                 },
                 {
-                    label: '相對溼度',
-                    name: 'rh',
+                    label: '每10分鐘累積雨量',
+                    name: 'min_10',
                     orderable: true,
                 },
                 {
-                    label: '最高舒適度',
-                    name: 'minci',
+                    label: '每3小時累積雨量',
+                    name: 'hour_3',
                     orderable: true,
                 },
                 {
-                    label: '最大風速',
-                    name: 'ws',
+                    label: '每6小時累積雨量',
+                    name: 'hour_6',
                     orderable: true,
                 },
                 {
-                    label: '最高體感溫度',
-                    name: 'maxat',
+                    label: '每12小時累積雨量',
+                    name: 'hour_12',
                     orderable: true,
                 },
                 {
-                    label: '天氣現象',
-                    name: 'wx',
+                    label: '每天累積雨量',
+                    name: 'hour_24',
                     orderable: true,
                 },
                 {
-                    label: '最大舒適度指數',
-                    name: 'maxci',
+                    label: '本日累積雨量',
+                    name: 'now',
                     orderable: true,
                 },
                 {
-                    label: '最低溫度',
-                    name: 'mini',
+                    label: '前1日0時到現在之累積雨量',
+                    name: 'latest_2days',
                     orderable: true,
                 },
                 {
-                    label: '紫外線指數',
-                    name: 'uvi',
-                    orderable: true,
-                },
-                {
-                    label: '天氣預報綜合描述',
-                    name: 'weatherdescription',
-                    orderable: true,
-                },
-                {
-                    label: '最低體感溫度',
-                    name: 'minat',
-                    orderable: true,
-                },
-                {
-                    label: '最高溫度',
-                    name: 'maxt',
-                    orderable: true,
-                },
-                {
-                    label: '風向',
-                    name: 'wd',
-                    orderable: true,
-                },
-                {
-                    label: '露點溫度',
-                    name: 'td',
+                    label: '前2日0時到現在之累積雨量',
+                    name: 'latest_3days',
                     orderable: true,
                 },
             ]
@@ -137,7 +112,7 @@ export default {
         }
     },
     watch:{
-        weekForecastUrl(val){
+        rainObservationUrl(val){
             this.url = val
             this.getData(this.url);
         }

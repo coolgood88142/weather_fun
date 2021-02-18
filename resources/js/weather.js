@@ -1,10 +1,271 @@
 import forecast from "./components/weather/forecast.vue"
+import weekForecast from "./components/weather/weekForecast.vue"
+import weatherObservation from "./components/weather/weatherObservation.vue"
+import rainObservation from "./components/weather/rainObservation.vue"
+import weatherObservationReport from "./components/weather/weatherObservationReport.vue"
+import acidRainPh from "./components/weather/acidRainPH.vue"
+import ultraviolet from "./components/weather/ultraviolet.vue"
+import ozoneYear from "./components/weather/ozoneYear.vue"
+import seismi from "./components/weather/seismi.vue"
+import smallSeiSmi from "./components/weather/smallSeiSmi.vue"
+import alarm from "./components/weather/alarm.vue"
+import sunrise from "./components/weather/sunrise.vue"
+import moonrise from "./components/weather/moonrise.vue"
 
-new Vue({
+let app = new Vue({
 	el: "#app",
+    data: {
+        showForecast: true,
+        showWeekForecast: false,
+        showWeatherObservation: false,
+        showRainObservation: false,
+        showWeatherObservationReport: false,
+        showAcidRainPh: false,
+        showUltraviolet: false,
+        showOzoneYear: false,
+        showSeismi: false,
+        showSmallSeiSmi: false,
+        showAlarm: false,
+        showSunrise: false,
+        showMoonrise: false,
+        forecastUrl: '',
+        url: 'http://127.0.0.1:8000/getWeather/',
+        symbolId: '',
+        weekForecastUrl: '',
+        weatherObservationUrl: '',
+        rainObservationUrl: '',
+        weatherObservationReportUrl: '',
+        acidRainPhUrl: '',
+        ultravioletUrl: '',
+        ozoneYearUrl: '',
+        seismiUrl: '',
+        smallSeiSmiUrl: '',
+        alarmUrl: '',
+        sunriseUrl: '',
+        moonriseUrl: '',
+        nowChart: 0,
+        status: "success",
+    },
     components: {
         'forecast': forecast,
+        'week-forecast': weekForecast,
+        'weather-observation': weatherObservation,
+        'rain-observation': rainObservation,
+        'weather-observation-report': weatherObservationReport,
+        'acid-rain-ph': acidRainPh,
+        'ultraviolet': ultraviolet,
+        'ozone-year': ozoneYear,
+        'seismi': seismi,
+        'small-sei-smi': smallSeiSmi,
+        'alarm': alarm,
+        'sunrise': sunrise,
+        'moonrise': moonrise,
     },
+    mounted() {
+        this.changeChart(this.nowChart);
+    },
+    methods:{
+        changeChart(now){
+            this.nowChart = now
+
+            if(now == 0){
+                this.showForecast = true
+                this.showWeekForecast = false
+                this.howWeatherObservation =  false
+                this.showRainObservation =  false
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.forecastUrl = this.url + this.nowChart;
+            }else if(now == 1){
+                this.showForecast = false
+                this.showWeekForecast = true
+                this.howWeatherObservation =  false
+                this.showRainObservation =  false
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.weekForecastUrl = this.url + this.nowChart;
+            }else if(now == 2){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = true
+                this.showRainObservation =  false
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.weatherObservationUrl = this.url + this.nowChart;
+            }else if(now == 3){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = false
+                this.showRainObservation = true 
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.rainObservationUrl = this.url + this.nowChart;
+            }else if(now == 4){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = false
+                this.showRainObservation = false 
+                this.showWeatherObservationReport =  true
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.weatherObservationReportUrl = this.url + this.nowChart;
+            }else if(now == 5){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = false
+                this.showRainObservation = false 
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  true
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.acidRainPhUrl = this.url + this.nowChart;
+            }else if(now == 6){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = false
+                this.showRainObservation = false 
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  true
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.ultravioletUrl = this.url + this.nowChart;
+            }else if(now == 7){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = false
+                this.showRainObservation = false 
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  true
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.ozoneYearUrl = this.url + this.nowChart;
+            }else if(now == 8){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = false
+                this.showRainObservation = false 
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  true
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.SeismiUrl = this.url + this.nowChart;
+            }else if(now == 9){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = false
+                this.showRainObservation = false 
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  true
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.smallSeiSmiUrl = this.url + this.nowChart;
+            }else if(now == 10){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = false
+                this.showRainObservation = false 
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  true
+                this.showSunrise =  false
+                this.showMoonrise =  false
+                this.alarmUrl = this.url + this.nowChart;
+            }else if(now == 11){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = false
+                this.showRainObservation = false 
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  true
+                this.showMoonrise =  false
+                this.sunriseUrl = this.url + this.nowChart;
+            }else if(now == 12){
+                this.showForecast = false
+                this.showWeekForecast = false
+                this.showWeatherObservation = false
+                this.showRainObservation = false 
+                this.showWeatherObservationReport =  false
+                this.showAcidRainPh =  false
+                this.showUltraviolet =  false
+                this.showOzoneYear =  false
+                this.showSeismi =  false
+                this.showSmallSeiSmi =  false
+                this.showAlarm =  false
+                this.showSunrise =  false
+                this.showMoonrise =  true
+                this.moonriseUrl = this.url + this.nowChart;
+            }
+        }
+    }
 })
 
 let forecastArray = JSON.parse(document.getElementById("forecastArray").value);
