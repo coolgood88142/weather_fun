@@ -11,7 +11,7 @@ let app = new Vue({
 		showMetas: false,
         showDealts: false,
         showTime: false,
-        url: 'http://127.0.0.1:8000/getFugle',
+        url: './getFugle',
         chartUrl: '',
         quoteUrl: '',
         metasUrl: '',

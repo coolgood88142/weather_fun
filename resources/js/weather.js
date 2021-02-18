@@ -29,7 +29,7 @@ let app = new Vue({
         showSunrise: false,
         showMoonrise: false,
         forecastUrl: '',
-        url: 'http://127.0.0.1:8000/getWeather/',
+        url: './getWeather/',
         symbolId: '',
         weekForecastUrl: '',
         weatherObservationUrl: '',
