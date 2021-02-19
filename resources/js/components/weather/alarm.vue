@@ -1,10 +1,15 @@
 <template>
-    <data-table 
-        :data="data"
-        :columns="columns"
-        @on-table-props-changed="reloadTable"
-    >
-    </data-table>
+    <div v-show="show">
+        <figure class="highcharts-figure">
+            <div id="chart"></div>
+        </figure>
+        <data-table 
+            :data="data"
+            :columns="columns"
+            @on-table-props-changed="reloadTable"
+        >
+        </data-table>
+    </div>
 </template>
 
 <script>
@@ -14,12 +19,12 @@ Vue.use(DataTable);
 export default {
     props: {
 		alarmUrl: {
-			type: String,
+			type: Array,
 		},
     },
     data() {
         return {
-            url: this.alarmUrl,
+            url:  this.alarmUrl,
             data: {},
             tableProps: {
                 search: '',

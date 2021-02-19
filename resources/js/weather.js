@@ -15,61 +15,34 @@ import moonrise from "./components/weather/moonrise.vue"
 let app = new Vue({
 	el: "#app",
     data: {
-        chartData: [
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-            {
-                show: false,
-                url: '',
-            },
-        ],
+        showForecast: true,
+        showWeekForecast: false,
+        showWeatherObservation: false,
+        showRainObservation: false,
+        showWeatherObservationReport: false,
+        showAcidRainPh: false,
+        showUltraviolet: false,
+        showOzoneYear: false,
+        showSeismi: false,
+        showSmallSeiSmi: false,
+        showAlarm: false,
+        showSunrise: false,
+        showMoonrise: false,
+        forecastUrl: '',
+        weekForecastUrl: '',
+        weatherObservationUrl: '',
+        rainObservationUrl: '',
+        weatherObservationReportUrl: '',
+        acidRainPhUrl: '',
+        ultravioletUrl: '',
+        ozoneYearUrl: '',
+        seismiUrl: '',
+        smallSeiSmiUrl: '',
+        alarmUrl: '',
+        sunriseUrl: '',
+        moonriseUrl: '',
         url: './getWeather/',
+        chartLength: 13,
         symbolId: '',
         nowChart: 0,
         status: "success",
@@ -89,166 +62,77 @@ let app = new Vue({
         'sunrise': sunrise,
         'moonrise': moonrise,
     },
-    mounted() {
+    created() {
         this.changeChart(this.nowChart);
     },
     methods:{
         getDefaultShowChart(){
-            this.chartData.forEach((el) => {
-				el['show'] = false
-			})
+            this.showForecast= false
+            this.showWeekForecast= false
+            this.showWeatherObservation= false
+            this.showRainObservation= false
+            this.showWeatherObservationReport= false
+            this.showAcidRainPh= false
+            this.showUltraviolet= false
+            this.showOzoneYear= false
+            this.showSeismi= false
+            this.showSmallSeiSmi= false
+            this.showAlarm= false
+            this.showSunrise= false
+            this.showMoonrise= false
         },
         changeChart(now){
             this.nowChart = now
             this.getDefaultShowChart()
-            this.chartData[now]['show'] = true
-            this.chartData[now]['url'] = this.url + this.nowChart
+
+            if(now == 0){
+                this.showForecast = true
+                this.forecastUrl = this.url + this.nowChart
+            }else if(now == 1){
+                this.showWeekForecast= true
+                this.weekForecastUrl = this.url + this.nowChart
+            }else if(now == 2){
+                this.showWeatherObservation= true
+                this.weatherObservationUrl = this.url + this.nowChart
+            }else if(now == 3){
+                this.showRainObservation= true
+                this.rainObservationUrl = this.url + this.nowChart
+            }else if(now == 4){
+                this.showWeatherObservationReport= true
+                this.weatherObservationReportUrl = this.url + this.nowChart
+            }else if(now == 5){
+                this.showAcidRainPh= true
+                this.acidRainPhUrl = this.url + this.nowChart
+            }else if(now == 6){
+                this.showUltraviolet= true
+                this.ultravioletUrl = this.url + this.nowChart
+            }else if(now == 7){
+                this.showOzoneYear= true
+                this.ozoneYearUrl = this.url + this.nowChart
+            }else if(now == 8){
+                this.showSeismi= true
+                this.seismiUrl = this.url + this.nowChart
+            }else if(now == 9){
+                this.showSmallSeiSmi= true
+                this.smallSeiSmiUrl = this.url + this.nowChart
+            }else if(now == 10){
+                this.showAlarm= true
+                this.alarmUrl = this.url + this.nowChart
+            }else if(now == 11){
+                this.showSunrise= true
+                this.sunriseUrl = this.url + this.nowChart
+            }else if(now == 12){
+                this.showMoonrise= true
+                this.moonriseUrl = this.url + this.nowChart
+            }
         }
     }
 })
 
-let forecastArray = JSON.parse(document.getElementById("forecastArray").value);
+// let forecastArray = JSON.parse(document.getElementById("forecastArray").value);
 // let observationArray = JSON.parse(document.getElementById("observationArray").value);
 // let totalArray = JSON.parse(document.getElementById("totalArray").value);
 
-Highcharts.chart('forecast', {
-    chart: {
-        zoomType: 'xy'
-    },
-    title: {
-        text: '氣象API-天氣預報',
-        align: 'left'
-    },
-    xAxis: [{
-        categories: forecastArray.city,
-        crosshair: true
-    }],
-    yAxis: [{ // Secondary yAxis
-        gridLineWidth: 0,
-        title: {
-            text: '降雨機率',
-            style: {
-                color: '#AAAAAA'
-            }
-        },
-        labels: {
-            format: '{value} %',
-            style: {
-                color: '#AAAAAA'
-            }
-        },
-
-    }, { // Primary yAxis
-        title: {
-            text: '最高溫度',
-            style: {
-                color: '#fd8307'
-            }
-        },
-        labels: {
-            format: '{value} °',
-            style: {
-                color: '#fd8307'
-            }
-        },
-        opposite: true
-    },
-    { // Tertiary yAxis
-        title: {
-            text: '最低溫度',
-            style: {
-                color: Highcharts.getOptions().colors[0]
-            }
-        },
-        labels: {
-            format: '{value} °',
-            style: {
-                color: Highcharts.getOptions().colors[0]
-            }
-        },
-        opposite: true
-    }],
-    tooltip: {
-        shared: true
-    },
-    legend: {
-        layout: 'vertical',
-        align: 'left',
-        x: 80,
-        verticalAlign: 'top',
-        y: 55,
-        floating: true,
-        backgroundColor:
-            Highcharts.defaultOptions.legend.backgroundColor || // theme
-            'rgba(255,255,255,0.25)'
-    },
-    series: [{
-        name: '降雨機率',
-        type: 'column',
-        yAxis: 0,
-        data: forecastArray.pop,
-        dashStyle: 'shortdot',
-        tooltip: {
-            valueSuffix: ' %'
-        },
-        color: '#AAAAAA',
-
-    }, {
-        name: '最高溫度',
-        type: 'spline',
-        yAxis: 1,
-        data: forecastArray.maxT,
-        tooltip: {
-            valueSuffix: ' °'
-        },
-        color: '#fd8307',
-
-    },{
-        name: '最低溫度',
-        type: 'spline',
-        yAxis: 2,
-        data: forecastArray.minT,
-        tooltip: {
-            valueSuffix: ' °'
-        },
-        color: Highcharts.getOptions().colors[0]
-
-    }],
-    responsive: {
-        rules: [{
-            condition: {
-                maxWidth: 500
-            },
-            chartOptions: {
-                legend: {
-                    floating: false,
-                    layout: 'horizontal',
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    x: 0,
-                    y: 0
-                },
-                yAxis: [{
-                    labels: {
-                        align: 'right',
-                        x: 0,
-                        y: -6
-                    },
-                    showLastLabel: false
-                }, {
-                    labels: {
-                        align: 'left',
-                        x: 0,
-                        y: -6
-                    },
-                    showLastLabel: false
-                }, {
-                    visible: false
-                }]
-            }
-        }]
-    }
-});
 
 // Highcharts.chart('observation', {
 //     chart: {

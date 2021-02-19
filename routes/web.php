@@ -51,7 +51,9 @@ Route::post('/fugle','StockController@getFugleApiStockData')->name('fugle');
 
 Route::post('/checkFugleDataTime','StockController@checkFugleApiStockData')->name('checkFugle');
 
-Route::get('/weatherChart','WeatherController@getWeatherApiData');
+Route::get('/weatherChart', function () {
+    return view('weatherChart');
+});
 
 Route::get('/getFugle/{category}/{symbolId}', 'StockController@getStockDataTable');
 

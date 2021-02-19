@@ -1,10 +1,15 @@
 <template>
-    <data-table 
-        :data="data"
-        :columns="columns"
-        @on-table-props-changed="reloadTable"
-    >
-    </data-table>
+    <div>
+        <figure class="highcharts-figure">
+            <div id="chart"></div>
+        </figure>
+        <data-table 
+            :data="data"
+            :columns="columns"
+            @on-table-props-changed="reloadTable"
+        >
+        </data-table>
+    </div>
 </template>
 
 <script>
@@ -14,7 +19,7 @@ Vue.use(DataTable);
 export default {
     props: {
 		sunriseUrl: {
-			type: String,
+			type: Array,
 		},
     },
     data() {
@@ -71,6 +76,6 @@ export default {
             this.url = val
             this.getData(this.url);
         }
-    }
+    }  
 }
 </script>
