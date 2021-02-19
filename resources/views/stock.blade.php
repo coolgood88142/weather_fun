@@ -2,6 +2,7 @@
     <head>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
         <link rel="stylesheet" href="/css/stock.css">
         <link rel="stylesheet" href="/css/datetimepicker.css">
     </head>
