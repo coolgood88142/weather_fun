@@ -75,24 +75,24 @@
                     <div id="total" style="display: none;"></div>
                 </figure>
             </form>
-            <forecast v-show="showForecast" :forecast-url="forecastUrl"></forecast>
-            <week-forecast v-show="showWeekForecast" :week-forecast-url="weekForecastUrl"></week-forecast>
-            <weather-observation v-show="showWeatherObservation" :weather-observation-url="weatherObservationUrl"></weather-observation>
-            <rain-observation v-show="showRainObservation" :rain-observation-url="rainObservationUrl"></rain-observation>
-            <weather-observation-report v-show="showWeatherObservationReport" :weather-observation-report-url="weatherObservationReportUrl"></weather-observation-report>
-            <acid-rain-ph v-show="showAcidRainPh" :acid-rain-ph-url="acidRainPhUrl"></acid-rain-ph>
-            <ultraviolet v-show="showUltraviolet" :ultraviolet-url="ultravioletUrl"></ultraviolet>
-            <ozone-year v-show="showOzoneYear" :ozone-year-url="ozoneYearUrl"></ozone-year>
-            <seismi v-show="showSeismi" :seismi-url="seismiUrl"></seismi>
-            <small-sei-smi v-show="showSmallSeiSmi" :small-sei-smi-url="smallSeiSmiUrl"></small-sei-smi>
-            <alarm v-show="showAlarm" :alarm-url="alarmUrl"></alarm>
-            <sunrise v-show="showSunrise" :sunrise-url="sunriseUrl"></sunrise>
-            <moonrise v-show="showMoonrise" :moonrise-url="moonriseUrl"></moonrise>
+            <forecast v-show="chartData[0]['show']" :forecast-url="chartData[0]['url']"></forecast>
+            <week-forecast v-show="chartData[1]['show']" :week-forecast-url="chartData[1]['url']"></week-forecast>
+            <weather-observation v-show="chartData[2]['show']" :weather-observation-url="chartData[2]['url']"></weather-observation>
+            <rain-observation v-show="chartData[3]['show']" :rain-observation-url="chartData[3]['url']"></rain-observation>
+            <weather-observation-report v-show="chartData[4]['show']" :weather-observation-report-url="chartData[4]['url']"></weather-observation-report>
+            <acid-rain-ph v-show="chartData[5]['show']" :acid-rain-ph-url="chartData[5]['url']"></acid-rain-ph>
+            <ultraviolet v-show="chartData[6]['show']" :ultraviolet-url="chartData[6]['url']"></ultraviolet>
+            <ozone-year v-show="chartData[7]['show']" :ozone-year-url="chartData[7]['url']"></ozone-year>
+            <seismi v-show="chartData[8]['show']" :seismi-url="chartData[8]['url']"></seismi>
+            <small-sei-smi v-show="chartData[9]['show']" :small-sei-smi-url="chartData[9]['url']"></small-sei-smi>
+            <alarm v-show="chartData[10]['show']" :alarm-url="chartData[10]['url']"></alarm>
+            <sunrise v-show="chartData[11]['show']" :sunrise-url="chartData[11]['url']"></sunrise>
+            <moonrise v-show="chartData[12]['show']" :moonrise-url="chartData[12]['url']"></moonrise>
         </div>
         
         <input type="hidden" id="forecastArray" value="{{ json_encode($forecast) }}"/>
-        <input type="hidden" id="observationArray" value="{{ json_encode($observation) }}"/>
-        <input type="hidden" id="totalArray" value="{{ json_encode($total) }}"/>
+        {{-- <input type="hidden" id="observationArray" value="{{ json_encode($observation) }}"/>
+        <input type="hidden" id="totalArray" value="{{ json_encode($total) }}"/> --}}
 
         <script src="https://code.highcharts.com/highcharts.js"></script>
         <script src="https://code.highcharts.com/modules/series-label.js"></script>

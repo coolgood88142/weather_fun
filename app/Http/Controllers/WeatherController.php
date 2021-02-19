@@ -213,23 +213,23 @@ class WeatherController extends Controller
                 'minT' => [],
                 'pop' => [],
             ],
-            'observation' => [
-                'city' => [],
-                'wdir' => [],
-                'wdsd' => [],
-                'humd' => [],
-                'pres' => [],
-            ],
-            'total' => [
-                'city' => [],
-                'ph' => [],
-                'uvi' => [],
-                'ozoneYear' => [],
-                'seismi' => [],
-                'smallSeiSmi' => [],
-                'sunrise' => [],
-                'moonrise' => []
-            ],
+            // 'observation' => [
+            //     'city' => [],
+            //     'wdir' => [],
+            //     'wdsd' => [],
+            //     'humd' => [],
+            //     'pres' => [],
+            // ],
+            // 'total' => [
+            //     'city' => [],
+            //     'ph' => [],
+            //     'uvi' => [],
+            //     'ozoneYear' => [],
+            //     'seismi' => [],
+            //     'smallSeiSmi' => [],
+            //     'sunrise' => [],
+            //     'moonrise' => []
+            // ],
         ];
 
         $startTime = 6;
@@ -263,53 +263,53 @@ class WeatherController extends Controller
                 array_push($dataArray['forecast']['pop'], (int)$pop);
             }
 
-            $automaticWeatherData = $this->getCrawlerData($client, $weathers[2], urlencode($automatic[$city][0]));
-            if(isset($automaticWeatherData->location[0])){
-                $wdir = $automaticWeatherData->location[0]->weatherElement[1]->elementValue;
-                $wdsd = $automaticWeatherData->location[0]->weatherElement[2]->elementValue;
-                $humd = $automaticWeatherData->location[0]->weatherElement[4]->elementValue;
-                $pres = $automaticWeatherData->location[0]->weatherElement[5]->elementValue;
+            // $automaticWeatherData = $this->getCrawlerData($client, $weathers[2], urlencode($automatic[$city][0]));
+            // if(isset($automaticWeatherData->location[0])){
+            //     $wdir = $automaticWeatherData->location[0]->weatherElement[1]->elementValue;
+            //     $wdsd = $automaticWeatherData->location[0]->weatherElement[2]->elementValue;
+            //     $humd = $automaticWeatherData->location[0]->weatherElement[4]->elementValue;
+            //     $pres = $automaticWeatherData->location[0]->weatherElement[5]->elementValue;
 
-                array_push($dataArray['observation']['city'], $city);
-                array_push($dataArray['observation']['wdir'], (int)$wdir);
-                array_push($dataArray['observation']['wdsd'], (float)$wdsd);
-                array_push($dataArray['observation']['humd'], (int)($humd * 100));
-                array_push($dataArray['observation']['pres'], (float)$pres);
-            }
+            //     array_push($dataArray['observation']['city'], $city);
+            //     array_push($dataArray['observation']['wdir'], (int)$wdir);
+            //     array_push($dataArray['observation']['wdsd'], (float)$wdsd);
+            //     array_push($dataArray['observation']['humd'], (int)($humd * 100));
+            //     array_push($dataArray['observation']['pres'], (float)$pres);
+            // }
             
 
-            $acidRainPh = 0;
-            $acidRainData = $this->getCrawlerData($client, $weathers[5], $locationName);
-            $rainPh = $acidRainData->weatherElement[0]->location;
-            if(count($rainPh) > 0){
-                $acidRainPh = $rainPh.value;
-            }
-            array_push($dataArray['total']['ph'], (int)$acidRainPh);
+            // $acidRainPh = 0;
+            // $acidRainData = $this->getCrawlerData($client, $weathers[5], $locationName);
+            // $rainPh = $acidRainData->weatherElement[0]->location;
+            // if(count($rainPh) > 0){
+            //     $acidRainPh = $rainPh.value;
+            // }
+            // array_push($dataArray['total']['ph'], (int)$acidRainPh);
 
-            $ultravioletRaysData = $this->getCrawlerData($client, $weathers[6], $locationName);
-            $ultravioletIndex = (String)$ultravioletRaysData->weatherElement->location[0]->value;
-            array_push($dataArray['total']['uvi'], (float)$ultravioletIndex);
+            // $ultravioletRaysData = $this->getCrawlerData($client, $weathers[6], $locationName);
+            // $ultravioletIndex = (String)$ultravioletRaysData->weatherElement->location[0]->value;
+            // array_push($dataArray['total']['uvi'], (float)$ultravioletIndex);
 
-            $ozoneYearAvgData = $this->getCrawlerData($client, $weathers[7], $locationName);
-            $ozoneYearAvg = $ozoneYearAvgData->location->weatherElement[0]->time[29]->elementValue;
-            array_push($dataArray['total']['ozoneYear'], (int)$ozoneYearAvg);
+            // $ozoneYearAvgData = $this->getCrawlerData($client, $weathers[7], $locationName);
+            // $ozoneYearAvg = $ozoneYearAvgData->location->weatherElement[0]->time[29]->elementValue;
+            // array_push($dataArray['total']['ozoneYear'], (int)$ozoneYearAvg);
 
-            $seismicityData = $this->getCrawlerData($client, $weathers[8], $locationName);
-            $seismicity = $seismicityData->earthquake[0]->reportContent;
-            array_push($dataArray['total']['seismi'], $seismicity);
+            // $seismicityData = $this->getCrawlerData($client, $weathers[8], $locationName);
+            // $seismicity = $seismicityData->earthquake[0]->reportContent;
+            // array_push($dataArray['total']['seismi'], $seismicity);
 
-            $smallAreaSeismicityData = $this->getCrawlerData($client, $weathers[9], $locationName);
-            $smallAreaSeismicity = $smallAreaSeismicityData->earthquake[0]->reportContent;
-            array_push($dataArray['total']['smallSeiSmi'], $smallAreaSeismicity);
+            // $smallAreaSeismicityData = $this->getCrawlerData($client, $weathers[9], $locationName);
+            // $smallAreaSeismicity = $smallAreaSeismicityData->earthquake[0]->reportContent;
+            // array_push($dataArray['total']['smallSeiSmi'], $smallAreaSeismicity);
 
-            $sunriseData = $this->getCrawlerData($client, $weathers[11], $locationName);
-            $sunrise = $sunriseData->note;
-            array_push($dataArray['total']['sunrise'], $sunrise);
+            // $sunriseData = $this->getCrawlerData($client, $weathers[11], $locationName);
+            // $sunrise = $sunriseData->note;
+            // array_push($dataArray['total']['sunrise'], $sunrise);
 
-            $moonriseData = $this->getCrawlerData($client, $weathers[12], $locationName);
-            $moonrise = $moonriseData->note;
-            array_push($dataArray['total']['moonrise'], $moonrise);
-            array_push($dataArray['total']['city'], $city);
+            // $moonriseData = $this->getCrawlerData($client, $weathers[12], $locationName);
+            // $moonrise = $moonriseData->note;
+            // array_push($dataArray['total']['moonrise'], $moonrise);
+            // array_push($dataArray['total']['city'], $city);
         }
         
 
