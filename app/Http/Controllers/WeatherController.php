@@ -11,6 +11,7 @@ use App\Services\CrawlerService;
 use Carbon\Carbon;
 use Config;
 use JamesDordoy\LaravelVueDatatable\Http\Resources\DataTableCollectionResource;
+use \Firebase\JWT\JWT;
 
 class WeatherController extends Controller
 {
@@ -185,8 +186,23 @@ class WeatherController extends Controller
 
     public function getWeatherData(){
         $db = DB::table('weather_info')->get();
+
+        $key = '344'; //key
+		$time = time(); //当前时间
+       		$token = [
+        	'iss' => 'http://www.helloweba.net', //签发者 可选
+           	'aud' => 'http://www.helloweba.net', //接收该JWT的一方，可选
+           	'iat' => $time, //签发时间
+           	'nbf' => $time , //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
+           	'exp' => $time+7200, //过期时间,这里设置2个小时
+            	'data' => [ //自定义信息，不要定义敏感信息
+             		'page' => '/weather',
+            ]
+        ];
+        
         return view('weather', [
-            'taiwanData' => $db
+            'taiwanData' => $db,
+            'token' => '/?token=' . (JWT::encode($token, $key)),
         ]);
     }
 

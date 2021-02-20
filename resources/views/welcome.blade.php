@@ -3,12 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>Laravel</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;600&display=swap" rel="stylesheet">
 
+        <link rel="stylesheet" href="/css/stock.css">
         <!-- Styles -->
         <style>
             html, body {
@@ -94,7 +95,16 @@
                     <a href="https://vapor.laravel.com">Vapor</a>
                     <a href="https://github.com/laravel/laravel">GitHub</a>
                 </div>
+
+                <div style="margin-top: 30px;">
+                    <input type="button" class="btn btn-primary" id="back" value="回上一頁" onclick="back({{ $page }})">
+                </div>
             </div>
         </div>
     </body>
+    <script>
+        function back(page){
+            window.location.href = page;
+        }
+    </script>
 </html>

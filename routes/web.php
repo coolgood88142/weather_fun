@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'HomeController@verification');
 
 Route::get('/test', function () {
     return view('weather');
@@ -58,3 +56,5 @@ Route::get('/weatherChart', function () {
 Route::get('/getFugle/{category}/{symbolId}', 'StockController@getStockDataTable');
 
 Route::get('/getWeather/{apiNum}', 'WeatherController@getWeatherDataTable');
+
+Route::get('/getCloudVision', 'CloudVisionController@getCloudVision');

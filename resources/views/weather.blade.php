@@ -9,6 +9,27 @@
   </head>
   <body>
     <div class="container" id="app">
+      <nav class="navbar navbar-expand-md navbar-light navbar-dark bg-dark fixed-top navbar-inverse">
+        <button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item ">
+              <a class="nav-link" href="{{ $token }}">首頁</a>
+            </li>
+            <li class="nav-item ">
+              <a class="nav-link" href="/weather">台灣地圖</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/weatherChart">氣象圖表</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/fugle">股票圖表</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
       <div class="taiwan-map" ref="map">
         <div id="map">
           <taiwan :taiwan-data="{{ json_encode($taiwanData) }}"  @save-city-data="saveCityData" />

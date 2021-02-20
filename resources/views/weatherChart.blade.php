@@ -15,7 +15,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                   <li class="nav-item ">
-                    <a class="nav-link" href="https://fierce-headland-21046.herokuapp.com/weather/">台灣地圖</a>
+                    <a class="nav-link" href="/">首頁</a>
+                  </li>
+                  <li class="nav-item ">
+                    <a class="nav-link" href="/weather">台灣地圖</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="/weatherChart">氣象圖表</a>
