@@ -97,14 +97,18 @@
                 </div>
 
                 <div style="margin-top: 30px;">
-                    <input type="button" class="btn btn-primary" id="back" value="回上一頁" onclick="back({{ $page }})">
+                    <input type="button" class="btn btn-primary" id="back" value="回上一頁" onclick="back('{{ $page }}')">
+                    <input type="hidden" id="page" value="{{ $page }}">
                 </div>
             </div>
         </div>
     </body>
+    <script src="{{mix('js/app.js')}}"></script>
     <script>
         function back(page){
-            window.location.href = page;
+            if(page != ''){
+                window.location.href = page;
+            }
         }
     </script>
 </html>

@@ -15,7 +15,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                   <li class="nav-item ">
-                    <a class="nav-link" href="/">首頁</a>
+                    <a class="nav-link" href="{{ $token }}">首頁</a>
                   </li>
                   <li class="nav-item ">
                     <a class="nav-link" href="/weather">台灣地圖</a>

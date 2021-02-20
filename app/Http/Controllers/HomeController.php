@@ -22,20 +22,24 @@ class HomeController extends Controller
 		$page = '';
 
 		$jwt = (String)$request->token;
-		try {
-	       		JWT::$leeway = 60;//当前时间减去60，把时间留点余地
-	       		$decoded = JWT::decode($jwt, $key, ['HS256']); //HS256方式，这里要和签发的时候对应
-	       		$arr = (array)$decoded;
-				$page = $arr['data']->page;
-	    	} catch(\Firebase\JWT\SignatureInvalidException $e) {  //签名不正确
-	    		echo $e->getMessage();
-	    	}catch(\Firebase\JWT\BeforeValidException $e) {  // 签名在某个时间点之后才能用
-	    		echo $e->getMessage();
-	    	}catch(\Firebase\JWT\ExpiredException $e) {  // token过期
-	    		echo $e->getMessage();
-	   	}catch(Exception $e) {  //其他错误
-	    		echo $e->getMessage();
-	    	}
+
+		if($jwt != ''){
+			try {
+				JWT::$leeway = 60;//当前时间减去60，把时间留点余地
+				$decoded = JWT::decode($jwt, $key, ['HS256']); //HS256方式，这里要和签发的时候对应
+				$arr = (array)$decoded;
+			 	$page = route($arr['data']->page);
+			} catch(\Firebase\JWT\SignatureInvalidException $e) {  //签名不正确
+				echo $e->getMessage();
+			}catch(\Firebase\JWT\BeforeValidException $e) {  // 签名在某个时间点之后才能用
+				echo $e->getMessage();
+			}catch(\Firebase\JWT\ExpiredException $e) {  // token过期
+				echo $e->getMessage();
+			}catch(Exception $e) {  //其他错误
+				echo $e->getMessage();
+			}
+		}
+		
 	    //Firebase定义了多个 throw new，我们可以捕获多个catch来定义问题，catch加入自己的业务，比如token过期可以用当前Token刷新一个新Token
 		
 		return view('welcome', [

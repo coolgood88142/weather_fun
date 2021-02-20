@@ -21,7 +21,7 @@ Route::get('/user', function () {
     return view('user');
 });
 
-Route::get('/weather','WeatherController@getWeatherData');
+Route::get('/weather','WeatherController@getWeatherData')->name('weather');
 
 Route::get('/articles','WeatherController@getArticlesApiData');
 
@@ -43,15 +43,13 @@ Route::get('/testSymboData','LineBotController@testSymboData');
 
 Route::post('/stock','StockController@getMessageStock')->name('stock');
 
-Route::get('/fugle','StockController@getFugleDefaultData');
+Route::get('/fugle','StockController@getFugleDefaultData')->name('fugle');
 
-Route::post('/fugle','StockController@getFugleApiStockData')->name('fugle');
+Route::post('/fugle','StockController@getFugleApiStockData');
 
 Route::post('/checkFugleDataTime','StockController@checkFugleApiStockData')->name('checkFugle');
 
-Route::get('/weatherChart', function () {
-    return view('weatherChart');
-});
+Route::get('/weatherChart', 'WeatherController@getWeatherChartData')->name('weatherChart');
 
 Route::get('/getFugle/{category}/{symbolId}', 'StockController@getStockDataTable');
 
