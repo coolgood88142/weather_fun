@@ -30,7 +30,7 @@
           </ul>
         </div>
       </nav>
-      <div class="taiwan-map" ref="map">
+      <div class="taiwan-map" ref="map" style="margin-top: 80px;">
         <div id="map">
           <taiwan :taiwan-data="{{ json_encode($taiwanData) }}"  @save-city-data="saveCityData" />
         </div>

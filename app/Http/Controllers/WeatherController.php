@@ -185,18 +185,28 @@ class WeatherController extends Controller
     }
 
     public function getWeatherData(){
+
+        // $header = [
+        //     "alg"=> "HS256",
+        //     "typ"=> "JWT",
+        // ];
+      
+        // $first = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9';
+        // $now  = Base64.urlsafe_encode64(JSON((object)$header));
+        // dd($now)
+
         $db = DB::table('weather_info')->get();
 
         $key = '344'; //key
 		$time = time(); //当前时间
-       		$token = [
+       	$token = [
         	'iss' => 'http://www.helloweba.net', //签发者 可选
            	'aud' => 'http://www.helloweba.net', //接收该JWT的一方，可选
            	'iat' => $time, //签发时间
            	'nbf' => $time , //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
            	'exp' => $time+7200, //过期时间,这里设置2个小时
-            	'data' => [ //自定义信息，不要定义敏感信息
-             		'page' => 'weather',
+            'data' => [ //自定义信息，不要定义敏感信息
+             	'page' => 'weather',
             ]
         ];
         
@@ -209,14 +219,14 @@ class WeatherController extends Controller
     public function getWeatherChartData(){
         $key = '344'; //key
 		$time = time(); //当前时间
-       		$token = [
+       	$token = [
         	'iss' => 'http://www.helloweba.net', //签发者 可选
            	'aud' => 'http://www.helloweba.net', //接收该JWT的一方，可选
            	'iat' => $time, //签发时间
            	'nbf' => $time , //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
            	'exp' => $time+7200, //过期时间,这里设置2个小时
-            	'data' => [ //自定义信息，不要定义敏感信息
-             		'page' => 'weatherChart',
+            'data' => [ //自定义信息，不要定义敏感信息
+             	'page' => 'weatherChart',
             ]
         ];
         

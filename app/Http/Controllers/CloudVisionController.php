@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Log;
 class CloudVisionController extends Controller
 {
     public function getCloudVision(){
-        // $client = new ImageAnnotatorClient();
-        $vision = new VisionClient();
+        $client = new ImageAnnotatorClient();
+        // $vision = new VisionClient();
 
         // $path = 'https://i.imgur.com/l8yNat5.jpg';
         $familyPhotoResource = fopen('C:/Users/coolg/Downloads/12.jpg', 'r');
