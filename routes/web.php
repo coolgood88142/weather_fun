@@ -56,3 +56,5 @@ Route::get('/getFugle/{category}/{symbolId}', 'StockController@getStockDataTable
 Route::get('/getWeather/{apiNum}', 'WeatherController@getWeatherDataTable');
 
 Route::get('/getCloudVision', 'CloudVisionController@getCloudVision');
+
+Route::get('/vision', 'CloudVisionController@getVisionData');
