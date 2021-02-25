@@ -578,6 +578,8 @@ class WeatherController extends Controller
 
             $no++;
         }
+        dd($dataArray);
+
         $collection = collect($dataArray);
 
         if($searchValue != ''){

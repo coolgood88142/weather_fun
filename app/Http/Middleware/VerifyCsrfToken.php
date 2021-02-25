@@ -24,5 +24,6 @@ class VerifyCsrfToken extends Middleware
         '/stock',
         '/fugle',
         '/weatherChart',
+        '/upload',
     ];
 }
