@@ -9,7 +9,13 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>This rows email address is: {{ row.keyword }}</p>
+                    <table id="item_table" class="table">
+                        <tr class="table-info" v-for="(col, index) in row" :key="index">
+                            <th></th>
+                            <th><input type="text" name="keys[]" :value="col"></th>
+                            <th></th>
+						</tr>
+					</table>
                 </div>
                 <div class="modal-footer">
                     <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->

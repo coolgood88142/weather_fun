@@ -85,10 +85,7 @@ export default {
             this.getData(this.url, tableProps);
         },
         updateSelectedModal(data) {
-            this.selectedRow = data;
-            this.getkeywords = data['keyword'].split(",");
-            console.log(this.getkeywords);
-            
+            this.selectedRow = data['keyword'].split(","); 
         }
     },
     watch:{
