@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 // require '/vendor/autoload.php';
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Google\Cloud\Vision\V1\Feature\Type;
 use Google\Cloud\Vision\V1\ImageAnnotatorClient;
@@ -11,13 +13,29 @@ use Google\Cloud\Vision\V1\Likelihood;
 use Google\Cloud\Vision\VisionClient;
 use Intervention\Image\ImageManagerStatic as Image;
 use JamesDordoy\LaravelVueDatatable\Http\Resources\DataTableCollectionResource;
-
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use \Firebase\JWT\JWT;
 
 class CloudVisionController extends Controller
-{
+{   
+    public function getVisionDefaultData(){
+        $key = '344'; //key
+		$time = time(); //当前时间
+       	$token = [
+        	'iss' => 'http://www.helloweba.net', //签发者 可选
+           	'aud' => 'http://www.helloweba.net', //接收该JWT的一方，可选
+           	'iat' => $time, //签发时间
+           	'nbf' => $time , //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
+           	'exp' => $time+7200, //过期时间,这里设置2个小时
+            'data' => [ //自定义信息，不要定义敏感信息
+             	'page' => 'vision',
+            ]
+        ];
+        
+        return view('vision', [
+            'token' => '/?token=' . (JWT::encode($token, $key)),
+        ]);
+    }
+
     public function getVisionDataTable(Request $request)
     {
         $db = DB::table('vision');

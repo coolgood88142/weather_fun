@@ -27,6 +27,9 @@
             <li class="nav-item">
               <a class="nav-link" href="/fugle">股票圖表</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/vision">圖片解析</a>
+            </li>
           </ul>
         </div>
       </nav>

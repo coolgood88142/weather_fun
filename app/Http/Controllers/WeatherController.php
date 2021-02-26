@@ -578,7 +578,7 @@ class WeatherController extends Controller
 
             $no++;
         }
-        dd($dataArray);
+        // dd($dataArray);
 
         $collection = collect($dataArray);
 

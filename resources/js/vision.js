@@ -1,6 +1,5 @@
 import keyword from "./components/vision/keyword.vue"
 import upload from "./components/vision/upload.vue"
-import edit from "./components/vision/edit.vue"
 
 let user = new Vue({
     el: "#app",
@@ -12,7 +11,6 @@ let user = new Vue({
     components: {
         'keyword': keyword,
         'upload': upload,
-        'edit': edit,
     },
     
 })

@@ -1,21 +1,22 @@
 <template>
-    <data-table 
-        :data="data"
-        :columns="columns"
-        @on-table-props-changed="reloadTable">
-    </data-table>
-    <model
-        :row="selectedRow"
-    >
-    </model>
+    <div>
+        <data-table 
+            :data="data"
+            :columns="columns">
+            
+        </data-table>
+        <edit
+            :row="selectedRow">
+        </edit>
+    </div>
+    <!-- <edit></edit> -->
 </template>
 
 <script>
 import imageCell from './imageCell';
-import Modal from './Modal';
+import edit from './edit';
 import button from './button';
 import DataTable from 'laravel-vue-datatable';
-// import Model from '../stock/meta/model.vue';
 Vue.use(DataTable);
 
 export default {
@@ -26,7 +27,7 @@ export default {
     },
     components: {
         imageCell,
-        Modal,
+        edit,
         button,
     },
     data() {
@@ -52,7 +53,7 @@ export default {
                     orderable: true,
                 },
                 {
-                    label: 'ediu',
+                    label: '操作',
                     name: '',
                     orderable: false,
                     component: button,
@@ -61,6 +62,7 @@ export default {
                 }, 
             ],
             selectedRow: {},
+            getkeywords: '',
         }
     },
     created() {
@@ -84,6 +86,9 @@ export default {
         },
         updateSelectedModal(data) {
             this.selectedRow = data;
+            this.getkeywords = data['keyword'].split(",");
+            console.log(this.getkeywords);
+            
         }
     },
     watch:{

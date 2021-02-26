@@ -3,16 +3,24 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">{{ row.name }}</h5>
+                    <h5 class="modal-title">keywords</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>This rows email address is: {{ row.email }}</p>
+                    <p>This rows email address is: {{ row.keyword }}</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+                    <div class="form-check form-check-inline">
+						<input type="button" class="btn btn-primary" id="cancel" name="cancel"
+								value="取消" data-dismiss="modal">
+					</div>
+					<div class="form-check form-check-inline">
+						<input type="button" class="btn btn-primary" id="save" name="save"
+								value="儲存" @click="checkCardData()">
+					</div>
                 </div>
             </div>
         </div>
@@ -24,12 +32,12 @@ export default {
     props: {
         row: {
             type: Object,
-            default: () => ({}),
         }
     },
-    methods:{
-        getEdit(id){
-            
+    watch:{
+        keyWords(val){
+            console.log(val)
+            return val.split(",")
         }
     }
 }

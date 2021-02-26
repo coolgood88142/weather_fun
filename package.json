@@ -15,6 +15,8 @@
         "bootstrap": "^4.0.0",
         "bootstrap-sass": "^3.4.1",
         "cross-env": "^7.0",
+        "eslint": "^7.20.0",
+        "eslint-plugin-vue": "^7.6.0",
         "jquery": "^3.2",
         "laravel-mix": "^5.0.1",
         "laravel-vue-datatable": "^0.6.0",

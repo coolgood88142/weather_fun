@@ -5,10 +5,9 @@
         @click="click(data)"
         class="btn btn-primary btn-sm"
         data-target="#exampleModal">
-        View Row {{ data.id }} Modal
+        編輯
     </button>
 </template>
-
 <script>
 export default {
     props: {
