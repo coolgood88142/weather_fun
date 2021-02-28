@@ -82,7 +82,6 @@ class CloudVisionController extends Controller
         $poImage = $request->po_image;
         $file_name = uniqid().'.'.$poImage->getClientOriginalExtension();
         $file_path = public_path('images');
-        dd($file_path);
         if (!is_dir($file_path)){
             mkdir($file_path);
         }
