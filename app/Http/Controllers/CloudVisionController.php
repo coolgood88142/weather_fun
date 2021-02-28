@@ -11,6 +11,7 @@ use Google\Cloud\Vision\V1\ImageAnnotatorClient;
 use Google\Cloud\Vision\V1\ImageContext;
 use Google\Cloud\Vision\V1\Likelihood;
 use Google\Cloud\Vision\VisionClient;
+use Google\Cloud\Storage\StorageClient;
 use Intervention\Image\ImageManagerStatic as Image;
 use JamesDordoy\LaravelVueDatatable\Http\Resources\DataTableCollectionResource;
 use \Firebase\JWT\JWT;
@@ -77,8 +78,8 @@ class CloudVisionController extends Controller
     }
 
     public function saveCloudVision(Request $request){
+        //先做圖片調整大小後暫存
         $poImage = $request->po_image;
-        $imageName = $poImage->getClientOriginalName();
         $imagePath = $poImage->store("uploads", 'public');
         $storageImagePath = public_path("storage/{$imagePath}");
         $image = Image::make($storageImagePath)->resize(300, null, function ($constraint) {
@@ -87,11 +88,25 @@ class CloudVisionController extends Controller
         $image->save($storageImagePath, 60);
         $image->save();
 
+        //再從本機的storage的圖片上傳
+        $storage = new StorageClient([
+            'projectId' => 'useVision'
+        ]);
+        $uploadFile = fopen($storageImagePath , 'r');
+        $bucketName = 'vision-save-image';
+        $bucket = $storage->bucket($bucketName);
+        $imageName = $poImage->getClientOriginalName();
+        
+        $bucket->upload($uploadFile, [
+            'name' => $imageName
+        ]);
+
         $imageAnnotator = new ImageAnnotatorClient();
         $imageContext = new ImageContext();
         $imageContext->setLanguageHints(['en','zh-Hant']);
         $dataArray = [];
         $keyword = '';
+        $googleStroageIamge = 'https://storage.googleapis.com/' . $bucket->name() . '/' .$imageName;
         
         try {
             $file = @file_get_contents($storageImagePath);
@@ -100,7 +115,7 @@ class CloudVisionController extends Controller
             ]);
             $labelDetection = $imageData->getLabelAnnotations();
             $labelData = $imageData->getLabelAnnotations();
-            if($labelData != null){
+            if(count($labelData) > 0){
                 foreach($labelData as $data){
                     $labels = explode("\n",$data->getDescription());
                     if(count($labels) > 1){
@@ -117,9 +132,7 @@ class CloudVisionController extends Controller
                 'imageContext' => $imageContext
             ]);
             $textData = $textDetection->getTextAnnotations();
-            // dd($textData);
-            $textCount = $textData;
-            if($textData != null){
+            if(count($textData) > 0){
                 $texts = explode("\n", $textData[0]->getDescription());
                 if(count($texts) > 1){
                     foreach($texts as $text){
@@ -132,9 +145,8 @@ class CloudVisionController extends Controller
             
             if($keyword != ''){
                 $keyword = substr($keyword,0,-1);
-                $path = 
                 $dbData = [
-                    'image' => (String)'storage/'.$imagePath, 'keyword' => (String)$keyword, 
+                    'image' => (String)$googleStroageIamge, 'keyword' => (String)$keyword, 
                 ];
                 
                 array_push($dataArray, $dbData);
@@ -153,6 +165,22 @@ class CloudVisionController extends Controller
         }
 
         $imageAnnotator->close();
-        return view('vision');
+
+        $key = '344'; //key
+		$time = time(); //当前时间
+       	$token = [
+        	'iss' => 'http://www.helloweba.net', //签发者 可选
+           	'aud' => 'http://www.helloweba.net', //接收该JWT的一方，可选
+           	'iat' => $time, //签发时间
+           	'nbf' => $time , //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
+           	'exp' => $time+7200, //过期时间,这里设置2个小时
+            'data' => [ //自定义信息，不要定义敏感信息
+             	'page' => 'vision',
+            ]
+        ];
+
+        return view('vision', [
+            'token' => '/?token=' . (JWT::encode($token, $key)),
+        ]);
     }
 }

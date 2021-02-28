@@ -20,7 +20,7 @@
                 <div class="modal-footer">
                     <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
                     <div class="form-check form-check-inline">
-						<input type="button" class="btn btn-primary" id="cancel" name="cancel"
+						<input type="button" class="btn btn-secondary" id="cancel" name="cancel"
 								value="取消" data-dismiss="modal">
 					</div>
 					<div class="form-check form-check-inline">

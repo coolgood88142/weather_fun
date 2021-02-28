@@ -31,5 +31,6 @@
         "vue-router": "^3.4.5",
         "vue-select": "^3.10.5",
         "vue-template-compiler": "^2.6.12"
-    }
+    },
+    "dependencies": {}
 }
