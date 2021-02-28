@@ -10,6 +10,7 @@
     "require": {
         "php": "^7.2",
         "elasticsearch/elasticsearch": "^7.8",
+        "ext-gd": "*",
         "fideloper/proxy": "^4.4",
         "firebase/php-jwt": "^5.2",
         "google/cloud-storage": "^1.23",
