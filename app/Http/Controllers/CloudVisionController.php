@@ -80,19 +80,18 @@ class CloudVisionController extends Controller
     public function saveCloudVision(Request $request){
         //先做圖片調整大小後暫存
         $poImage = $request->po_image;
-        $imagePath = $poImage->store("uploads", 'public');
-        $storageImagePath = public_path("storage/{$imagePath}");
-        $image = Image::make($storageImagePath)->resize(300, null, function ($constraint) {
-            $constraint->aspectRatio();
-        });
-        $image->save($storageImagePath, 60);
-        $image->save();
-
+        $file_name = uniqid().'.'.$poImage->getClientOriginalExtension();
+        $file_path = public_path('images');
+        if (!is_dir($file_path)){
+            mkdir($file_path);
+        }
+        $thumbnail_file_path = $file_path . '\\' .$file_name;
+        $image = Image::make($poImage)->resize(300, null, function ($constraint) {$constraint->aspectRatio();})->save($thumbnail_file_path, 60);
         //再從本機的storage的圖片上傳
         $storage = new StorageClient([
             'projectId' => 'useVision'
         ]);
-        $uploadFile = fopen($storageImagePath , 'r');
+        $uploadFile = fopen($thumbnail_file_path , 'r');
         $bucketName = 'vision-save-image';
         $bucket = $storage->bucket($bucketName);
         $imageName = $poImage->getClientOriginalName();
@@ -107,9 +106,8 @@ class CloudVisionController extends Controller
         $dataArray = [];
         $keyword = '';
         $googleStroageIamge = 'https://storage.googleapis.com/' . $bucket->name() . '/' .$imageName;
-        
         try {
-            $file = @file_get_contents($storageImagePath);
+            $file = @file_get_contents($googleStroageIamge);
             $imageData = $imageAnnotator->labelDetection($file, [
                 'imageContext' => $imageContext
             ]);
