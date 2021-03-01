@@ -141,10 +141,15 @@ class CloudVisionController extends Controller
                 $texts = explode("\n", $textData[0]->getDescription());
                 if(count($texts) > 1){
                     foreach($texts as $text){
-                        $keyword = $keyword . $text . ',';
+                        if($text != ''){
+                            $keyword = $keyword . $text . ',';
+                        }
                     }
                 }else{
-                    $keyword = $keyword . $textData->getDescription() . ',';
+                    $text = $textData->getDescription();
+                    if($text != ''){
+                        $keyword = $keyword . $text . ',';
+                    }
                 }
             }
             
@@ -190,5 +195,26 @@ class CloudVisionController extends Controller
         return view('vision', [
             'token' => '/?token=' . (JWT::encode($token, $key)),
         ]);
+    }
+
+    public function saveKeyWordData(Request $request){
+        $keyword = $request->keyword;
+        $status = 'success';
+        $message = '更新成功!';
+
+        $data = [ 
+            'keyword' => $keyword, 
+        ];
+
+        try {
+            $user = DB::table('vision')->where('id', $request->id)->update($data);
+
+        } catch (Exception $e) {
+            $status = 'error';
+            $message = '更新失敗!';
+            dd($e);
+        }
+         return [ 'status' => $status, 'message' => $message, ];
+
     }
 }

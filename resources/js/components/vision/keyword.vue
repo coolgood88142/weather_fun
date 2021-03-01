@@ -6,7 +6,7 @@
             
         </data-table>
         <edit
-            :row="selectedRow">
+            :row="selectedRow" :key-word-id="id">
         </edit>
     </div>
     <!-- <edit></edit> -->
@@ -15,7 +15,7 @@
 <script>
 import imageCell from './imageCell';
 import edit from './edit';
-import button from './button';
+import editButton from './editButton';
 import DataTable from 'laravel-vue-datatable';
 Vue.use(DataTable);
 
@@ -28,7 +28,7 @@ export default {
     components: {
         imageCell,
         edit,
-        button,
+        editButton,
     },
     data() {
         return {
@@ -56,13 +56,13 @@ export default {
                     label: '操作',
                     name: '',
                     orderable: false,
-                    component: button,
+                    component: editButton,
                     event: "click",
                     handler: this.updateSelectedModal,
                 }, 
             ],
             selectedRow: {},
-            getkeywords: '',
+            id: '',
         }
     },
     created() {
@@ -86,6 +86,7 @@ export default {
         },
         updateSelectedModal(data) {
             this.selectedRow = data['keyword'].split(","); 
+            this.id = data["editId"];
         }
     },
     watch:{

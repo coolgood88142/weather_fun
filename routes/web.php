@@ -61,3 +61,5 @@ Route::post('/upload', 'CloudVisionController@saveCloudVision')->name('upload');
 Route::get('/getVision', 'CloudVisionController@getVisionDataTable');
 
 Route::get('/vision', 'CloudVisionController@getVisionDefaultData')->name('vision');
+
+Route::post('/saveKeyWord', 'CloudVisionController@saveKeyWordData')->name('saveKeyWord');
