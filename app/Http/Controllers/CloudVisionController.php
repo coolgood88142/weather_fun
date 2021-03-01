@@ -80,6 +80,14 @@ class CloudVisionController extends Controller
     public function saveCloudVision(Request $request){
         //先做圖片調整大小後暫存
         $poImage = $request->po_image;
+        // $a = $poImage->size;
+        $size = (int)(($poImage->getSize()) / 1024);
+        $imageName = $poImage->getClientOriginalName();
+        if($size > 1024){
+            $message = $imageName . ' 檔案大小不可超過1M ';
+            return $message;
+        }
+        // dd($size);
         $file_name = uniqid().'.'.$poImage->getClientOriginalExtension();
         $file_path = public_path('images');
         if (!is_dir($file_path)){
@@ -94,7 +102,6 @@ class CloudVisionController extends Controller
         $uploadFile = fopen($thumbnail_file_path , 'r');
         $bucketName = 'vision-save-image';
         $bucket = $storage->bucket($bucketName);
-        $imageName = $poImage->getClientOriginalName();
         
         $bucket->upload($uploadFile, [
             'name' => $imageName
@@ -149,7 +156,7 @@ class CloudVisionController extends Controller
                 
                 array_push($dataArray, $dbData);
             } else {
-                $message = $image . '此圖並無特徵';
+                $message = $imageName . '此圖並無特徵';
                 return $message;
             }
 
@@ -163,6 +170,9 @@ class CloudVisionController extends Controller
         }
 
         $imageAnnotator->close();
+        if(file_exists($thumbnail_file_path)){
+            unlink($thumbnail_file_path);
+        }
 
         $key = '344'; //key
 		$time = time(); //当前时间

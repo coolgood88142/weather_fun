@@ -9,14 +9,17 @@
         </div>
         <div class="form-group">
             <div id="query" class="col-min-btn col-md-3 col-lg-2" style="text-align:right;">
-                        <input type="submit" name="query_data" class="btn btn-primary" value="上傳" >
-                    </div>
+                <input type="submit" name="query_data" class="btn btn-primary" value="上傳" >
+            </div>
+            <!-- <input type="hidden" id="message" name="message" value="{{ $message }}"/> -->
         </div>
         
     </form>
 </template>
 
 <script>
+// let message = document.getElementById('message').value
+
 import axios from 'axios'
 export default {
      props: {
