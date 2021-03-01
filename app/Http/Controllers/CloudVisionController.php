@@ -217,4 +217,21 @@ class CloudVisionController extends Controller
          return [ 'status' => $status, 'message' => $message, ];
 
     }
+
+    public function deleteKeyWordData(Request $request){
+        $id = $request->id;
+        $status = 'success';
+        $message = '刪除成功!';
+        
+        try {
+            $user = DB::table('vision')->whereIn('id', $id)->delete();
+
+        } catch (Exception $e) {
+            $status = 'error';
+            $message = '刪除失敗!';
+            dd($e);
+        }
+         return [ 'status' => $status, 'message' => $message, ];
+
+    }
 }

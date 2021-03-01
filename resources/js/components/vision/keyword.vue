@@ -16,6 +16,7 @@
 import imageCell from './imageCell';
 import edit from './edit';
 import editButton from './editButton';
+import deleteButton from './deleteButton';
 import DataTable from 'laravel-vue-datatable';
 Vue.use(DataTable);
 
@@ -29,6 +30,7 @@ export default {
         imageCell,
         edit,
         editButton,
+        deleteButton,
     },
     data() {
         return {
@@ -60,6 +62,19 @@ export default {
                     event: "click",
                     handler: this.updateSelectedModal,
                 }, 
+                // {
+                //     label: '刪除',
+                //     name: '',
+                //     orderable: false,
+                //     classes: { 
+                //         'btn': true,
+                //         'btn-primary': true,
+                //         'btn-sm': true,
+                //     },
+                //     component: deleteButton,
+                //     event: "click",
+                //     handler: this.deleteKeyWord,
+                // }, 
             ],
             selectedRow: {},
             id: '',
@@ -87,6 +102,31 @@ export default {
         updateSelectedModal(data) {
             this.selectedRow = data['keyword'].split(","); 
             this.id = data["editId"];
+        },
+        deleteKeyWord(data){
+            const params = {
+				id: data["editId"],
+			}
+            axios.post('/deleteKeyWord', params).then((response) => {
+				if (response.data.status === "success") {
+					swal({
+						title: response.data.message,
+						confirmButtonColor: "#e6b930",
+						icon: response.data.status,
+						showCloseButton: true,
+					}).then(() => {
+						window.location.reload()
+					});
+				}
+			}).catch((error) => {
+				if (error.response) {
+					console.log(error.response.data)
+					console.log(error.response.status)
+					console.log(error.response.headers)
+				} else {
+					console.log("Error", error.message)
+				}
+			})
         }
     },
     watch:{

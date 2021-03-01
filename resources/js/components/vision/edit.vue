@@ -1,6 +1,5 @@
 <template>
     <div class="modal" id="exampleModal" tabindex="-1" role="dialog" aria-hidden="true">
-        
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -50,6 +49,8 @@
 </template>
 
 <script>
+// $('#exampleModal').draggable();
+
 export default {
     props: {
         row: {
