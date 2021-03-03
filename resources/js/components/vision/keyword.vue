@@ -115,7 +115,7 @@ export default {
 						icon: response.data.status,
 						showCloseButton: true,
 					}).then(() => {
-						window.location.reload()
+						window.location.href = '/vision'
 					});
 				}
 			}).catch((error) => {

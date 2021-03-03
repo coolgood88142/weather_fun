@@ -13,11 +13,7 @@
                     
                 </div>
                 <div class="modal-body">
-                    <!-- <ul v-sortable="{ onUpdate: onUpdate }">
-                            <li v-for="(col, index) in keyWordRow" :key="index">{{ col }}</li>
-                        </ul> -->
-                    <table id="item_table" class="table">
-                        
+                    <table id="item_table" class="table" v-sortable="{ onUpdate: onUpdate }">
                         <tr class="table-info" v-for="(col, index) in keyWordRow" :key="index">
                             <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
                                 @click="upKeyWord(index)">
@@ -53,8 +49,13 @@
 </template>
 
 <script>
-import Sortable from 'vue-sortable'
-Vue.use(Sortable)
+
+Vue.directive('sortable', {
+  inserted: function (el, binding) {
+    new Sortable(el, binding.value || {})
+  }
+})
+
 export default {
     props: {
         row: {
@@ -109,7 +110,7 @@ export default {
 						icon: response.data.status,
 						showCloseButton: true,
 					}).then(() => {
-						window.location.reload()
+						window.location.href = '/vision'
 					});
 				}
 			}).catch((error) => {

@@ -3,7 +3,11 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="stylesheet" href="/css/stock.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
-    </head>
+        <!-- SortableJS -->
+  <script src="https://unpkg.com/sortablejs@1.4.2"></script>
+  <!-- VueSortable -->
+  <script src="https://unpkg.com/vue-sortable@0.1.3"></script>
+      </head>
     <body>
         <div id="app" class="container">
             <nav class="navbar navbar-expand-md navbar-light navbar-dark bg-dark fixed-top navbar-inverse">
