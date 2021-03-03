@@ -72,7 +72,11 @@ export default {
     },
     methods:{
         onUpdate: function (event) {
-            this.keyWordRow.splice(event.newIndex, 0, this.keyWordRow.splice(event.oldIndex, 1)[0])
+            let now = this.keyWordRow[event.newIndex]
+            let old = this.keyWordRow[event.oldIndex]
+
+            this.keyWordRow[event.newIndex] = old
+            this.keyWordRow[event.oldIndex] = now
         },
         addKeyWord(){
             let length = this.keyWordRow.length
