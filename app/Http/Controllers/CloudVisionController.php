@@ -224,7 +224,7 @@ class CloudVisionController extends Controller
         $message = '刪除成功!';
         
         try {
-            $user = DB::table('vision')->whereIn('id', $id)->delete();
+            $user = DB::table('vision')->where('id', $request->id)->delete();
 
         } catch (Exception $e) {
             $status = 'error';

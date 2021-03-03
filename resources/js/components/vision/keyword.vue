@@ -62,22 +62,22 @@ export default {
                     event: "click",
                     handler: this.updateSelectedModal,
                 }, 
-                // {
-                //     label: '刪除',
-                //     name: '',
-                //     orderable: false,
-                //     classes: { 
-                //         'btn': true,
-                //         'btn-primary': true,
-                //         'btn-sm': true,
-                //     },
-                //     component: deleteButton,
-                //     event: "click",
-                //     handler: this.deleteKeyWord,
-                // }, 
+                {
+                    label: '刪除',
+                    name: '',
+                    orderable: false,
+                    classes: { 
+                        'btn': true,
+                        'btn-primary': true,
+                        'btn-sm': true,
+                    },
+                    component: deleteButton,
+                    event: "click",
+                    handler: this.deleteKeyWord,
+                }, 
             ],
-            selectedRow: {},
-            id: '',
+            selectedRow: [],
+            id: null,
         }
     },
     created() {
