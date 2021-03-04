@@ -14,7 +14,7 @@
                 </div>
                 <div class="modal-body">
                     <table id="item_table" class="table" v-sortable="{ onUpdate: onUpdate }">
-                        <tr class="table-info" v-for="(col, index) in keyWordRow" :key="index">
+                        <tr class="table-info" v-for="(col, index) in keyWordRow" :key="col">
                             <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
                                 @click="upKeyWord(index)">
                             <i class="bi-arrow-up-circle"></i>
@@ -62,12 +62,13 @@ export default {
             type: Array,
         },
         keyWordId: {
-            type: String,
+            type: Number,
         }
     },
     data() {
         return {
             'keyWordRow': this.row,
+            'id' : this.keyWordId
         }
     },
     methods:{
@@ -103,7 +104,7 @@ export default {
         },
         saveKeyword(){
             const params = {
-				id: this.keyWordId,
+				id: this.id,
                 keyword: this.getKeyWord()
 			}
             axios.post('/saveKeyWord', params).then((response) => {
@@ -158,9 +159,9 @@ export default {
         }
     },
     watch:{
-        keyWords(val){
-            console.log(val)
-            return val.split(",")
+        keyWordId(val){
+            this.id = val
+            return val
         },
         row(val){
             this.keyWordRow = val

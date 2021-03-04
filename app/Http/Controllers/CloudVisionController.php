@@ -12,6 +12,7 @@ use Google\Cloud\Vision\V1\ImageContext;
 use Google\Cloud\Vision\V1\Likelihood;
 use Google\Cloud\Vision\VisionClient;
 use Google\Cloud\Storage\StorageClient;
+use Google\Cloud\Translate\TranslateClient;
 use Intervention\Image\ImageManagerStatic as Image;
 use JamesDordoy\LaravelVueDatatable\Http\Resources\DataTableCollectionResource;
 use \Firebase\JWT\JWT;
@@ -131,6 +132,11 @@ class CloudVisionController extends Controller
                         $keyword = $keyword . $data->getDescription() . ',';
                     }
                 }
+
+                if($keyword != ''){
+                    $translate =  $this->getTranslateClient($keyword, 'zh-Hant');
+                    $keyword = str_replace('，', ',', $translate['text']);
+                }
             }
 
             $textDetection = $imageAnnotator->textDetection($file, [
@@ -234,4 +240,14 @@ class CloudVisionController extends Controller
          return [ 'status' => $status, 'message' => $message, ];
 
     }
+
+    public function getTranslateClient(String $text, String $targetLanguage){
+        $translate = new TranslateClient();
+        $result = $translate->translate($text, [
+            'target' => $targetLanguage,
+        ]);
+
+        return $result;
+    }
+
 }
