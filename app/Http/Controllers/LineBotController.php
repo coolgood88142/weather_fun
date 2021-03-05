@@ -600,7 +600,7 @@ class LineBotController extends Controller
                 // }
             }
 
-            dd($messageArray);
+            // dd($messageArray);
 
             // if($count == 0){
             //     array_push($messageArray, [
@@ -626,7 +626,7 @@ class LineBotController extends Controller
                 
             ]
         );
-            dd($messageArray);
+            // dd($messageArray);
     }
 
     public function getProbabilityOfPrecipitationImage(String $probability_of_precipitation){

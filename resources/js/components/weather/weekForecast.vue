@@ -178,13 +178,13 @@ export default {
                     title: {
                         text: '相對溼度',
                         style: {
-                            color: '#0000C6'
+                            color: '#CCEEFF'
                         }
                     },
                     labels: {
                         format: '{value} %',
                         style: {
-                            color: '#0000C6'
+                            color: '#CCEEFF'
                         }
                     },
 
@@ -241,7 +241,7 @@ export default {
                     tooltip: {
                         valueSuffix: ' %'
                     },
-                    color: '#0000C6',
+                    color: '#CCEEFF',
 
                 }, {
                     name: '最高溫度',

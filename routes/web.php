@@ -65,3 +65,7 @@ Route::get('/vision', 'CloudVisionController@getVisionDefaultData')->name('visio
 Route::post('/saveKeyWord', 'CloudVisionController@saveKeyWordData')->name('saveKeyWord');
 
 Route::post('/deleteKeyWord', 'CloudVisionController@deleteKeyWordData')->name('deleteKeyWord');
+
+Route::get('/delete', 'CloudVisionController@deleteKeyWordData');
+
+Route::get('/testError', 'StockController@getStockData');

@@ -124,7 +124,6 @@ export default {
                     crosshair: true
                 }],
                 yAxis: [{ // Secondary yAxis
-                    gridLineWidth: 0,
                     title: {
                         text: '降雨機率',
                         style: {
@@ -137,8 +136,10 @@ export default {
                             color: '#AAAAAA'
                         }
                     },
+                    opposite: true
 
                 }, { // Primary yAxis
+                    gridLineWidth: 0,
                     title: {
                         text: '最高溫度',
                         style: {
@@ -151,9 +152,9 @@ export default {
                             color: '#fd8307'
                         }
                     },
-                    opposite: true
                 },
                 { // Tertiary yAxis
+                    gridLineWidth: 0,
                     title: {
                         text: '最低溫度',
                         style: {
@@ -166,7 +167,6 @@ export default {
                             color: Highcharts.getOptions().colors[0]
                         }
                     },
-                    opposite: true
                 }],
                 tooltip: {
                     shared: true
@@ -184,7 +184,7 @@ export default {
                 },
                 series: [{
                     name: '降雨機率',
-                    type: 'column',
+                    type: 'spline',
                     yAxis: 0,
                     data: data.pop,
                     dashStyle: 'shortdot',
@@ -195,9 +195,10 @@ export default {
 
                 }, {
                     name: '最高溫度',
-                    type: 'spline',
+                    type: 'column',
                     yAxis: 1,
                     data: data.maxt,
+                    dashStyle: 'shortdot',
                     tooltip: {
                         valueSuffix: ' °'
                     },
@@ -205,9 +206,10 @@ export default {
 
                 },{
                     name: '最低溫度',
-                    type: 'spline',
+                    type: 'column',
                     yAxis: 2,
                     data: data.mint,
+                    dashStyle: 'shortdot',
                     tooltip: {
                         valueSuffix: ' °'
                     },

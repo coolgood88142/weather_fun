@@ -372,6 +372,7 @@ class WeatherController extends Controller
         $sortBy = $request->input('column');
         $orderBy = $request->input('dir');
         $searchValue = $request->input('search');
+        $pageValue = $request->input('page');
         $apiNum = $request->apiNum;
         $weather = $weathers[(int)$apiNum];
 

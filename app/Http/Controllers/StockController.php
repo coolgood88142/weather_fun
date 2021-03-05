@@ -48,19 +48,47 @@ class StockController extends Controller
 
     public function getMessageStock(Request $request){
         $replyToken = $request->events[0]['replyToken'];
-        $text = $request->events[0]['message']['text'];
+        $type = $request->events[0]['type'];
+        $text = '';
+        $symbolId = '';
+        if($type == 'postback'){
+            $data = $request->events[0]['postback']['data'];
+            $dataArray = explode('&', $data);
+            $textArray = explode('=', $dataArray[0]);
+            $symbolIdArray = explode('=', $dataArray[1]);
+            $text = $textArray[1];
+            $symbolId = $symbolIdArray[1];
+        }else if($type == 'message'){
+            $symbolId = $request->events[0]['message']['text'];
+        }
+
         $apiToken = '001ca47f2cf24652cb26f74d97251ab3';
-        $symbolId = '3515';
         $fugleUrl = 'https://api.fugle.tw/realtime/v0/intraday/';
-        $parameter = '?symbolId='. $symbolId . '&apiToken=' . $apiToken;
+        $parameter = '?apiToken=' . $apiToken;
+        $isStockkData = $this->checkStockData($fugleUrl, $parameter, $symbolId);
+        $name = '';
         
+        if($isStockkData){
+            $parameter  = $parameter . '&symbolId='. (int)$symbolId;
+            $url = $fugleUrl . 'meta' . $parameter;
+            $Guzzleclient = new \GuzzleHttp\Client();
+            $response = $Guzzleclient->get($url);
+            $json = json_decode($response->getBody());
+            $name = $json->data->meta->nameZhTw;
+        }
+
         $messageBuilder = new TextMessageBuilder('請輸入【股票代碼】');
 
-        if($text == '股票'){
+        if($text == '' && $isStockkData){
+            $size = 'lg';
+            if(strlen($name) > 2 ){
+                $size = 'md';
+            }
+            
             $messageBuilder =  new RawMessageBuilder(
                 [
                     'type' => 'flex',
-                    'altText' => '請問要選擇哪個股票資訊?',
+                    'altText' => '請問要選擇哪個' . $name .'股票資訊?',
                     'contents' => [
                         'type'=> 'bubble',
                         'hero'=> [
@@ -75,10 +103,10 @@ class StockController extends Controller
                             'layout'=> 'vertical',
                             'contents'=> [
                                 [
-                                    'type'=>'text',
-                                    'text'=>'請問要選擇哪個股票資訊?',
+                                    'type'=> 'text',
+                                    'text'=> '請問要選擇哪個' . $name . '股票資訊?',
                                     'weight'=> 'bold',
-                                    'size'=> 'xl',
+                                    'size'=> $size,
                                     'margin'=>'md'
                                 ],
                                 [
@@ -94,36 +122,36 @@ class StockController extends Controller
                                 [
                                     'type'=>'button',
                                     'action'=>[
-                                        'type'=>'message',
+                                        'type'=>'postback',
                                         'label' => '線圖',
-                                        'text'=> '線圖',
+                                        'data' => 'text=線圖&symbolId='.$symbolId,
                                     ],
                                     'height'=>'sm'
                                 ],
                                 [
                                     'type'=>'button',
                                     'action'=>[
-                                        'type'=>'message',
+                                        'type'=>'postback',
                                         'label' => '統計資訊',
-                                        'text'=> '統計資訊',
+                                        'data' => 'text=統計資訊&symbolId='.$symbolId,
                                     ],
                                     'height'=>'sm'
                                 ],
                                 [
                                     'type'=>'button',
                                     'action'=>[
-                                        'type'=>'message',
+                                        'type'=>'postback',
                                         'label' => '當日資訊',
-                                        'text'=> '當日資訊',
+                                        'data' => 'text=當日資訊&symbolId='.$symbolId,
                                     ],
                                     'height'=>'sm'
                                 ],
                                 [
                                     'type'=>'button',
                                     'action'=>[
-                                        'type'=>'message',
+                                        'type'=>'postback',
                                         'label' => '當日成交資訊',
-                                        'text'=> '當日成交資訊',
+                                        'data' => 'text=當日成交資訊&symbolId='.$symbolId,
                                     ],
                                     'height'=>'sm'
                                 ],
@@ -138,232 +166,105 @@ class StockController extends Controller
                     ]
                 ],
             );
-        }else if($text == '線圖'){
-            $url = $fugleUrl . 'chart' . $parameter;
-            $Guzzleclient = new \GuzzleHttp\Client();
-            $response = $Guzzleclient->get($url);
-            $json = json_decode($response->getBody());
-            $datas = $json->data->chart;
-            $deatsKeys = array_keys(get_object_vars($datas));
-
-            if(count($deatsKeys) > 0){
-                $lastKey = $deatsKeys[count($deatsKeys) - 1];
-                $lastDeatlsData = $datas->$lastKey;
-                $charts = Config::get('chart');
-
-                $messageArray = [
-                    [
-                        'type'=> 'text',
-                        'text'=> '華擎股票',
-                        'weight'=> 'bold',
-                        'size'=> 'xxl',
-                        'margin'=> 'md'
-                    ],
-                    [
-                        'type'=> 'separator',
-                        'margin'=> 'xxl'
-                    ],
-                ];
-
-                foreach($charts as $chart){
-                    foreach($chart as $key => $value){
-                        $chartValue = $lastDeatlsData->$key;
-                        $message = $this->getStockHorizontalTemplate((string)$value, (string)$chartValue);
-                        array_push($messageArray, $message);
-
-                        if(count($messageArray) == 1){
-                            array_push($messageArray[1], [
-                                'margin'=> 'xxl',
-                                'spacing'=> 'sm',
-                            ]);
+        }else{
+            if($text == '線圖'){
+                $url = $fugleUrl . 'chart' . $parameter;
+                $Guzzleclient = new \GuzzleHttp\Client();
+                $response = $Guzzleclient->get($url);
+                $json = json_decode($response->getBody());
+                $datas = $json->data->chart;
+                $deatsKeys = array_keys(get_object_vars($datas));
+    
+                if(count($deatsKeys) > 0){
+                    $lastKey = $deatsKeys[count($deatsKeys) - 1];
+                    $lastDeatlsData = $datas->$lastKey;
+                    $charts = Config::get('chart');
+    
+                    $messageArray = [
+                        [
+                            'type'=> 'text',
+                            'text'=> $name . '股票',
+                            'weight'=> 'bold',
+                            'size'=> 'xxl',
+                            'margin'=> 'md'
+                        ],
+                        [
+                            'type'=> 'separator',
+                            'margin'=> 'xxl'
+                        ],
+                    ];
+    
+                    foreach($charts as $chart){
+                        foreach($chart as $key => $value){
+                            $chartValue = $lastDeatlsData->$key;
+                            if($key != 'unit' && $key != 'volume'){
+                                $chartValue = '$' . $chartValue;
+                            }
+                            
+                            $message = $this->getStockHorizontalTemplate((string)$value, (string)$chartValue);
+                            array_push($messageArray, $message);
+    
+                            if(count($messageArray) == 1){
+                                array_push($messageArray[1], [
+                                    'margin'=> 'xxl',
+                                    'spacing'=> 'sm',
+                                ]);
+                            }
                         }
                     }
-                }
-
-                $messageBuilder =  new RawMessageBuilder(
-                    [
-                        'type' => 'flex',
-                        'altText' => '華擎線圖',
-                        'contents' => [
-                            'type'=> 'bubble',
-                            'size'=> 'mega',
-                            'body'=> [
-                                'type'=> 'box',
-                                'layout'=> 'vertical',
-                                'contents'=> $messageArray
-                            ]  
+    
+                    $messageBuilder =  new RawMessageBuilder(
+                        [
+                            'type' => 'flex',
+                            'altText' => $name . '線圖',
+                            'contents' => [
+                                'type'=> 'bubble',
+                                'size'=> 'mega',
+                                'body'=> [
+                                    'type'=> 'box',
+                                    'layout'=> 'vertical',
+                                    'contents'=> $messageArray
+                                ]  
+                            ]
+                            
                         ]
-                        
-                    ]
-                );
-            }else{
-                $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
-            }
-            
-
-        }else if($text == '統計資訊'){
-            $url = $fugleUrl . 'quote' . $parameter;
-            $Guzzleclient = new \GuzzleHttp\Client();
-            $response = $Guzzleclient->get($url);
-            $json = json_decode($response->getBody());
-            $datas = get_object_vars($json->data->quote);
-
-            if(count($datas) > 0){
-                $quotes = Config::get('quote');
-
-                $messageArray1 = [
-                    [
-                        'type'=> 'text',
-                        'text'=> '華擎股票',
-                        'weight'=> 'bold',
-                        'size'=> 'xxl',
-                        'margin'=> 'md'
-                    ],
-                    [
-                        'type'=> 'separator',
-                        'margin'=> 'xxl'
-                    ],
-                ];
-
-                $messageArray2 = [
-                    
-                ];
-
-                
-
-                foreach($quotes as $quote){
-                    foreach($quote as $key => $value){
-                        $fugleValue = '';
-                        $message = [];
-                        if(end($quotes) != $quote){
-                            if(is_numeric($key)){
-                                $keys = array_keys($value);
-                                $firstKey = $keys[0];
-        
-                                $message = [
-                                    'type'=> 'box',
-                                    'layout'=> 'horizontal',
-                                    'contents'=> [
-                                        [
-                                            'type'=> 'text',
-                                            'text'=> (string)$value[$firstKey],
-                                            'size'=> 'sm',
-                                            'color'=> '#555555',
-                                            'flex'=> 0
-                                        ],
-                                        [
-                                            'type'=> 'box',
-                                            'layout'=> 'vertical',
-                                            'margin'=> 'xxl',
-                                            'spacing'=> 'sm',
-                                            'contents'=> [
-                                                [
-                                                    'type'=> 'box',
-                                                    'layout'=> 'horizontal',
-                                                    'contents'=> [
-                                                        [
-                                                            'type'=> 'text',
-                                                            'text'=> 'info',
-                                                            'size'=> 'md',
-                                                            'color'=> '#555555',
-                                                        ]
-                                                    ]
-                                                ],
-                                                [
-                                                    'type'=> 'separator',
-                                                    'margin'=> 'none',
-                                                ]
-                                            ]
-                                        ],
-                                    ]
-                                ];
-        
-                                foreach($keys as $index => $key){
-                                    if($index != 0){
-                                        $keyMessage = [
-                                            'type'=> 'box',
-                                            'layout'=> 'horizontal',
-                                            'contents'=> [
-                                                [
-                                                    'type'=> 'text',
-                                                    'text'=> (string)$value[$key],
-                                                    'size'=> 'sm',
-                                                    'color'=> '#555555',
-                                                ],
-                                                [
-                                                    'type'=> 'text',
-                                                    'text'=> (string)$datas[$firstKey]->$key,
-                                                    'size'=> 'sm',
-                                                    'color'=> '#111111',
-                                                    'align'=> 'end'
-                                                ]
-                                            ]
-                                        ];
-        
-                                        array_push($message['contents'][1]['contents'], $keyMessage);
-                                    }
-                                }
-                                    
-                            }else{
-                                $fugleValue = $datas[$key]; 
-                                if(is_bool($fugleValue)){
-                                    if($fugleValue){
-                                        $fugleValue = '是';
-                                    }else{
-                                        $fugleValue = '否';
-                                    }
-                                }else if(is_numeric($fugleValue)){
-                                    $fugleValue = '$' . $fugleValue;
-                                }else if($fugleValue == null){
-                                    $fugleValue = '無';
-                                }
-        
-                                $message = [
-                                    'type'=> 'box',
-                                    'layout'=> 'horizontal',
-                                    'contents'=> [
-                                        [
-                                            'type'=> 'text',
-                                            'text'=> (string)$value,
-                                            'size'=> 'sm',
-                                            'color'=> '#555555',
-                                            'flex'=> 0
-                                        ],
-                                        [
-                                            'type'=> 'text',
-                                            'text'=> (string)$fugleValue,
-                                            'size'=> 'sm',
-                                            'color'=> '#111111',
-                                            'align'=> 'end'
-                                        ]
-                                    ]
-                                ];
-                            }
-                            array_push($messageArray1, $message);
-                        }else{
-                            if(is_array($value)){
-                                if(count($value) == 1){
-                                    $keys = array_keys($value);
-                                    $message = [
-                                        'type'=> 'box',
-                                        'layout'=> 'horizontal',
-                                        'contents'=> [
-                                            [
-                                                'type'=> 'text',
-                                                'text'=> $value[$keys[0]],
-                                                'size'=> 'sm',
-                                                'color'=> '#555555',
-                                            ],
-                                            [
-                                                'type'=> 'text',
-                                                'text'=> $datas['order']->at,
-                                                'size'=> 'sm',
-                                                'color'=> '#555555',
-                                            ],
-                                        ]
-                                        
-                                    ];  
-                                }else{
+                    );
+                }else{
+                    $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
+                }
+    
+            }else if($text == '統計資訊'){
+                $url = $fugleUrl . 'quote' . $parameter;
+                $Guzzleclient = new \GuzzleHttp\Client();
+                $response = $Guzzleclient->get($url);
+                $json = json_decode($response->getBody());
+                $datas = get_object_vars($json->data->quote);
+    
+                if(count($datas) > 0){
+                    $quotes = Config::get('quote');
+    
+                    $messageArray1 = [
+                        [
+                            'type'=> 'text',
+                            'text'=> $name . '股票',
+                            'weight'=> 'bold',
+                            'size'=> 'xxl',
+                            'margin'=> 'md'
+                        ],
+                        [
+                            'type'=> 'separator',
+                            'margin'=> 'xxl'
+                        ],
+                    ];
+    
+                    $messageArray2 = [];
+    
+                    foreach($quotes as $quote){
+                        foreach($quote as $key => $value){
+                            $fugleValue = '';
+                            $message = [];
+                            if(end($quotes) != $quote){
+                                if(is_numeric($key)){
                                     $keys = array_keys($value);
                                     $firstKey = $keys[0];
             
@@ -405,201 +306,338 @@ class StockController extends Controller
                                         ]
                                     ];
             
-                                    $sumCount = 0;
-                                    foreach($keys as $key){
-                                        if(is_numeric($key)){
-                                            foreach($value[$key] as $sumKey => $sum){
-                                                $keyMessage = [
+                                    foreach($keys as $index => $key){
+                                        if($index != 0){
+                                            $fugleValue = (string)$datas[$firstKey]->$key;
+                                            if($key == 'at'){
+                                                $date = (new Carbon($fugleValue))->timezone('Asia/Taipei');
+                                                $fugleValue = $date->format('Y-m-d H:m');
+                                            }
+
+                                            $keyMessage = [
+                                                'type'=> 'box',
+                                                'layout'=> 'horizontal',
+                                                'contents'=> [
+                                                    [
+                                                        'type'=> 'text',
+                                                        'text'=> (string)$value[$key],
+                                                        'size'=> 'sm',
+                                                        'color'=> '#555555',
+                                                    ],
+                                                    [
+                                                        'type'=> 'text',
+                                                        'text'=> $fugleValue,
+                                                        'size'=> 'sm',
+                                                        'color'=> '#111111',
+                                                        'align'=> 'end'
+                                                    ]
+                                                ]
+                                            ];
+            
+                                            array_push($message['contents'][1]['contents'], $keyMessage);
+                                        }
+                                    }
+                                        
+                                }else{
+                                    $fugleValue = $datas[$key]; 
+                                    if(is_bool($fugleValue)){
+                                        if($fugleValue){
+                                            $fugleValue = '是';
+                                        }else{
+                                            $fugleValue = '否';
+                                        }
+                                    }else if(is_numeric($fugleValue)){
+                                        $fugleValue = '$' . $fugleValue;
+                                    }else if($fugleValue == null){
+                                        $fugleValue = '無';
+                                    }
+            
+                                    $message = [
+                                        'type'=> 'box',
+                                        'layout'=> 'horizontal',
+                                        'contents'=> [
+                                            [
+                                                'type'=> 'text',
+                                                'text'=> (string)$value,
+                                                'size'=> 'sm',
+                                                'color'=> '#555555',
+                                                'flex'=> 0
+                                            ],
+                                            [
+                                                'type'=> 'text',
+                                                'text'=> (string)$fugleValue,
+                                                'size'=> 'sm',
+                                                'color'=> '#111111',
+                                                'align'=> 'end'
+                                            ]
+                                        ]
+                                    ];
+                                }
+                                array_push($messageArray1, $message);
+                            }else{
+                                if(is_array($value)){
+                                    if(count($value) == 1){
+                                        $keys = array_keys($value);
+                                        $date = (new Carbon($datas['order']->at))->timezone('Asia/Taipei');
+                                        $fugleValue = $date->format('Y-m-d H:m');
+                                        $message = [
+                                            'type'=> 'box',
+                                            'layout'=> 'horizontal',
+                                            'contents'=> [
+                                                [
+                                                    'type'=> 'text',
+                                                    'text'=> $value[$keys[0]],
+                                                    'size'=> 'sm',
+                                                    'color'=> '#555555',
+                                                ],
+                                                [
+                                                    'type'=> 'text',
+                                                    'text'=> $fugleValue,
+                                                    'size'=> 'sm',
+                                                    'color'=> '#555555',
+                                                ],
+                                            ]
+                                            
+                                        ];  
+                                    }else{
+                                        $keys = array_keys($value);
+                                        $firstKey = $keys[0];
+                
+                                        $message = [
+                                            'type'=> 'box',
+                                            'layout'=> 'horizontal',
+                                            'contents'=> [
+                                                [
+                                                    'type'=> 'text',
+                                                    'text'=> (string)$value[$firstKey],
+                                                    'size'=> 'sm',
+                                                    'color'=> '#555555',
+                                                    'flex'=> 0
+                                                ],
+                                                [
                                                     'type'=> 'box',
-                                                    'layout'=> 'horizontal',
+                                                    'layout'=> 'vertical',
+                                                    'margin'=> 'xxl',
+                                                    'spacing'=> 'sm',
                                                     'contents'=> [
                                                         [
-                                                            'type'=> 'text',
-                                                            'text'=> (string)$sum,
-                                                            'size'=> 'sm',
-                                                            'color'=> '#555555',
+                                                            'type'=> 'box',
+                                                            'layout'=> 'horizontal',
+                                                            'contents'=> [
+                                                                [
+                                                                    'type'=> 'text',
+                                                                    'text'=> 'info',
+                                                                    'size'=> 'md',
+                                                                    'color'=> '#555555',
+                                                                ]
+                                                            ]
                                                         ],
                                                         [
-                                                            'type'=> 'text',
-                                                            'text'=> (string)$datas['order']->$firstKey[$sumCount]->$sumKey,
-                                                            'size'=> 'sm',
-                                                            'color'=> '#111111',
-                                                            'align'=> 'end'
+                                                            'type'=> 'separator',
+                                                            'margin'=> 'none',
                                                         ]
                                                     ]
-                                                ];
-                                                array_push($message['contents'][1]['contents'], $keyMessage);
-                                            }
-                                            $sumCount++;
-                                        }
-                                    }    
-                                }
-                            }else{
-                                $message = [
-                                    'type'=> 'box',
-                                    'layout'=> 'horizontal',
-                                    'contents'=> [
-                                        [
-                                            'type'=> 'text',
-                                            'text'=> $value,
-                                            'size'=> 'sm',
-                                            'color'=> '#555555',
-                                        ],
-                                    ]
-                                    
-                                ];  
-                            }
-                            
-                            array_push($messageArray2, $message);
-                        }
-                    }
-                }
-
-                $messageBuilder =  new RawMessageBuilder(
-                    [
-                        'type' => 'flex',
-                        'altText' => '華擎線圖',
-                        'contents' => [
-                            'type' => 'carousel',
-                            'contents' => [
-                                [
-                                    'type'=> 'bubble',
-                                    'size'=> 'giga',
-                                    'body'=> [
-                                        'type'=> 'box',
-                                        'layout'=> 'vertical',
-                                        'contents'=> $messageArray1
-                                    ]
-                                ],
-                                [
-                                    'type'=> 'bubble',
-                                    'size'=> 'giga',
-                                    'body'=> [
-                                        'type'=> 'box',
-                                        'layout'=> 'vertical',
-                                        'contents'=> $messageArray2
-                                    ]
-                                ]
-                            ]
-                            
-                        ]
-                        
-                    ]
-                );
-            }else{
-                $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
-            }
-        }else if($text == '當日資訊'){
-            $url = $fugleUrl . 'meta' . $parameter;
-            $Guzzleclient = new \GuzzleHttp\Client();
-            $response = $Guzzleclient->get($url);
-            $json = json_decode($response->getBody());
-            $datas = get_object_vars($json->data->meta);
-
-            if(count($datas) > 0){
-                $metas = Config::get('meta');
-
-                $messageArray = [
-                    [
-                        'type'=> 'text',
-                        'text'=> '華擎股票',
-                        'weight'=> 'bold',
-                        'size'=> 'xxl',
-                        'margin'=> 'md'
-                    ],
-                    [
-                        'type'=> 'separator',
-                        'margin'=> 'xxl'
-                    ],
-                ];
-    
-                foreach($metas as $meta){
-                    foreach($meta as $key => $value){
-                        $fugleValue = $datas[$key];
-                        if(is_bool($fugleValue)){
-                            if($fugleValue){
-                                $fugleValue = '是';
-                            }else{
-                                $fugleValue = '否';
-                            }
-                        }else if(is_numeric($fugleValue)){
-                            $fugleValue = '$' . $fugleValue;
-                        }
-
-                        $message = [
-                            'type'=> 'box',
-                            'layout'=> 'horizontal',
-                            'contents'=> [
-                                [
-                                    'type'=> 'text',
-                                    'text'=> (string)$value,
-                                    'size'=> 'sm',
-                                    'color'=> '#555555',
-                                    'flex'=> 0
-                                ],
-                                [
-                                    'type'=> 'text',
-                                    'text'=> (string)$fugleValue,
-                                    'size'=> 'sm',
-                                    'color'=> '#111111',
-                                    'align'=> 'start'
-                                ]
-                            ]
-                        ];
-                        array_push($messageArray, $message);
-                    }
-                }
-    
-                $messageBuilder =  new RawMessageBuilder(
-                    [
-                        'type' => 'flex',
-                        'altText' => '華擎線圖',
-                        'contents' => [
-                            'type'=> 'bubble',
-                                'body'=> [
-                                'type'=> 'box',
-                                'layout'=> 'vertical',
-                                'contents'=> $messageArray
-                                ]  
-                        ]
-                        
-                    ]
-                );
-            }else{
-                $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
-            }
-        }else if($text == '當日成交資訊'){
-            $url = $fugleUrl . 'dealts' . $parameter . '&limit=1';
-            $Guzzleclient = new \GuzzleHttp\Client();
-            $response = $Guzzleclient->get($url);
-            $json = json_decode($response->getBody());
-            $datas = $json->data->dealts;
-            
-            
-            if(count($datas) > 0){
-                $dealts = Config::get('dealts');
-
-                $messageArray = [
-                    [
-                        'type'=> 'text',
-                        'text'=> '華擎股票',
-                        'weight'=> 'bold',
-                        'size'=> 'xxl',
-                        'margin'=> 'md'
-                    ],
-                    [
-                        'type'=> 'separator',
-                        'margin'=> 'xxl'
-                    ],
-                ];
-
-                $dealt = end($dealts);
+                                                ],
+                                            ]
+                                        ];
                 
+                                        $sumCount = 0;
+                                        foreach($keys as $key){
+                                            if(is_numeric($key)){
+                                                foreach($value[$key] as $sumKey => $sum){
+                                                    $keyMessage = [
+                                                        'type'=> 'box',
+                                                        'layout'=> 'horizontal',
+                                                        'contents'=> [
+                                                            [
+                                                                'type'=> 'text',
+                                                                'text'=> (string)$sum,
+                                                                'size'=> 'sm',
+                                                                'color'=> '#555555',
+                                                            ],
+                                                            [
+                                                                'type'=> 'text',
+                                                                'text'=> (string)$datas['order']->$firstKey[$sumCount]->$sumKey,
+                                                                'size'=> 'sm',
+                                                                'color'=> '#111111',
+                                                                'align'=> 'end'
+                                                            ]
+                                                        ]
+                                                    ];
+                                                    array_push($message['contents'][1]['contents'], $keyMessage);
+                                                }
+                                                $sumCount++;
+                                            }
+                                        }    
+                                    }
+                                }else{
+                                    $message = [
+                                        'type'=> 'box',
+                                        'layout'=> 'horizontal',
+                                        'contents'=> [
+                                            [
+                                                'type'=> 'text',
+                                                'text'=> $value,
+                                                'size'=> 'sm',
+                                                'color'=> '#555555',
+                                            ],
+                                        ]
+                                        
+                                    ];  
+                                }
+                                
+                                array_push($messageArray2, $message);
+                            }
+                        }
+                    }
+    
+                    $messageBuilder =  new RawMessageBuilder(
+                        [
+                            'type' => 'flex',
+                            'altText' => $name . '線圖',
+                            'contents' => [
+                                'type' => 'carousel',
+                                'contents' => [
+                                    [
+                                        'type'=> 'bubble',
+                                        'size'=> 'giga',
+                                        'body'=> [
+                                            'type'=> 'box',
+                                            'layout'=> 'vertical',
+                                            'contents'=> $messageArray1
+                                        ]
+                                    ],
+                                    [
+                                        'type'=> 'bubble',
+                                        'size'=> 'giga',
+                                        'body'=> [
+                                            'type'=> 'box',
+                                            'layout'=> 'vertical',
+                                            'contents'=> $messageArray2
+                                        ]
+                                    ]
+                                ]
+                                
+                            ]
+                            
+                        ]
+                    );
+                }else{
+                    $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
+                }
+            }else if($text == '當日資訊'){
+                $url = $fugleUrl . 'meta' . $parameter;
+                $Guzzleclient = new \GuzzleHttp\Client();
+                $response = $Guzzleclient->get($url);
+                $json = json_decode($response->getBody());
+                $datas = get_object_vars($json->data->meta);
+    
+                if(count($datas) > 0){
+                    $metas = Config::get('meta');
+    
+                    $messageArray = [
+                        [
+                            'type'=> 'text',
+                            'text'=> $name . '股票',
+                            'weight'=> 'bold',
+                            'size'=> 'xxl',
+                            'margin'=> 'md'
+                        ],
+                        [
+                            'type'=> 'separator',
+                            'margin'=> 'xxl'
+                        ],
+                    ];
+        
+                    foreach($metas as $meta){
+                        foreach($meta as $key => $value){
+                            $fugleValue = $datas[$key];
+                            if(is_bool($fugleValue)){
+                                if($fugleValue){
+                                    $fugleValue = '是';
+                                }else{
+                                    $fugleValue = '否';
+                                }
+                            }else if(is_numeric($fugleValue)){
+                                $fugleValue = '$' . $fugleValue;
+                            }
+    
+                            $message = [
+                                'type'=> 'box',
+                                'layout'=> 'horizontal',
+                                'contents'=> [
+                                    [
+                                        'type'=> 'text',
+                                        'text'=> (string)$value,
+                                        'size'=> 'sm',
+                                        'color'=> '#555555',
+                                        'flex'=> 0
+                                    ],
+                                    [
+                                        'type'=> 'text',
+                                        'text'=> (string)$fugleValue,
+                                        'size'=> 'sm',
+                                        'color'=> '#111111',
+                                        'align'=> 'end'
+                                    ]
+                                ]
+                            ];
+                            array_push($messageArray, $message);
+                        }
+                    }
+        
+                    $messageBuilder =  new RawMessageBuilder(
+                        [
+                            'type' => 'flex',
+                            'altText' => $name . '線圖',
+                            'contents' => [
+                                'type'=> 'bubble',
+                                    'body'=> [
+                                    'type'=> 'box',
+                                    'layout'=> 'vertical',
+                                    'contents'=> $messageArray
+                                    ]  
+                            ]
+                            
+                        ]
+                    );
+                }else{
+                    $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
+                }
+            }else if($text == '當日成交資訊'){
+                $url = $fugleUrl . 'dealts' . $parameter . '&limit=1';
+                $Guzzleclient = new \GuzzleHttp\Client();
+                $response = $Guzzleclient->get($url);
+                $json = json_decode($response->getBody());
+                $datas = $json->data->dealts;
+                
+                
+                if(count($datas) > 0){
+                    $dealts = Config::get('dealts');
+    
+                    $messageArray = [
+                        [
+                            'type'=> 'text',
+                            'text'=> $name . '股票',
+                            'weight'=> 'bold',
+                            'size'=> 'xxl',
+                            'margin'=> 'md'
+                        ],
+                        [
+                            'type'=> 'separator',
+                            'margin'=> 'xxl'
+                        ],
+                    ];
+    
+                    $dealt = end($dealts);
+                    
                     foreach($dealt as $key => $value){
                         $fugleValue = $datas[0]->$key;
                         if($key == 'at'){
                             $date = (new Carbon($fugleValue))->timezone('Asia/Taipei');
                             $fugleValue = $date->format('Y-m-d h:m');
+                        }else if($key == 'price'){
+                            $fugleValue = '$' . $fugleValue;
                         }
                         $message = [
                             'type'=> 'box',
@@ -623,33 +661,43 @@ class StockController extends Controller
                         ];
                         array_push($messageArray, $message);
                     }
-                
-    
-                $messageBuilder =  new RawMessageBuilder(
-                    [
-                        'type' => 'flex',
-                        'altText' => '華擎線圖',
-                        'contents' => [
-                            'type'=> 'bubble',
-                                'body'=> [
-                                'type'=> 'box',
-                                'layout'=> 'vertical',
-                                'contents'=> $messageArray
-                                ]  
+        
+                    $messageBuilder =  new RawMessageBuilder(
+                        [
+                            'type' => 'flex',
+                            'altText' => $name . '線圖',
+                            'contents' => [
+                                'type'=> 'bubble',
+                                    'body'=> [
+                                    'type'=> 'box',
+                                    'layout'=> 'vertical',
+                                    'contents'=> $messageArray
+                                    ]  
+                            ]
+                            
                         ]
-                        
-                    ]
-                );
-            }else{
-                $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
+                    );
+                }else{
+                    $messageBuilder = new TextMessageBuilder('目前股票尚未開盤');
+                }
             }
         }
-
         $response = $this->bot->replyMessage($replyToken, $messageBuilder);
 
         if ($response->isSucceeded()) {
             echo 'Succeeded!';
             return;
+        }
+    }
+
+    public function checkStockData(String $fugleUrl, String $parameter, String $symbolId){
+        $url = $fugleUrl . 'meta' . $parameter . '&symbolId='. (int)$symbolId;
+        $Guzzleclient = new \GuzzleHttp\Client();
+        try{
+            $response = $Guzzleclient->get($url);
+            return true;
+        } catch (RequestException $e) {
+            return false;
         }
     }
 

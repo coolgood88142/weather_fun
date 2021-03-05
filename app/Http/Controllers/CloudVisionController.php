@@ -164,7 +164,6 @@ class CloudVisionController extends Controller
                 $dbData = [
                     'image' => (String)$googleStroageIamge, 'keyword' => (String)$keyword, 
                 ];
-                
                 array_push($dataArray, $dbData);
             } else {
                 $message = $imageName . '此圖並無特徵';
@@ -228,6 +227,14 @@ class CloudVisionController extends Controller
         $id = $request->id;
         $status = 'success';
         $message = '刪除成功!';
+
+        $storage = new StorageClient([
+            'projectId' => 'useVision'
+        ]);
+
+        $bucketName = 'vision-save-image';
+        $bucket = $storage->bucket($bucketName);
+        dd($bucket);
         
         try {
             $user = DB::table('vision')->where('id', $request->id)->delete();

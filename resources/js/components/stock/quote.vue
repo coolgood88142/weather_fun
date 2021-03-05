@@ -2,6 +2,7 @@
     <data-table 
         :data="data"
         :columns="columns"
+        :per-page="perpage"
         @on-table-props-changed="reloadTable"
     >
     </data-table>
@@ -21,6 +22,7 @@ export default {
     data() {
         return {
             url: this.quoteUrl,
+            perpage : ['10', '15' ,'20', '25', '30'],
             data: {},
             tableProps: {
                 search: '',
@@ -28,6 +30,7 @@ export default {
                 column: 'type',
                 dir: 'asc'
             },
+            translate: { nextButton: 'Next', previousButton: 'Previous', placeholderSearch: 'Search Table'},
             columns: [
                 {
                     label: '資料類別',

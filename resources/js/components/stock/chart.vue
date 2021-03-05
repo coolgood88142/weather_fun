@@ -23,9 +23,12 @@ export default {
             data: {},
             tableProps: {
                 search: '',
-                length: 10,
+                length: 5,
                 column: 'time',
-                dir: 'asc'
+                dir: 'asc',
+                pagination: {
+                    showdisabled : true
+                }
             },
             columns: [
                 {
