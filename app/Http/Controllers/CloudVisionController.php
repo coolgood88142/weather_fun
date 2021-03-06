@@ -50,7 +50,8 @@ class CloudVisionController extends Controller
         foreach($visionData as $data){
             $array = [];
             $array['image'] = $data->image;
-            $array['keyword'] = $data->keyword;
+            $array['englishKeyword'] = $data->english_keyword;
+            $array['chineseKeyword'] = $data->chinese_keyword;
             $array['editId'] = $data->id;
             array_push($dataArray, (object)$array);
         }
@@ -110,35 +111,39 @@ class CloudVisionController extends Controller
 
         $imageAnnotator = new ImageAnnotatorClient();
         $imageContext = new ImageContext();
-        $imageContext->setLanguageHints(['en','zh-Hant']);
+        $imageContext->setLanguageHints(['zh-Hant']);
         $dataArray = [];
-        $keyword = '';
+        $englishKeyword = '';
         $googleStroageIamge = 'https://storage.googleapis.com/' . $bucket->name() . '/' .$imageName;
         try {
             $file = @file_get_contents($googleStroageIamge);
-            $imageData = $imageAnnotator->labelDetection($file, [
+            $labelDetection = $imageAnnotator->labelDetection($file, [
                 'imageContext' => $imageContext
             ]);
-            $labelDetection = $imageData->getLabelAnnotations();
-            $labelData = $imageData->getLabelAnnotations();
+            $labelData = $labelDetection->getLabelAnnotations();
             if(count($labelData) > 0){
                 foreach($labelData as $data){
-                    $labels = explode("\n",$data->getDescription());
-                    if(count($labels) > 1){
-                        foreach($labels as $label){
-                            $keyword = $keyword . $label . ',';
+                    if(strpos($data->getDescription(), "\n")){
+                        //有文字的圖片會解析整段文字，可能會有換行的情況
+                        $labels = explode("\n",$data->getDescription());
+                        if(count($labels) > 1){
+                            foreach($labels as $label){
+                                $englishKeyword = $englishKeyword . $label . ',';
+                            }
                         }
                     }else{
-                        $keyword = $keyword . $data->getDescription() . ',';
+                        $englishKeyword = $englishKeyword . $data->getDescription() . ',';
                     }
                 }
-
-                if($keyword != ''){
-                    $translate =  $this->getTranslateClient($keyword, 'zh-Hant');
-                    $keyword = str_replace('，', ',', $translate['text']);
+                if($englishKeyword != ''){
+                    $translate =  $this->getTranslateClient($englishKeyword, 'zh-Hant');
+                    $englishKeyword = str_replace('，', ',', $translate['text']);
+                    $englishKeyword = substr($englishKeyword,0,-1);
                 }
             }
 
+            
+            $chineseKeyword = '';
             $textDetection = $imageAnnotator->textDetection($file, [
                 'imageContext' => $imageContext
             ]);
@@ -148,21 +153,23 @@ class CloudVisionController extends Controller
                 if(count($texts) > 1){
                     foreach($texts as $text){
                         if($text != ''){
-                            $keyword = $keyword . $text . ',';
+                            $chineseKeyword = $chineseKeyword . $text . ',';
                         }
                     }
                 }else{
                     $text = $textData->getDescription();
                     if($text != ''){
-                        $keyword = $keyword . $text . ',';
+                        $chineseKeyword = $chineseKeyword . $text . ',';
                     }
                 }
             }
             
-            if($keyword != ''){
-                $keyword = substr($keyword,0,-1);
+            if($englishKeyword != '' || $chineseKeyword != ''){
+                $chineseKeyword = substr($chineseKeyword,0,-1);
                 $dbData = [
-                    'image' => (String)$googleStroageIamge, 'keyword' => (String)$keyword, 
+                    'image' => (String)$googleStroageIamge,
+                    'english_keyword' => (String)$englishKeyword,
+                    'chinese_keyword' => (String)$chineseKeyword, 
                 ];
                 array_push($dataArray, $dbData);
             } else {
@@ -203,12 +210,14 @@ class CloudVisionController extends Controller
     }
 
     public function saveKeyWordData(Request $request){
-        $keyword = $request->keyword;
+        $english_keyword = $request->english_keyword;
+        $chinese_keyword = $request->chinese_keyword;
         $status = 'success';
         $message = '更新成功!';
 
         $data = [ 
-            'keyword' => $keyword, 
+            'english_keyword' => $english_keyword,
+            'chinese_keyword' => $chinese_keyword,
         ];
 
         try {
@@ -228,16 +237,23 @@ class CloudVisionController extends Controller
         $status = 'success';
         $message = '刪除成功!';
 
-        $storage = new StorageClient([
-            'projectId' => 'useVision'
-        ]);
-
-        $bucketName = 'vision-save-image';
-        $bucket = $storage->bucket($bucketName);
-        dd($bucket);
-        
         try {
-            $user = DB::table('vision')->where('id', $request->id)->delete();
+            $db = DB::table('vision')->where('id', $id);
+            $data = $db->get();
+            $path = $data[0]->image;
+            $fileObj = explode('/', $path);
+            $file = $fileObj[4];
+
+            $storage = new StorageClient([
+                'projectId' => 'useVision'
+            ]);
+    
+            $bucketName = 'vision-save-image';
+            $bucket = $storage->bucket($bucketName);
+            $object = $bucket->object($file);
+            $object->delete();
+
+            $db->delete();
 
         } catch (Exception $e) {
             $status = 'error';

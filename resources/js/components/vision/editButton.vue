@@ -3,7 +3,7 @@
         type="button"
         data-toggle="modal"
         @click="click(data)"
-        class="btn btn-primary btn-sm"
+        class="btn btn-primary"
         data-target="#exampleModal">
         編輯
     </button>

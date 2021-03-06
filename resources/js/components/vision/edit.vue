@@ -1,6 +1,6 @@
 <template>
     <div class="modal" id="exampleModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">keywords</h5>
@@ -13,24 +13,81 @@
                     
                 </div>
                 <div class="modal-body">
-                    <table id="item_table" class="table" v-sortable="{ onUpdate: onUpdate }">
-                        <tr class="table-info" v-for="(col, index) in keyWordRow" :key="col">
+                    <div class="row">
+                        <div class="col">英文關鍵字</div>
+                        <div class="col">中文關鍵字</div>
+                        <div class="w-100"></div>
+                        <div class="col-6">
+                            <table id="entable" class="table" v-sortable="{ onUpdateEnglish: onUpdateEnglish }">
+                                <tr class="table-info" v-for="(en, index) in enKeywords" :key="en" >
+                                    <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
+                                        @click="upEnglishKeyWord(index)">
+                                    <i class="bi-arrow-up-circle"></i>
+                                    </button>
+                                    <button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
+                                        @click="downEnglishKeyWord(index)">
+                                    <i class="bi-arrow-down-circle"></i>
+                                    </button></th>
+                                    <th><input type="text" name="enkeys[]" :value="en" v-on:input="changeEnglishKeyWord(index)"></th>
+                                    <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
+                                        @click="deleteEnglishKeyWord(index)">
+                                    <i class="bi bi-trash"></i>
+                                    </button></th>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-6">
+                            <table id="chtable" class="table" v-sortable="{ onUpdateChinese: onUpdateChinese }">
+                                <tr class="table-info" v-for="(ch, index) in chKeywords" :key="ch" >
+                                    <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
+                                        @click="upChineseKeyWord(index)">
+                                    <i class="bi-arrow-up-circle"></i>
+                                    </button>
+                                    <button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
+                                        @click="downChineseKeyWord(index)">
+                                    <i class="bi-arrow-down-circle"></i>
+                                    </button></th>
+                                    <th><input type="text" name="chkeys[]" :value="ch" v-on:input="changeChineseKeyWord(index)"></th>
+                                    <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
+                                        @click="deleteChineseKeyWord(index)">
+                                    <i class="bi bi-trash"></i>
+                                    </button></th>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- <table id="item_table" class="table"> -->
+                        <!-- <tr class="table-info" v-for="(en, index) in enKeywords" :key="en" >
                             <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
-                                @click="upKeyWord(index)">
+                                @click="upEnglishKeyWord(yyyindex)">
                             <i class="bi-arrow-up-circle"></i>
                             </button>
                             <button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
-                                @click="downKeyWord(index)">
+                                @click="downEnglishKeyWord(index)">
                             <i class="bi-arrow-down-circle"></i>
                             </button></th>
-                            <th><input type="text" name="keys[]" :value="col" v-on:input="changeKeyWord(index)"></th>
+                            <th><input type="text" name="enkeys[]" :value="en" v-on:input="changeEnglishKeyWord(index)"></th>
                             <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
-                                @click="deleteKeyWord(index)">
+                                @click="deleteEnglishKeyWord(index)">
                             <i class="bi bi-trash"></i>
                             </button></th>
-
-						</tr>
-					</table>
+						</tr> -->
+                        <!-- <tr class="table-info" v-for="(ch, index) in chKeywords" :key="ch" v-sortable="{ onUpdateChinese: onUpdateChinese }">
+                            <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
+                                @click="upChineseKeyWord(index)">
+                            <i class="bi-arrow-up-circle"></i>
+                            </button>
+                            <button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
+                                @click="downChinesehKeyWord(index)">
+                            <i class="bi-arrow-down-circle"></i>
+                            </button></th>
+                            <th><input type="text" name="chkeys[]" :value="ch" v-on:input="changeChineseKeyWord(index)"></th>
+                            <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
+                                @click="deleteChineseKeyWord(index)">
+                            <i class="bi bi-trash"></i>
+                            </button></th>
+						</tr> -->
+					<!-- </table> -->
                 </div>
                 <div class="modal-footer">
                     <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
@@ -58,7 +115,10 @@ Vue.directive('sortable', {
 
 export default {
     props: {
-        row: {
+        englishKeywords: {
+            type: Array,
+        },
+        chineseKeywords: {
             type: Array,
         },
         keyWordId: {
@@ -67,45 +127,80 @@ export default {
     },
     data() {
         return {
-            'keyWordRow': this.row,
+            'keywords': [
+                this.englishKeywords,
+                this.chineseKeywords,
+            ],
+            'enKeywords': this.englishKeywords,
+            'chKeywords': this.chineseKeywords,
             'id' : this.keyWordId
         }
     },
     methods:{
-        onUpdate: function (event) {
-            let now = this.keyWordRow[event.newIndex]
-            let old = this.keyWordRow[event.oldIndex]
+        onUpdateEnglish(event) {
+            let now = this.enKeywords[event.newIndex]
+            let old = this.enKeywords[event.oldIndex]
 
-            this.keyWordRow[event.newIndex] = old
-            this.keyWordRow[event.oldIndex] = now
+            this.enKeywords[event.newIndex] = old
+            this.enKeywords[event.oldIndex] = now
+        },
+        onUpdateChinese(event) {
+            let now = this.chKeywords[event.newIndex]
+            let old = this.chKeywords[event.oldIndex]
+
+            this.chKeywords[event.newIndex] = old
+            this.chKeywords[event.oldIndex] = now
         },
         addKeyWord(){
-            let length = this.keyWordRow.length
-            this.keyWordRow.splice(length+1, 0, '')
+            let length1 = this.enKeywords.length
+            let length2 = this.chKeywords.length
+
+            this.enKeywords.splice(length1+1, 0, '')
+            this.chKeywords.splice(length2+1, 0, '')
         },
-        deleteKeyWord(index){
-            this.keyWordRow.splice(index, 1)
+        deleteEnglishKeyWord(index){
+            this.enKeywords.splice(index, 1)
         },
-        upKeyWord(index){
-            let now = this.keyWordRow[index];
-            let before = this.keyWordRow[index-1];
+        deleteChineseKeyWord(index){
+            this.chKeywords.splice(index, 1)
+        },
+        upEnglishKeyWord(index){
+            let now = this.enKeywords[index];
+            let before = this.enKeywords[index-1];
             if(now != undefined && before != undefined){
-                this.keyWordRow.splice(index-1, 0, now)
-                this.keyWordRow.splice(index+1, 1)
+                this.enKeywords.splice(index-1, 0, now)
+                this.enKeywords.splice(index+1, 1)
             }
         },
-        downKeyWord(index){
-            let now = this.keyWordRow[index];
-            let after = this.keyWordRow[index+1];
+        upChineseKeyWord(index){
+            let now = this.chKeywords[index];
+            let before = this.chKeywords[index-1];
+            if(now != undefined && before != undefined){
+                this.chKeywords.splice(index-1, 0, now)
+                this.chKeywords.splice(index+1, 1)
+            }
+        },
+        downEnglishKeyWord(index){
+            let now = this.enKeywords[index];
+            let after = this.enKeywords[index+1];
             if(now != undefined && after != undefined){
-                this.keyWordRow.splice(index, 0, after)
-                this.keyWordRow.splice(index+2, 1)
+                this.enKeywords.splice(index, 0, after)
+                this.enKeywords.splice(index+2, 1)
+            }
+        },
+        downChineseKeyWord(index){
+            let now = this.chKeywords[index];
+            let after = this.chKeywords[index+1];
+            if(now != undefined && after != undefined){
+                this.chKeywords.splice(index, 0, after)
+                this.chKeywords.splice(index+2, 1)
             }
         },
         saveKeyword(){
             const params = {
 				id: this.id,
-                keyword: this.getKeyWord()
+                english_keyword: this.getEnglishKeyWord(),
+                chinese_keyword: this.getChineseKeyWord()
 			}
             axios.post('/saveKeyWord', params).then((response) => {
 				if (response.data.status === "success") {
@@ -129,13 +224,13 @@ export default {
 			})
 
         },
-        getKeyWord(){
+        getEnglishKeyWord(){
             let keyword = '';
-            let ketElement = document.getElementsByName('keys[]');
+            let ketElement = document.getElementsByName('enkeys[]');
             ketElement.forEach((e, index) => {
                 if(e.value == ''){
                     swal({
-                        title: '第' + index + '筆資料不能為空',
+                        title: '英文關鍵字第' + index + '筆資料不能為空',
                         confirmButtonColor: "#e6b930",
                         icon: 'error',
                         showCloseButton: true,
@@ -152,10 +247,36 @@ export default {
 
             return keyword
         },
-        changeKeyWord(index){
-            let ketElement = document.getElementsByName('keys[]');
-            this.keyWordRow[index] = ketElement[index].value
+        getChineseKeyWord(){
+            let keyword = '';
+            let ketElement = document.getElementsByName('chkeys[]');
+            ketElement.forEach((e, index) => {
+                if(e.value == ''){
+                    swal({
+                        title: '中文關鍵字第' + index + '筆資料不能為空',
+                        confirmButtonColor: "#e6b930",
+                        icon: 'error',
+                        showCloseButton: true,
+                    })
+                    keyword = ''
+                }else{
+                    keyword = keyword + e.value + ','
+                }
+            })
 
+            if(keyword != ''){
+               keyword = keyword.substring(0,keyword.length-1)
+            }
+
+            return keyword
+        },
+        changeEnglishKeyWord(index){
+            let ketElement = document.getElementsByName('enkeys[]');
+            this.enKeywords[index] = ketElement[index].value
+        },
+        changeChineseKeyWord(index){
+            let ketElement = document.getElementsByName('chkeys[]');
+            this.chKeywords[index] = ketElement[index].value
         }
     },
     watch:{
@@ -163,8 +284,12 @@ export default {
             this.id = val
             return val
         },
-        row(val){
-            this.keyWordRow = val
+        englishKeywords(val){
+            this.enKeywords = val
+            return val
+        },
+        chineseKeywords(val){
+            this.chKeywords = val
             return val
         },
     }

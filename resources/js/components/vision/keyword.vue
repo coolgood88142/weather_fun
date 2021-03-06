@@ -3,10 +3,9 @@
         <data-table 
             :data="data"
             :columns="columns">
-            
         </data-table>
         <edit
-            :row="selectedRow" :key-word-id="id">
+            :english-keywords="englishKeywords" :chinese-keywords="chineseKeywords" :key-word-id="id">
         </edit>
     </div>
     <!-- <edit></edit> -->
@@ -50,14 +49,22 @@ export default {
                     component: imageCell,
                 },
                 {
-                    label: 'keyword',
-                    name: 'keyword',
+                    label: '英文關鍵字',
+                    name: 'englishKeyword',
                     orderable: true,
+                    width: 30,
+                },
+                {
+                    label: '中文關鍵字',
+                    name: 'chineseKeyword',
+                    orderable: true,
+                    width: 30,
                 },
                 {
                     label: '操作',
                     name: '',
                     orderable: false,
+                    width: 10,
                     component: editButton,
                     event: "click",
                     handler: this.updateSelectedModal,
@@ -71,12 +78,14 @@ export default {
                         'btn-primary': true,
                         'btn-sm': true,
                     },
+                    width: 10,
                     component: deleteButton,
                     event: "click",
                     handler: this.deleteKeyWord,
                 }, 
             ],
-            selectedRow: [],
+            englishKeywords: [],
+            chineseKeywords: [],
             id: null,
         }
     },
@@ -100,7 +109,8 @@ export default {
             this.getData(this.url, tableProps);
         },
         updateSelectedModal(data) {
-            this.selectedRow = data['keyword'].split(","); 
+            this.englishKeywords = data['englishKeyword'].split(","); 
+            this.chineseKeywords = data['chineseKeyword'].split(","); 
             this.id = data["editId"];
         },
         deleteKeyWord(data){

@@ -16,7 +16,8 @@ class CreateVisionTable extends Migration
         Schema::create('vision', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('image', 500);
-            $table->string('keyword', 1000);
+            $table->string('english_keyword', 1000);
+            $table->string('chinese_keyword', 1000);
             $table->timestamp('created_at')->nullable();
         });
     }

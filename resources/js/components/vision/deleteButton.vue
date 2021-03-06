@@ -2,7 +2,7 @@
     <button
         type="button"
         @click="click(data)"
-        class="btn btn-primary btn-sm">
+        class="btn btn-danger">
         刪除
     </button>
 </template>
