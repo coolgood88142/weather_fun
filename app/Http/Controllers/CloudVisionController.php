@@ -114,6 +114,7 @@ class CloudVisionController extends Controller
         $imageContext->setLanguageHints(['zh-Hant']);
         $dataArray = [];
         $englishKeyword = '';
+        $chineseKeyword = '';
         $googleStroageIamge = 'https://storage.googleapis.com/' . $bucket->name() . '/' .$imageName;
         try {
             $file = @file_get_contents($googleStroageIamge);
@@ -137,13 +138,11 @@ class CloudVisionController extends Controller
                 }
                 if($englishKeyword != ''){
                     $translate =  $this->getTranslateClient($englishKeyword, 'zh-Hant');
-                    $englishKeyword = str_replace('，', ',', $translate['text']);
                     $englishKeyword = substr($englishKeyword,0,-1);
+                    $chineseKeyword = str_replace('，', ',', $translate['text']);
                 }
             }
 
-            
-            $chineseKeyword = '';
             $textDetection = $imageAnnotator->textDetection($file, [
                 'imageContext' => $imageContext
             ]);
