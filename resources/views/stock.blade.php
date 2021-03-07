@@ -55,7 +55,7 @@
                     </div>
                 </div>
                 <div class="row justify-content-center align-items-center">   
-                    <label class="col-md-3 col-lg-2 col-xl-2">起始時間:</label>
+                    <label class="col-md-3 col-lg-2 col-xl-2">起始時間：</label>
                     <div class="input-group date col-md-3 col-lg-2 col-xl-3" id="time1">
                         <input type="text" class="form-control" id="begintime" name="begintime" v-model="begintime" value="" >
                         <div class="input-group-addon input-group-append">
@@ -65,7 +65,7 @@
                         </div>
                     </div>
 
-                    <label class="col-md-3 col-lg-2 col-xl-2">截止時間:</label>
+                    <label class="col-md-3 col-lg-2 col-xl-2">截止時間：</label>
                         <div class="input-group date col-md-3 col-lg-2 col-xl-3" id="time2">
                             <input type="text" class="form-control" id="endtime" name="endtime" v-model="endtime" value="">
                             <div class="input-group-addon input-group-append">

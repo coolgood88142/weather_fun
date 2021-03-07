@@ -124,6 +124,7 @@ class StockController extends Controller
                                     'action'=>[
                                         'type'=>'postback',
                                         'label' => '線圖',
+                                        'text' => $name . '-線圖',
                                         'data' => 'text=線圖&symbolId='.$symbolId,
                                     ],
                                     'height'=>'sm'
@@ -133,6 +134,7 @@ class StockController extends Controller
                                     'action'=>[
                                         'type'=>'postback',
                                         'label' => '統計資訊',
+                                        'text' => $name . '-統計資訊',
                                         'data' => 'text=統計資訊&symbolId='.$symbolId,
                                     ],
                                     'height'=>'sm'
@@ -142,6 +144,7 @@ class StockController extends Controller
                                     'action'=>[
                                         'type'=>'postback',
                                         'label' => '當日資訊',
+                                        'text' => $name . '-當日資訊',
                                         'data' => 'text=當日資訊&symbolId='.$symbolId,
                                     ],
                                     'height'=>'sm'
@@ -151,6 +154,7 @@ class StockController extends Controller
                                     'action'=>[
                                         'type'=>'postback',
                                         'label' => '當日成交資訊',
+                                        'text' => $name . '-當日成交資訊',
                                         'data' => 'text=當日成交資訊&symbolId='.$symbolId,
                                     ],
                                     'height'=>'sm'

@@ -4,6 +4,29 @@
         :columns="columns"
         @on-table-props-changed="reloadTable"
     >
+    <div slot="pagination" slot-scope="{ links = {}, meta = {} }">
+        <nav class="row">
+            <div class="col-md-6 text-left">
+                <span>
+                    Showing {{meta.from}} to {{meta.to}} of {{ meta.total }} Entries
+                </span>
+            </div>
+            <div class="col-md-6 text-right">
+                <button
+                    :disabled="!links.prev"
+                    class="btn btn-primary"
+                    @click="url = links.prev">
+                    Prev
+                </button>
+                <button
+                    :disabled="!links.next"
+                    class="btn btn-primary ml-2"
+                    @click="url = links.next">
+                    Next
+                </button>
+            </div>      
+        </nav>
+    </div>
     </data-table>
 </template>
 

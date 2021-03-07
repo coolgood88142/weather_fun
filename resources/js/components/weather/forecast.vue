@@ -72,7 +72,9 @@ export default {
         }
     },
     created() {
-        this.getData(this.url);
+        if(this.url != ''){
+            this.getData(this.url)
+        }
     },
     methods:{
         getData(url = this.url, options = this.tableProps) {

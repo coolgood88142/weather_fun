@@ -69,3 +69,5 @@ Route::post('/deleteKeyWord', 'CloudVisionController@deleteKeyWordData')->name('
 Route::get('/delete', 'CloudVisionController@deleteKeyWordData');
 
 Route::get('/testError', 'StockController@getStockData');
+
+Route::get('/getPagination','KeywordController@getPagination')->name('getPagination');
