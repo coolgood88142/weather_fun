@@ -220,7 +220,7 @@ class StockController extends Controller
                     $messageBuilder =  new RawMessageBuilder(
                         [
                             'type' => 'flex',
-                            'altText' => $name . '線圖',
+                            'altText' => $name . '股票',
                             'contents' => [
                                 'type'=> 'bubble',
                                 'size'=> 'mega',
@@ -498,7 +498,7 @@ class StockController extends Controller
                     $messageBuilder =  new RawMessageBuilder(
                         [
                             'type' => 'flex',
-                            'altText' => $name . '線圖',
+                            'altText' => $name . '股票',
                             'contents' => [
                                 'type' => 'carousel',
                                 'contents' => [
@@ -593,7 +593,7 @@ class StockController extends Controller
                     $messageBuilder =  new RawMessageBuilder(
                         [
                             'type' => 'flex',
-                            'altText' => $name . '線圖',
+                            'altText' => $name . '股票',
                             'contents' => [
                                 'type'=> 'bubble',
                                     'body'=> [
@@ -669,7 +669,7 @@ class StockController extends Controller
                     $messageBuilder =  new RawMessageBuilder(
                         [
                             'type' => 'flex',
-                            'altText' => $name . '線圖',
+                            'altText' => $name . '股票',
                             'contents' => [
                                 'type'=> 'bubble',
                                     'body'=> [
