@@ -57,24 +57,13 @@
                 <div class="row justify-content-center align-items-center">   
                     <label class="col-md-3 col-lg-2 col-xl-2">起始時間：</label>
                     <div class="input-group date col-md-3 col-lg-2 col-xl-3" id="time1">
-                        <input type="text" class="form-control" id="begintime" name="begintime" v-model="begintime" value="" >
-                        <div class="input-group-addon input-group-append">
-                            <div class="input-group-text">
-                                <i class="glyphicon glyphicon-time fa fa-clock-o"></i>
-                            </div>
-                        </div>
+                        <datetime format="H:i" v-model='begintime' ></datetime>
                     </div>
 
                     <label class="col-md-3 col-lg-2 col-xl-2">截止時間：</label>
                         <div class="input-group date col-md-3 col-lg-2 col-xl-3" id="time2">
-                            <input type="text" class="form-control" id="endtime" name="endtime" v-model="endtime" value="">
-                            <div class="input-group-addon input-group-append">
-                                <div class="input-group-text">
-                                    <i class="glyphicon glyphicon-time fa fa-clock-o"></i>
-                                </div>
-                            </div>
+                            <datetime format="H:i" v-model='endtime' ></datetime>
                         </div>
-                        
                     <div id="query" class="col-min-btn col-md-3 col-lg-2" style="text-align:right;">
                         <input type="button" name="query_data" class="btn btn-primary" value="查詢" v-on:click="checkTime()">
                     </div>
@@ -102,23 +91,4 @@
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>
     <script type="text/javascript" src="https://monim67.github.io/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#time1').datetimepicker({
-                "allowInputToggle": true,
-                "showClose": true,
-                "showClear": true,
-                "showTodayButton": true,
-                "format": "HH:mm",
-            });
-
-            $('#time2').datetimepicker({
-                "allowInputToggle": true,
-                "showClose": true,
-                "showClear": true,
-                "showTodayButton": true,
-                "format": "HH:mm",
-            });
-        });
-    </script>    
 </html>

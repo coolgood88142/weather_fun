@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import imageCell from './imageCell';
+import image from './image';
 import edit from './edit';
 import editButton from './editButton';
 import deleteButton from './deleteButton';
@@ -26,7 +26,7 @@ export default {
 		},
     },
     components: {
-        imageCell,
+        image,
         edit,
         editButton,
         deleteButton,
@@ -46,7 +46,7 @@ export default {
                     label: '圖片',
                     name: 'image',
                     orderable: true,
-                    component: imageCell,
+                    component: image,
                 },
                 {
                     label: '英文關鍵字',

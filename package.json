@@ -33,7 +33,8 @@
         "vue-router": "^3.4.5",
         "vue-select": "^3.10.5",
         "vue-sortable": "^0.1.3",
-        "vue-template-compiler": "^2.6.12"
+        "vue-template-compiler": "^2.6.12",
+        "vuejs-datetimepicker": "^1.1.13"
     },
     "dependencies": {}
 }

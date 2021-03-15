@@ -56,38 +56,6 @@
                             </table>
                         </div>
                     </div>
-                    <!-- <table id="item_table" class="table"> -->
-                        <!-- <tr class="table-info" v-for="(en, index) in enKeywords" :key="en" >
-                            <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
-                                @click="upEnglishKeyWord(yyyindex)">
-                            <i class="bi-arrow-up-circle"></i>
-                            </button>
-                            <button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
-                                @click="downEnglishKeyWord(index)">
-                            <i class="bi-arrow-down-circle"></i>
-                            </button></th>
-                            <th><input type="text" name="enkeys[]" :value="en" v-on:input="changeEnglishKeyWord(index)"></th>
-                            <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
-                                @click="deleteEnglishKeyWord(index)">
-                            <i class="bi bi-trash"></i>
-                            </button></th>
-						</tr> -->
-                        <!-- <tr class="table-info" v-for="(ch, index) in chKeywords" :key="ch" v-sortable="{ onUpdateChinese: onUpdateChinese }">
-                            <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
-                                @click="upChineseKeyWord(index)">
-                            <i class="bi-arrow-up-circle"></i>
-                            </button>
-                            <button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
-                                @click="downChinesehKeyWord(index)">
-                            <i class="bi-arrow-down-circle"></i>
-                            </button></th>
-                            <th><input type="text" name="chkeys[]" :value="ch" v-on:input="changeChineseKeyWord(index)"></th>
-                            <th><button  class="navbar-toggler pull-left" type="button" data-toggle="collapse-side" data-target-sidebar=".side-collapse-left" data-target-content=".side-collapse-container-left" 
-                                @click="deleteChineseKeyWord(index)">
-                            <i class="bi bi-trash"></i>
-                            </button></th>
-						</tr> -->
-					<!-- </table> -->
                 </div>
                 <div class="modal-footer">
                     <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->

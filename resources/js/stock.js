@@ -2,6 +2,7 @@ import chart from "./components/stock/chart.vue"
 import dealts from "./components/stock/dealts.vue"
 import metas from "./components/stock/metas.vue"
 import quote from "./components/stock/quote.vue"
+import datetime from 'vuejs-datetimepicker';
 
 let app = new Vue({
 	el: "#app",
@@ -29,6 +30,7 @@ let app = new Vue({
         'dealts': dealts,
         'metas': metas,
         'quote': quote,
+        'datetime': datetime 
     },
     methods: {
         showMessage(isError, message){

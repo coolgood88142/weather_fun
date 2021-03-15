@@ -20,15 +20,15 @@ use \Firebase\JWT\JWT;
 class CloudVisionController extends Controller
 {   
     public function getVisionDefaultData(){
-        $key = '344'; //key
-		$time = time(); //当前时间
+        $key = '344'; 
+		$time = time(); 
        	$token = [
-        	'iss' => 'http://www.helloweba.net', //签发者 可选
-           	'aud' => 'http://www.helloweba.net', //接收该JWT的一方，可选
-           	'iat' => $time, //签发时间
-           	'nbf' => $time , //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
-           	'exp' => $time+7200, //过期时间,这里设置2个小时
-            'data' => [ //自定义信息，不要定义敏感信息
+        	'iss' => 'http://www.helloweba.net', 
+           	'aud' => 'http://www.helloweba.net', 
+           	'iat' => $time, 
+           	'nbf' => $time , 
+           	'exp' => $time+7200, 
+            'data' => [ 
              	'page' => 'vision',
             ]
         ];
@@ -82,14 +82,12 @@ class CloudVisionController extends Controller
     public function saveCloudVision(Request $request){
         //先做圖片調整大小後暫存
         $poImage = $request->po_image;
-        // $a = $poImage->size;
         $size = (int)(($poImage->getSize()) / 1024);
         $imageName = $poImage->getClientOriginalName();
         if($size > 1024){
             $message = $imageName . ' 檔案大小不可超過1M ';
             return $message;
         }
-        // dd($size);
         $file_name = uniqid().'.'.$poImage->getClientOriginalExtension();
         $file_path = public_path('images');
         if (!is_dir($file_path)){
