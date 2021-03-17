@@ -14,7 +14,8 @@ $url = [
     '/v1/rest/datastore/A-B0062-001',
     '/v1/rest/datastore/A-B0063-001',
     '/v1/rest/datastore/F-D0047-089',
-    '/v1/rest/datastore/O-A0058-001'
+    '/v1/rest/datastore/O-A0058-001',
+    '/v1/rest/datastore/F-A0021-001'
 ];
 
 return $url;

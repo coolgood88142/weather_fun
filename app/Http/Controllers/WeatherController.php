@@ -250,31 +250,16 @@ class WeatherController extends Controller
         $cityData = Config::get('city');
         $weathers = Config::get('weather');
         $automatic = Config::get('automatic');
+        $tidalCityData = Config::get('tidalCity');
 
         $dataArray = [
-            'forecast' => [
+            'tidal' => [
                 'city' => [],
-                'maxT' => [],
-                'minT' => [],
-                'pop' => [],
+                'status' => [],
+                'twvd' => [],
+                'local' => [],
+                'Relative' => [],
             ],
-            // 'observation' => [
-            //     'city' => [],
-            //     'wdir' => [],
-            //     'wdsd' => [],
-            //     'humd' => [],
-            //     'pres' => [],
-            // ],
-            // 'total' => [
-            //     'city' => [],
-            //     'ph' => [],
-            //     'uvi' => [],
-            //     'ozoneYear' => [],
-            //     'seismi' => [],
-            //     'smallSeiSmi' => [],
-            //     'sunrise' => [],
-            //     'moonrise' => []
-            // ],
         ];
 
         $startTime = 6;
@@ -289,74 +274,21 @@ class WeatherController extends Controller
             $type = 1;
         }
 
-        foreach($cityData as $city){
-            $weatherArray = [];
-            $acidRainPh = 0;
-            $locationName = urlencode($city);
-            $temperature = '';
-            $probabilityOfPrecipitation = '';
-
-            $weatherForecastData = $this->getCrawlerData($client, $weathers[0], $locationName);
-            if(isset($weatherForecastData->location[0])){
-                $maxt = $weatherForecastData->location[0]->weatherElement[4]->time[$type]->parameter->parameterName;
-                $mint = $weatherForecastData->location[0]->weatherElement[2]->time[$type]->parameter->parameterName;
-                $pop = $weatherForecastData->location[0]->weatherElement[1]->time[$type]->parameter->parameterName;
-
-                array_push($dataArray['forecast']['city'], $city);
-                array_push($dataArray['forecast']['maxT'], (int)$maxt);
-                array_push($dataArray['forecast']['minT'], (int)$mint);
-                array_push($dataArray['forecast']['pop'], (int)$pop);
-            }
-
-            // $automaticWeatherData = $this->getCrawlerData($client, $weathers[2], urlencode($automatic[$city][0]));
-            // if(isset($automaticWeatherData->location[0])){
-            //     $wdir = $automaticWeatherData->location[0]->weatherElement[1]->elementValue;
-            //     $wdsd = $automaticWeatherData->location[0]->weatherElement[2]->elementValue;
-            //     $humd = $automaticWeatherData->location[0]->weatherElement[4]->elementValue;
-            //     $pres = $automaticWeatherData->location[0]->weatherElement[5]->elementValue;
-
-            //     array_push($dataArray['observation']['city'], $city);
-            //     array_push($dataArray['observation']['wdir'], (int)$wdir);
-            //     array_push($dataArray['observation']['wdsd'], (float)$wdsd);
-            //     array_push($dataArray['observation']['humd'], (int)($humd * 100));
-            //     array_push($dataArray['observation']['pres'], (float)$pres);
-            // }
+        foreach($tidalCityData as $data){
+            $tidaltData = $this->getCrawlerData($client, $weathers[15], $data);
+            if(isset($tidaltData->location[0])){
+                $status = $tidaltData->location[0]->validTime[0]->weatherElement[3]->time[0]->parameter[0]->parameterValue;
+                $twvd = $tidaltData->location[0]->validTime[0]->weatherElement[3]->time[0]->parameter[1]->parameterValue;
+                $local = $tidaltData->location[0]->validTime[0]->weatherElement[3]->time[0]->parameter[2]->parameterValue;
+                $relative = $tidaltData->location[0]->validTime[0]->weatherElement[3]->time[0]->parameter[3]->parameterValue;
             
-
-            // $acidRainPh = 0;
-            // $acidRainData = $this->getCrawlerData($client, $weathers[5], $locationName);
-            // $rainPh = $acidRainData->weatherElement[0]->location;
-            // if(count($rainPh) > 0){
-            //     $acidRainPh = $rainPh.value;
-            // }
-            // array_push($dataArray['total']['ph'], (int)$acidRainPh);
-
-            // $ultravioletRaysData = $this->getCrawlerData($client, $weathers[6], $locationName);
-            // $ultravioletIndex = (String)$ultravioletRaysData->weatherElement->location[0]->value;
-            // array_push($dataArray['total']['uvi'], (float)$ultravioletIndex);
-
-            // $ozoneYearAvgData = $this->getCrawlerData($client, $weathers[7], $locationName);
-            // $ozoneYearAvg = $ozoneYearAvgData->location->weatherElement[0]->time[29]->elementValue;
-            // array_push($dataArray['total']['ozoneYear'], (int)$ozoneYearAvg);
-
-            // $seismicityData = $this->getCrawlerData($client, $weathers[8], $locationName);
-            // $seismicity = $seismicityData->earthquake[0]->reportContent;
-            // array_push($dataArray['total']['seismi'], $seismicity);
-
-            // $smallAreaSeismicityData = $this->getCrawlerData($client, $weathers[9], $locationName);
-            // $smallAreaSeismicity = $smallAreaSeismicityData->earthquake[0]->reportContent;
-            // array_push($dataArray['total']['smallSeiSmi'], $smallAreaSeismicity);
-
-            // $sunriseData = $this->getCrawlerData($client, $weathers[11], $locationName);
-            // $sunrise = $sunriseData->note;
-            // array_push($dataArray['total']['sunrise'], $sunrise);
-
-            // $moonriseData = $this->getCrawlerData($client, $weathers[12], $locationName);
-            // $moonrise = $moonriseData->note;
-            // array_push($dataArray['total']['moonrise'], $moonrise);
-            // array_push($dataArray['total']['city'], $city);
+                array_push($dataArray['tidal']['city'], $data);
+                array_push($dataArray['tidal']['status'], $status);
+                array_push($dataArray['tidal']['twvd'], $twvd);
+                array_push($dataArray['tidal']['local'], $local);
+                array_push($dataArray['tidal']['relative'], $relative);
+            }
         }
-        
 
         return view('weatherChart', $dataArray);
     }

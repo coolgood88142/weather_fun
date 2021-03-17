@@ -46,10 +46,6 @@ let app = new Vue({
             })
         },
         changeChart(now){
-            const begintime = document.getElementById("begintime").value
-            const endtime = document.getElementById("endtime").value
-            this.begintime = begintime
-            this.endtime = endtime
             this.nowChart = now
 
             if(now == 1){
@@ -64,11 +60,11 @@ let app = new Vue({
                     this.chartUrl = ''
                 }else if(this.symbolId != ''){
                     this.chartUrl = this.url + '/chart/' + this.symbolId;
-                    if(begintime != '' && endtime != ''){
+                    if(this.begintime != '' && this.endtime != ''){
                         this.chartUrl = this.chartUrl + '?begintime=' + begintime + '&endtime=' + endtime;
-                    }else if(begintime != ''){
+                    }else if(this.begintime != ''){
                         this.chartUrl = this.chartUrl + '?begintime=' + begintime;
-                    }else if(endtime != ''){
+                    }else if(this.endtime != ''){
                         this.chartUrl = this.chartUrl + '?endtime=' + endtime
                     }
                 }
@@ -119,9 +115,6 @@ let app = new Vue({
         },
         checkTime(){
             let isSuccess = true;
-            this.begintime = document.getElementById("begintime").value;
-            this.endtime = document.getElementById("endtime").value;
-
             if(this.begintime  != "" && this.endtime  != ""){
                 if(this.begintime  > this.endtime){
                     this.showMessage(true, "截止時間不能大於起始時間!");
