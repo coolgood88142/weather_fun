@@ -72,6 +72,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(12)">月出日沒時刻</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:void(0)" v-on:click="changeChart(13)">潮汐預報</a>
+                </li>
             </ul>
             <form id="fugle_form" name="fugle_form" class="sidebar-form" style="margin-top:10px;">
                 <h2 id="title" class="text-center text-black font-weight-bold" style="margin-bottom:20px;">氣象圖表</h2>
@@ -88,6 +91,7 @@
                 <alarm v-show="showAlarm" :alarm-url="alarmUrl"></alarm>
                 <sunrise v-show="showSunrise" :sunrise-url="sunriseUrl"></sunrise>
                 <moonrise v-show="showMoonrise" :moonrise-url="moonriseUrl"></moonrise>
+                <tidal v-show="showTidal" :tidal-url="tidalUrl"></tidal>
             </form>
             
         </div>

@@ -258,7 +258,7 @@ class WeatherController extends Controller
                 'status' => [],
                 'twvd' => [],
                 'local' => [],
-                'Relative' => [],
+                'relative' => [],
             ],
         ];
 
@@ -275,13 +275,14 @@ class WeatherController extends Controller
         }
 
         foreach($tidalCityData as $data){
-            $tidaltData = $this->getCrawlerData($client, $weathers[15], $data);
+            $city = urlencode($data);
+            $tidaltData = $this->getCrawlerData($client, $weathers[15], $city);
             if(isset($tidaltData->location[0])){
-                $status = $tidaltData->location[0]->validTime[0]->weatherElement[3]->time[0]->parameter[0]->parameterValue;
-                $twvd = $tidaltData->location[0]->validTime[0]->weatherElement[3]->time[0]->parameter[1]->parameterValue;
-                $local = $tidaltData->location[0]->validTime[0]->weatherElement[3]->time[0]->parameter[2]->parameterValue;
-                $relative = $tidaltData->location[0]->validTime[0]->weatherElement[3]->time[0]->parameter[3]->parameterValue;
-            
+                $status = $tidaltData->location[0]->validTime[0]->weatherElement[2]->time[0]->parameter[0]->parameterValue;
+                $twvd = $tidaltData->location[0]->validTime[0]->weatherElement[2]->time[0]->parameter[1]->parameterValue;
+                $local = $tidaltData->location[0]->validTime[0]->weatherElement[2]->time[0]->parameter[2]->parameterValue;
+                $relative = $tidaltData->location[0]->validTime[0]->weatherElement[2]->time[0]->parameter[3]->parameterValue;
+
                 array_push($dataArray['tidal']['city'], $data);
                 array_push($dataArray['tidal']['status'], $status);
                 array_push($dataArray['tidal']['twvd'], $twvd);
@@ -511,7 +512,43 @@ class WeatherController extends Controller
 
             $no++;
         }
-        // dd($dataArray);
+        
+        if($apiNum == 13){
+            $no = 1;
+            $tidalCityData = Config::get('tidalCity');
+            foreach($tidalCityData as $data){
+                $array['no'] = $no;
+                $array['city'] = $data;
+                $city = urlencode($data);
+                $tidaltData = $this->getCrawlerData($client, $weathers[15], $city);
+                if(isset($tidaltData->location[0])){
+                    $tidal = $tidaltData->location[0]->validTime[0]->weatherElement[2]->time[0]->parameter[0]->parameterValue;
+                    $twvd = $tidaltData->location[0]->validTime[0]->weatherElement[2]->time[0]->parameter[1]->parameterValue;
+                    $local = $tidaltData->location[0]->validTime[0]->weatherElement[2]->time[0]->parameter[2]->parameterValue;
+                    $relative = $tidaltData->location[0]->validTime[0]->weatherElement[2]->time[0]->parameter[3]->parameterValue;
+    
+                    if($twvd == '' || $twvd < 0){
+                        $twvd = 0;
+                    }
+
+                    if($local == '' || $local < 0){
+                        $local = 0;
+                    }
+
+                    if($relative == '' || $relative < 0){
+                        $relative = 0;
+                    }
+
+                    $array['tidal'] = $tidal;
+                    $array['twvd'] = (int)$twvd;
+                    $array['local'] = (int)$local;
+                    $array['relative'] = (int)$relative;
+                    array_push($dataArray, (object)$array);
+                }
+
+                $no++;
+            }
+        }
 
         $collection = collect($dataArray);
 

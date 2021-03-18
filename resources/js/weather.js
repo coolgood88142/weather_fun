@@ -11,6 +11,7 @@ import smallSeiSmi from "./components/weather/smallSeiSmi.vue"
 import alarm from "./components/weather/alarm.vue"
 import sunrise from "./components/weather/sunrise.vue"
 import moonrise from "./components/weather/moonrise.vue"
+import tidal from "./components/weather/tidal.vue"
 
 let app = new Vue({
 	el: "#app",
@@ -28,6 +29,7 @@ let app = new Vue({
         showAlarm: false,
         showSunrise: false,
         showMoonrise: false,
+        showTidal: false,
         forecastUrl: '',
         weekForecastUrl: '',
         weatherObservationUrl: '',
@@ -41,6 +43,7 @@ let app = new Vue({
         alarmUrl: '',
         sunriseUrl: '',
         moonriseUrl: '',
+        tidalUrl: '',
         url: './getWeather/',
         chartLength: 13,
         symbolId: '',
@@ -61,6 +64,7 @@ let app = new Vue({
         'alarm': alarm,
         'sunrise': sunrise,
         'moonrise': moonrise,
+        'tidal': tidal,
     },
     created() {
         this.changeChart(this.nowChart);
@@ -80,6 +84,7 @@ let app = new Vue({
             this.showAlarm= false
             this.showSunrise= false
             this.showMoonrise= false
+            this.showTidal = false
         },
         changeChart(now){
             this.nowChart = now
@@ -124,6 +129,9 @@ let app = new Vue({
             }else if(now == 12){
                 this.showMoonrise= true
                 this.moonriseUrl = this.url + this.nowChart
+            }else if(now == 13){
+                this.showTidal= true
+                this.tidalUrl = this.url + this.nowChart
             }
         }
     }

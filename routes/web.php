@@ -71,3 +71,5 @@ Route::get('/delete', 'CloudVisionController@deleteKeyWordData');
 Route::get('/testError', 'StockController@getStockData');
 
 Route::get('/getPagination','KeywordController@getPagination')->name('getPagination');
+
+Route::get('/getWeatherApi','WeatherController@getWeatherApiData');
