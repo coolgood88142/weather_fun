@@ -176,49 +176,33 @@ export default {
                     crosshair: true
                 }],
                 yAxis: [{ // Secondary yAxis
-                    gridLineWidth: 0,
                     title: {
                         text: '相對溼度',
                         style: {
-                            color: '#CCEEFF'
+                            color: '#0080FF'
                         }
                     },
                     labels: {
                         format: '{value} %',
                         style: {
-                            color: '#CCEEFF'
+                            color: '#0080FF'
                         }
                     },
-
+                    opposite: true
                 }, { // Primary yAxis
+                    gridLineWidth: 0,
                     title: {
-                        text: '最高溫度',
+                        text: '溫度',
                         style: {
-                            color: '#fd8307'
+                            color: '#000000'
                         }
                     },
                     labels: {
                         format: '{value} °',
                         style: {
-                            color: '#fd8307'
+                            color: '#000000'
                         }
                     },
-                    opposite: true
-                },
-                { // Tertiary yAxis
-                    title: {
-                        text: '最低溫度',
-                        style: {
-                            color: Highcharts.getOptions().colors[0]
-                        }
-                    },
-                    labels: {
-                        format: '{value} °',
-                        style: {
-                            color: Highcharts.getOptions().colors[0]
-                        }
-                    },
-                    opposite: true
                 }],
                 tooltip: {
                     shared: true
@@ -236,18 +220,18 @@ export default {
                 },
                 series: [{
                     name: '相對溼度',
-                    type: 'column',
+                    type: 'spline',
                     yAxis: 0,
                     data: data.rh,
                     dashStyle: 'shortdot',
                     tooltip: {
                         valueSuffix: ' %'
                     },
-                    color: '#CCEEFF',
+                    color: '#0080FF',
 
                 }, {
                     name: '最高溫度',
-                    type: 'spline',
+                    type: 'column',
                     yAxis: 1,
                     data: data.maxt,
                     tooltip: {
@@ -257,8 +241,8 @@ export default {
 
                 },{
                     name: '最低溫度',
-                    type: 'spline',
-                    yAxis: 2,
+                    type: 'column',
+                    yAxis: 1,
                     data: data.mini,
                     tooltip: {
                         valueSuffix: ' °'

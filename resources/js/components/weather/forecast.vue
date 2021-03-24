@@ -143,30 +143,15 @@ export default {
                 }, { // Primary yAxis
                     gridLineWidth: 0,
                     title: {
-                        text: '最高溫度',
+                        text: '溫度',
                         style: {
-                            color: '#fd8307'
+                            color: '#000000'
                         }
                     },
                     labels: {
                         format: '{value} °',
                         style: {
-                            color: '#fd8307'
-                        }
-                    },
-                },
-                { // Tertiary yAxis
-                    gridLineWidth: 0,
-                    title: {
-                        text: '最低溫度',
-                        style: {
-                            color: Highcharts.getOptions().colors[0]
-                        }
-                    },
-                    labels: {
-                        format: '{value} °',
-                        style: {
-                            color: Highcharts.getOptions().colors[0]
+                            color: '#000000'
                         }
                     },
                 }],
@@ -209,7 +194,7 @@ export default {
                 },{
                     name: '最低溫度',
                     type: 'column',
-                    yAxis: 2,
+                    yAxis: 1,
                     data: data.mint,
                     dashStyle: 'shortdot',
                     tooltip: {

@@ -123,48 +123,19 @@ export default {
                     categories: data.city,
                     crosshair: true
                 }],
-                yAxis: [{ // Secondary yAxis
-                    title: {
-                        text: '潮高(相對海圖)',
-                        style: {
-                            color: '#AAAAAA'
-                        }
-                    },
-                    labels: {
-                        format: '{value} ',
-                        style: {
-                            color: '#AAAAAA'
-                        }
-                    },
-                    opposite: true
-
-                }, { // Primary yAxis
-                    gridLineWidth: 0,
-                    title: {
-                        text: '潮高(高程基準)',
-                        style: {
-                            color: '#fd8307'
-                        }
-                    },
-                    labels: {
-                        format: '{value} ',
-                        style: {
-                            color: '#fd8307'
-                        }
-                    },
-                },
+                yAxis: [
                 { // Tertiary yAxis
                     gridLineWidth: 0,
                     title: {
                         text: '潮高(當地)',
                         style: {
-                            color: Highcharts.getOptions().colors[0]
+                            color: '#FF0000'
                         }
                     },
                     labels: {
                         format: '{value} ',
                         style: {
-                            color: Highcharts.getOptions().colors[0]
+                            color: '#FF0000'
                         }
                     },
                 }],
@@ -184,36 +155,36 @@ export default {
                 },
                 series: [{
                     name: '潮高(高程基準)',
-                    type: 'spline',
+                    type: 'column',
                     yAxis: 0,
                     data: data.twvd,
                     dashStyle: 'shortdot',
                     tooltip: {
                         valueSuffix: ' '
                     },
-                    color: '#AAAAAA',
+                    color: '#000000',
 
                 }, {
                     name: '潮高(當地)',
                     type: 'column',
-                    yAxis: 1,
+                    yAxis: 0,
                     data: data.local,
                     dashStyle: 'shortdot',
                     tooltip: {
                         valueSuffix: ' '
                     },
-                    color: '#fd8307',
+                    color: '#FF0000',
 
                 },{
                     name: '潮高(相對海圖)',
                     type: 'column',
-                    yAxis: 2,
+                    yAxis: 0,
                     data: data.relative,
                     dashStyle: 'shortdot',
                     tooltip: {
                         valueSuffix: ' '
                     },
-                    color: Highcharts.getOptions().colors[0]
+                    color: '#0000C6'
 
                 }],
                 responsive: {
