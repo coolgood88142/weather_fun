@@ -129,13 +129,13 @@ export default {
                     title: {
                         text: '降雨機率',
                         style: {
-                            color: '#AAAAAA'
+                            color: '#0000FF'
                         }
                     },
                     labels: {
                         format: '{value} %',
                         style: {
-                            color: '#AAAAAA'
+                            color: '#0000FF'
                         }
                     },
                     opposite: true
@@ -170,17 +170,6 @@ export default {
                         'rgba(255,255,255,0.25)'
                 },
                 series: [{
-                    name: '降雨機率',
-                    type: 'spline',
-                    yAxis: 0,
-                    data: data.pop,
-                    dashStyle: 'shortdot',
-                    tooltip: {
-                        valueSuffix: ' %'
-                    },
-                    color: '#AAAAAA',
-
-                }, {
                     name: '最高溫度',
                     type: 'column',
                     yAxis: 1,
@@ -202,7 +191,19 @@ export default {
                     },
                     color: Highcharts.getOptions().colors[0]
 
-                }],
+                },
+                {
+                    name: '降雨機率',
+                    type: 'spline',
+                    yAxis: 0,
+                    data: data.pop,
+                    dashStyle: 'shortdot',
+                    tooltip: {
+                        valueSuffix: ' %'
+                    },
+                    color: '#0000FF',
+
+                }, ],
                 responsive: {
                     rules: [{
                         condition: {
