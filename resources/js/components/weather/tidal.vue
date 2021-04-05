@@ -129,13 +129,13 @@ export default {
                     title: {
                         text: '潮高(當地)',
                         style: {
-                            color: '#FF0000'
+                            color: '#0080FF'
                         }
                     },
                     labels: {
                         format: '{value} ',
                         style: {
-                            color: '#FF0000'
+                            color: '#0080FF'
                         }
                     },
                 }],
@@ -162,7 +162,7 @@ export default {
                     tooltip: {
                         valueSuffix: ' '
                     },
-                    color: '#000000',
+                    color: '#003D79',
 
                 }, {
                     name: '潮高(當地)',
@@ -173,7 +173,7 @@ export default {
                     tooltip: {
                         valueSuffix: ' '
                     },
-                    color: '#FF0000',
+                    color: '#0080FF',
 
                 },{
                     name: '潮高(相對海圖)',
@@ -184,7 +184,7 @@ export default {
                     tooltip: {
                         valueSuffix: ' '
                     },
-                    color: '#0000C6'
+                    color: '#46A3FF'
 
                 }],
                 responsive: {
